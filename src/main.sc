@@ -1,23 +1,3669 @@
 require: slotfilling/slotFilling.sc
   module = sys.zb-common
-theme: /
+require: dateTime/dateTime.sc
+  module = sys.zb-common
+# Оперделение отдела, который примет звонок, в заввисимости от времени и дня
+require: ./scripts/getPhoneByDateTime.js 
 
+# скрипты для работы с ответом по движениям ДС
+require: ./scripts/moneyTransfer.js 
+
+# require: ./scripts/setTimeout.js
+
+require: ./scripts/DialogError.js
+
+require: ./scripts/ScriptError.js
+
+require: ./scripts/additionalNumbers.js
+
+require: ./scripts/regionalOfficeCall.js
+
+require: ./scripts/callProcessing.js
+
+theme: /
+    
     state: Start
         q!: $regex</start>
-        a: Начнём.
-
+        a: Добрый день! Вас приветствует голосовой помощник фина'м! Какой у вас вопрос?
+        script:
+            $dialer.setNoInputTimeout(15000);
+        
     state: Hello
-        intent!: /привет
-        a: Привет привет
+        q!: @hello
+        a: Здравствуйте! Уточните, пожалуйста, ваш вопрос.
+        script:
+            $dialer.setNoInputTimeout(15000);
+        
+    state: Другой_вопрос
+        q!: * @another_question
+        random:
+            a: Пожалуйста, опишите коротко суть вопроса.
+            a: Позвольте мне вам помочь. Какой у вас вопрос?
+        script:
+            $dialer.setNoInputTimeout(15000);    
+        
+    state: Я робот
+        q!: * @robot *    
+        a: Я голосовой помощник компании Фина'м. Какой у вас вопрос?
+        script:
+            $dialer.setNoInputTimeout(15000);
+        
+    state: Открытие_закрытие_счета
+        intent!: /016 Открытие_закрытие_счета
+        script:
+            if ( typeof $parseTree._open_close != "undefined" ){
+                $session.open_close = $parseTree._open_close;
+            }
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }            
+            if ( typeof $session.open_close == "undefined" ){
+                $reactions.transition("/Открытие_закрытие_счета/Уточнение открыть_закрыть");
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Открытие_закрытие_счета/Уточнение компании");
+            } else {
+                $session.operatorPhoneNumber = $session.company.phoneNumber;
+                $reactions.transition("/Открытие_закрытие_счета/" + $session.open_close.name + "_" + $session.company.name);
+            }
+        # go!: ./{{ $parseTree._open_close.name }}_{{ $parseTree._company.name }}
+        
+        state: Уточнение открыть_закрыть
+            a: Уточните, пожалуйста, вы хотели бы открыть или закрыть счет?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            
+            state: Ожидание ответа
+                q: * @open_close *
+                script:
+                    $session.open_close = $parseTree._open_close;
+                    $reactions.transition("/Открытие_закрытие_счета")
+                
+        state: Уточнение компании
+            a: Операции со счетом в какой компании вас интересуют? Брокер Фина'м, Банк, Управляющая компания или Фина'м форекс.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Открытие_закрытие_счета")
+        
+        state: open_Банк
+            a: Открыть банковский счет, депозит, или карту в банке фина'м, можно в офисе компании. Или дистанционно, если ранее, вы открывали, брокерский счет, лично, в офисе компании. Дистанционно подать заявку на открытие счета, можно в личном кабинете на сайте фина'м точка ру, кнопка открыть новый счет, находится под списком ваших открытых счетов. Далее выберите раздел, банковские продукты, далее выберите, карты, или тип счета. Обращаем ваше внимание, если вы не открывали ранее брокерский счет, или открывали его дистанционно, то открыть банковский счет, или карту, можно только при личном визите в офис компании фина'м. Хотите получить консультацию у оператора по открытию банковского счёта?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
 
-    state: Bye
-        intent!: /пока
-        a: Пока пока
+        state: open_Брокер
+            a: Открыть брокерский счет в компании фина'м, можно дистанционно, или в офисе компании. Дистанционно подать заявку на открытие счета, можно на сайте, фина'м точка ру. Желтая кнопка, открыть счет, находится в верхнем правом углу страницы. Для заполнения анкеты понадобится мобильный телефон, и гражданский паспорт. Открыть дополнительный счет можно дистанционно в личном кабинете. Количество действующих стандартных брокерских счетов неограниченно, НО счет ИИС у физического лица может быть только один.
+            a: Брокерские счета полностью независимы, по ним могут быть разные тарифы и торговые системы. Новый счет будет доступен для торговли через несколько часов, после подписания документов об открытии. Обращаем ваше внимание: открыть дистанционно, первичный счет, могут только совершеннолетние физические лица, граждане эРэФ и дружественных государств. Лицам до 18 лет, открытие счёта доступно только при личном посещении офиса, с родителем или опекуном.
+            a: Хотите получить консультацию у оператора по открытию брокерского счёта?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+            
+        state: open_УК
+            a: Открыть счет доверительного управления в управляющей компании Фина'м, можно дистанционно в личном кабинете брокера, на сайте фина'м точка ру.
+            a: Кнопка открыть новый счёт, находится слева под списком ваших открытых счетов. Далее выберите раздел Доверительное управление, и следуйте инструкциям сайта.
+            a: Хотите получить консультацию у оператора по выбору стратегии управления активами и открытию счёта?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
 
+        state: open_Форекс
+            a: Открытие счёта фина'м Форекс доступно совершеннолетним гражданам Российской федерации.
+            a: Открыть форекс счет в компании фина'м, можно дистанционно, или в офисе компании, адрес ближайшего офиса можно посмотреть на сайте Фина'м точка ру, в разделе контактная информация, внизу страницы.
+            a: Дистанционно подать заявку на открытие счета, можно на сайте форекс точка фина'м точка ру.
+            a: Если у вас есть брокерский счет в компании Фина'м, вы можете дистанционно открыть счет форекс в личном кабинете брокера, на сайте едо'кс точка Фина''м точка ру.
+            a: Для этого выберите, открыть новый счет, выберите тип компании форекс-диллер, далее следуйте инструкциям. Дополнительные счета «фина'м Форекс» можно открыть в личном кабинете Форекс на сайте форекс кабинет точка фина'м точка ру.
+            a: Хотите получить консультацию у оператора?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+
+        # state: open_undefined
+        #     go!: /NoMatch
+            
+        state: close_Банк
+            a: Закрыть банковский счет или карту можно в личном кабинете банка фина'м, на сайте айбанк точка фина'м точка ру.
+            a: Для этого выберите нужный счет, в поле справа выберите, закрыть счет. Обращаем ваше внимание, что закрытие счетов, открытых до две тысячи двадцать третьего года, может быть доступно только в офисе компании.
+            a: Хотите получить консультацию у оператора?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+        
+        state: close_Брокер
+            a: Закрыть брокерский счет можно дистанционно в личном кабинете едо'кс точка фина'м точка ру, для этого, в разделе, Услуги, выберите меню, Прочие операции.
+            a: Договор расторгается на 5-й рабочий день с момента подписания заявления.
+            a: Обращаем ваше внимание, что в рамках брокерского договора может быть несколько счетов. При расторжении все они будут закрыты.
+            a: Закрытие счетов доступно при отсутствии на них активов, открытых позиций и задолженностей.
+            a: Способ закрытия счёта ИИС зависит от желаемого типа налогового вычета. Хотите получить консультацию у оператора?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+        
+        state: close_УК
+            a: Закрыть счет доверительного управления в Управляющей компании можно дистанционно в личном кабинете едо'кс точка фина'м точка ру.
+            a: Для этого, в разделе, Услуги, выберите меню, Операции по договорам доверительного управления, расторжение договора.
+            a: Договор расторгается на 3-й рабочий день с момента подписания заявления, продажа активов с последующими расчетами, осуществляется в течение 10 дней с даты расторжения договора.
+            a: В случае, если у вас в договоре заранее была указана дата расторжения, не забудьте предоставить реквизиты для перечисления средств в личном кабинете на сайте едо'кс точка фина'м точка ру, в разделе, Информация.
+            a: Хотите получить консультацию у оператора?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+        
+        state: close_Форекс
+            a: Закрыть дополнительный счет форекс, можно дистанционно в личном кабинете на сайте форекс точка фина'м точка ру. 
+            a: Чтобы закрыть единственный счет форекс, обратитесь к менеджеру фина'м.
+            a: Хотите получить консультацию у оператора?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+        
+        # state: close_undefined
+        #     go!: /NoMatch
+    
+    
+    
+    state: Заказ_документов
+        intent!: /017 Заказ_документов
+        
+        script:
+            if ( typeof $parseTree._document != "undefined" ){
+                $session.document = $parseTree._document;
+            }            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.document == "undefined" ){
+                $reactions.transition("/Заказ_документов/Уточнение типа документа");
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Заказ_документов/Уточнение компании");
+            }
+             else {
+                $reactions.transition("/Заказ_документов/Заказ_" + $session.document.name + "_" + $session.company.name);
+            }
+
+        
+        state: Уточнение типа документа
+            a: Какой документ вас интересует?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @document *
+                script:
+                    $session.document = $parseTree._document;
+                    $reactions.transition("/Заказ_документов");
+    
+        
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Фина'м Брокер, Фина'м Банк, Фина'м Форекс или Управляющая компания Фина'м.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Заказ_документов");
+            
+        # заказ документов по Брокеру            
+        state: Заказ_справка_Брокер
+            a: Заказать справку по брокерскому счету, можно в личном кабинете на сайте, фина'м точка ру, для этого выберите меню отчёты, далее выберите раздел, налоги и справки.
+            a: Максимальный интервал получения справки по счету, 92 дня. При необходимости получить годовой отчет, справку можно сформировать 4 раза.
+            a: В разделе, брокерский отчет, два раза в месяц автоматически выгружается отчет брокера на подпись.
+            a: Также, историю операций по счету, можно посмотреть в личном кабинете, для этого выберите нужный счет, далее выберите вкладку, история.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: Заказ_счет_фактура_Брокер
+            script: 
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_выписка_депо_Брокер
+            a: Заказать выписки из депозитария, можно в личном кабинете на сайте, фина'м точка ру, для этого выберите меню отчёты, далее выберите раздел, налоги и справки, далее выберите раздел, депозитарий.
+            a: Заказ документов оплачивается по тарифам депозитария, Выписка по счету ДЕПО, или Выписка об операциях по счету ДЕПО, 200 рублей.
+            a: Изготовление, в течение трех рабочих дней. Заказ выписки из национального расчетного депозитария, 500 рублей, изготовление, в течение месяца.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"  
+        
+        state: Заказ_налог_справка_Брокер
+            a: Заказать справку о доходах 2НДФЛ, и справку об убытках, можно за отчетный период, то есть один календарный год, в личном кабинете на сайте, фина'м точка ру.
+            a: Для этого выберите меню, отчёты, далее выберите раздел, налоги и справки, далее выберите раздел, налоги. 
+            a: Электронный формат справки будет доступен в личном кабинете в течение трех рабочих дней. Изготовление справки на бумажном носителе в течение одной рабочей недели.
+            a: Вы хотите узнать подробнее о содержимом справки 2НДФЛ?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @agree ||toState = "/Заказ_документов/Заказ_налог_справка_Брокер/Подробнее_2НДФЛ"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+                
+            state: Подробнее_2НДФЛ
+                a: В справке 2НДФЛ, в разделе доход, содержится общая стоимость сделок продажи за отчетный период. В разделе Вычет, общая стоимость сделок покупки за отчетный период, а также комиссии, соответствующие коду дохода. 
+                a: В разделе НалогООблага'емая база, указана итоговая прибыль, которая рассчитывается как разница дохода и вычета.
+                a: Если в данной графе указано ноль, то за текущий отчетный период отсутствуют доходы и необходимо проверить справку об убытках.
+                a: Чем я могу еще помочь?
+                script: 
+                    $context.session = {};
+                    $dialer.setNoInputTimeout(15000);
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                q: @repeat_please * ||toState = "."
+    
+        state: Заказ_справка_актив_Брокер
+            a: Заказать справку об активах можно в личном кабинете на сайте, фина'м точка ру, для этого выберите меню, отчёты, далее выберите раздел, налоги и справки, далее выберите, 
+            a: Запрос на предоставление справки об активах. Изготовление справки занимает до двух рабочих дней.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Заказ_документы_откр_Брокер
+            a: Заказать документы об открытии брокерского счета, можно в личном кабинете на сайте, едо'кс точка фина'м точка ру, для этого выберите меню отчетность, далее выберите раздел, основные документы. 
+            a: Основными документами являются, Заявление о выборе условий обслуживания, Уведомление о заключении договора присоединения, Заявление о присоединении к регламенту, Уведомление для ИФНС.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Заказ_справка_госслуж_Брокер
+            a: Заказать справку для гос служащего по форме 57 98 уу, можно в личном кабинете на сайте, фина'м точка ру, для этого выберите меню, отчёты, далее выберите раздел, налоги и справки, справка для гос служащих.
+            a: Изготовление справки до пяти рабочих дней.
+            a: Вы хотите узнать подробнее о содержимом справки для госслужащих?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @agree ||toState = "/Заказ_документов/Заказ_справка_госслуж_Брокер/Подробнее_госслуж"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+                
+            state: Подробнее_госслуж
+                a: В первом разделе справки для гос служащего указаны сведения по банковским счетам, соответственно при получении данной справки от брокера, раздел не заполняется. 
+                a: Для получения сведений об остатках средств на брокерских счетах, можно заказать справку по счету в личном кабинете на сайте, фина'м точка ру, для этого выберите меню отчёты, далее выберите раздел, налоги и справки. 
+                a: Во втором разделе указана информация о поставленных ценных бумагах, а также, сведения о доходах, налогах, дивидендах и купонах. Важно. Производные финансовые инструменты, фьючерсы и опционы, не являются ценными бумагами. 
+                a: В третьем разделе указана информация об иных доходах, процентах на остаток, доходах от продажи валюты без учета расходов, доходах по драгоценным металлам и прочее. 
+                a: В четвертом разделе указана информация о займах, сделках РЕПО' и иных обязательствах клиента и брокера перед клиентом, если они превышали сумму 1000000 рублей.
+                a: Чем я могу еще помочь?
+                script: 
+                    $context.session = {};
+                    $dialer.setNoInputTimeout(15000);
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                q: @repeat_please * ||toState = "."
+        
+        state: Заказ_1042s_Брокер
+            a: Справку формы 10 42 ЭС, формируют национальный расчетный депозитарий и СПБ-биржа, и направляют брокеру. 
+            a: Готовые формы загружаются автоматически в личный кабинет на сайте, фина'м точка ру. Справка формируется за отчетный период, то есть за один календарный год. 
+            a: Чтобы заказать справку в личном кабинете, выберите меню, отчёты, далее выберите раздел, налоги и справки, далее выберите раздел, налоги. 
+            a: Электронный формат справки доступен на следующий рабочий день. Изготовление справки на бумажном носителе в течение одной рабочей недели.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Заказ_w8_Брокер
+            a: Подписать форму дабл ю 8 бэн, можно в личном кабинете на сайте, фина'м точка ру, для этого выберите меню, отчёты, далее выберите раздел, налоги и справки, Форма дабл ю 8 бэн. 
+            a: Далее выберите биржу, сформируйте заявление, распечатайте, поставьте подпись, отсканируйте документ и вложите скан в сформированный вами документ в личном кабинете. 
+            a: Сформировать документ, распечатать, подписать и прикрепить заявление необходимо в течение одного дня. Форма рассматривается 30 календарных дней.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Заказ_выписка_квал_Брокер
+            a: Если вы являетесь квалифицированным инвестором в Фина'м, вы можете заказать выписку из реестра квалифицированных лиц,
+            a: в личном кабинете на сайте, едо'кс точка Фина'м точка ру. для этого выберите меню, Услуги, далее выберите раздел, Налоги, выписки, справки, в поле меню другОе, выберите, Выписка из реестра квалифицированных лиц.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Заказ_регламент_Брокер
+            a: Регламент брокерского обслуживания представлен на сайте фина'м точка ру. Чтобы открыть регламент, в верхней части страницы сайта выберите раздел, 
+            a: Брокерские услуги, далее в появившемся меню выберите пункт, Информация, далее выберите, Документы.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        # заказ документов по Банку    
+        state: Заказ_справка_Банк
+            a: Заказать выписку по договору банковского счета, срочного вклада или по банковской карте, можно в личном кабинете банка Фина'м, на сайте айбанк точка фина'м точка ру.
+            a: Для этого выберите нужный счет, в поле справа выберите, выписка по счету. Если у вас есть также брокерский счет, то заказать выписку можно и в личном кабинете брокера на сайте, едо'кс точка Фина'м точка ру.
+            a: Для этого выберите меню, Услуги, далее выберите раздел, Налоги выписки справки, в поле меню, Запрос в Банк на предоставление документов выберите нужное.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+
+        state: Заказ_счет_фактура_Банк
+            script: 
+                $session.operatorPhoneNumber =  '3820';
+                $reactions.transition("/Оператор/Оператор по номеру");
+                
+        state: Заказ_выписка_депо_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Заказ_налог_справка_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+    
+        state: Заказ_справка_актив_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_документы_откр_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_справка_госслуж_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Заказ_1042s_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_w8_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_выписка_квал_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_регламент_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        # заказ документов по Форекс   
+        state: Заказ_справка_Форекс
+            a: Заказать справку по счету можно в личном кабинете форекс точка фина'м точка ру, для этого в левом вертикальном меню выберите вкладку, отчёты. Изготовление справки занимает до двух рабочих дней.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: Заказ_налог_справка_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_документы_откр_Форекс
+            a: Заказать документы об открытии форекс счёта, можно в личном кабинете брокера фина'м на сайте, едо'кс точка фина'м точка ру, для этого выберите меню отчетность, далее выберите раздел, основные документы.
+            a: Основными документами об открытии форекс счёта являются, Заявление о присоединении к регламенту, Уведомление о заключении Рамочного договора, Уведомление о рисках к Рамочному договору.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Заказ_справка_госслуж_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Заказ_1042s_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_выписка_квал_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_регламент_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");           
+            
+        # заказ документов по УК   
+        state: Заказ_справка_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_выписка_депо_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру"); 
+        
+        state: Заказ_налог_справка_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+    
+        state: Заказ_справка_актив_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_документы_откр_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_справка_госслуж_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Заказ_1042s_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_w8_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_выписка_квал_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Заказ_регламент_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");    
+
+            
+            
+    state: MoneyTransfer || modal = true
+        # Движение ДС (сущность компании обязательна и определяется при первичном обращении только для ФФ и УК)
+        intent!: /005 Движение_ДС 
+        #|| toState = "/MoneyTransfer", onlyThisState = true
+        script:
+            
+            $session.moneyTransfer = {
+                company : "undefined",
+                assetType : "undefined",
+                type : "undefined", //ввод, вывод, перевод
+                method : "undefined", //для ввода, вывода актуально: СБП, наличные, реквизиты, карта
+                transferCBbetweenАccounts : "undefined", //между своими, между разными клиентами, между разделами
+                companyPhoneNumber : "undefined", //для банка и фф автоперевод на добавочный компании
+                isCommission : false,
+                isPeriod : false
+            };
+            
+            moneyTransferRun(true);
+        
+        state: MoneyTransferGetCompany
+            a: Операции со счетом в какой компании вас интересуют. Брокер Фина'м, Банк, Управляющая компания или Фина'м форекс?
+            script:
+                $dialer.setNoInputTimeout(15000);
+
+            state: Уточнение_MoneyTransferGetCompany
+                # q: * {[@commission] * [@assetType] * [@period] * [@moneyTransferType] * [@moneyTransferMethod]} 
+                q: * @company *
+                script: 
+                    # $reactions.answer("3");
+                    moneyTransferRun(false);
+                    
+            state: LocalCatchAll
+                event: noMatch
+                a: Это не похоже на компанию. Попробуйте еще раз.
+                script:
+                    $dialer.setNoInputTimeout(15000);
+            
+        state: MoneyTransferGetAssetType
+            a: Уточните, вас интересуют операции с денежными средствами, или с ценными бумагами?
+            script:
+                $dialer.setNoInputTimeout(15000);
+
+            state: Уточнение_MoneyTransferGetAssetType
+                q: * {[@commission] * [@period] * [@moneyTransferType] * [@moneyTransferMethod] * @assetType} *
+                script: 
+                    
+                    moneyTransferRun(false);
+                    
+            state: LocalCatchAll
+                event: noMatch
+                a: Это не похоже на компанию. Попробуйте еще раз.
+                script:
+                    $dialer.setNoInputTimeout(15000);  
+
+        state: MoneyTransferGetType
+            if: $session.moneyTransfer.assetType === 'ДС'
+                a: Уточните, какой тип операции Вас интересует, пополнение счёта, вывод средств или перевод между своими счетами?
+                script:
+                    $dialer.setNoInputTimeout(15000);
+                
+            
+            if: $session.moneyTransfer.assetType === 'ЦБ'
+                a: Уточните, вы хотите перевести бумаги от другого брокера в фина'м, вывести бумаги к другому брокеру, или перевести бумаги между счетами внутри фина'м?
+                script:
+                    $dialer.setNoInputTimeout(15000);
+            # a: Уточните, какой тип операции Вас интересует, пополнение счёта, вывод средств или перевод между своими счетами?
+            # script:
+            #     $dialer.setNoInputTimeout(15000);
+
+            state: Уточнение_MoneyTransferGetType
+                q: * {[@commission] * [@period] * [@moneyTransferMethod] * [@transferCBbetweenАccounts] * @moneyTransferType} *
+                script: 
+                    moneyTransferRun(false);
+                    
+            
+            state: LocalCatchAll
+                event: noMatch
+                a: Это не похоже на тип операции. Попробуйте еще раз.
+                script:
+                    $dialer.setNoInputTimeout(15000);
+        
+        state: MoneyTransferGetBetweenAccounts
+            a: Какой тип перевода Вас интересует, перевод между своими счетами, перевод между разными клиентами фина'м, или перевод между разделами.
+            script:
+                $dialer.setNoInputTimeout(15000);
+
+            state: Уточнение_MoneyTransferGetBetweenAccounts
+                q: * {[@commission] * [@period] * @transferCBbetweenАccounts} *
+                script: 
+                    moneyTransferRun(false);
+                    
+            state: LocalCatchAll
+                event: noMatch
+                a: Это не похоже на тип операции. Попробуйте еще раз.
+                script:
+                    $dialer.setNoInputTimeout(15000);
+
+        state: MoneyTransferGetMethod
+            if: $session.moneyTransfer.type === 'Ввод'
+                a: Какой способ пополнения вас интересует? Системой быстрых платежей, СБП? Банковской картой, По реквизитам счета, или Наличными в кассе.
+                script:
+                    $dialer.setNoInputTimeout(15000);
+                
+            
+            if: $session.moneyTransfer.type === 'Вывод'
+                a: Какой способ вывода средств Вас интересует? Системой быстрых платежей, СБП? Банковской картой, По реквизитам счета, или Наличными в кассе.
+                script:
+                    $dialer.setNoInputTimeout(15000);
+                
+            
+            # if: $session.moneyTransfer.type === 'Перевод'
+            #     a: Уточните, какой способ перевода Вас интересует?
+
+            state: Уточнение_MoneyTransferGetMethod
+                q: * {[@commission] * [@period] * [@moneyTransferType] * @moneyTransferMethod} *
+                # a: {{ $parseTree._moneyTransferMethod.name }}
+                script: 
+                    moneyTransferRun(false);
+                    
+            state: LocalCatchAll
+                event: noMatch
+                a: Это не похоже на способ {{ $session.moneyTransfer.type }}a. Попробуйте еще раз.
+                script:
+                    $dialer.setNoInputTimeout(15000);
+
+        state: MoneyTransferText
+            script:
+                $response.replies = $response.replies || [];
+                $session.moneyTransfer.text = getTestForMoneyTransfer($session.moneyTransfer, $response.replies);
+            a: {{ $session.moneyTransfer.text['a'] ? $session.moneyTransfer.text['a'] : $session.moneyTransfer.text }}
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # script:
+            #     unset($session.moneyTransfer);
+    
+
+        state: MoneyTransferOperator
+            a: Информацию по данному вопросу, вам предоставит специалист профильного отдела.
+            script:
+                $session.operatorPhoneNumber = $session.moneyTransfer.companyPhoneNumber;
+                $dialer.setNoInputTimeout(15000);
+            go!: /Оператор/Оператор по номеру
+        
+    state: Установка_ИТС
+        intent!: /011 Установка_ИТС
+        # go!: ./Установка_ИТС_{{ $parseTree._ITS.name }}
+        script:
+            if ( typeof $parseTree._ITS != "undefined" ){
+                $session.ITS = $parseTree._ITS;
+            }
+            if ( typeof $session.ITS == "undefined" ){
+                $reactions.transition("/Установка_ИТС/Уточнение ИТС");
+            } else {
+                $reactions.transition("/Установка_ИТС/Установка_ИТС_" + $session.ITS.name);
+            }
+        
+        state: Уточнение ИТС
+            a: Какую торговую систему вы хотели бы установить?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            state: Ожидание ответа
+                q: * @ITS *
+                script:
+                    $session.ITS = $parseTree._ITS;
+                    $reactions.transition("/Установка_ИТС");
+        
+        state: Установка_ИТС_Quik
+            a: Торговая система КВИК предназначена для установки на устройства с системой Windows. Терминал предоставляется бесплатно. 
+            a: Скачать торговую систему КВИК можно на сайте фина'м точка ру. Для этого выберите раздел, брокерские услуги. в открывшемся поле слева выберите, торговые платформы. 
+            a: Далее выберите систему КВИК, здесь вы можете скачать дистрибутив КВИК, генератор ключей Кей Ген, и инструкцию по его установке. 
+            a: Чтобы продолжить настройки, убедитесь в доступности терминала по вашему брокерскому счету.
+            a: Если при открытии брокерского счета, вы не подключали терминал квик к счету, то вы можете подключить КВИК в личном кабинете, на сайте едо'кс точка фина'м точка ру, в разделе, 
+            a: Торговля, выберите пункт меню, информационно торговые системы, И Т эС, и подключите терминал к желаемому счету.
+            a: Для получения подробной иллюстрированной инструкции или обучающего видео, по установке и настройке КВИК, напишите нам в чате поддержки на сайте фина'м точка ру или в терминале фина'м трейд.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: Установка_ИТС_Transaq
+            a: Торговые системы ТРАНЗАК или ТРАНЗА'К Ю ЭС, предназначены для установки на устройства с системой Windows.
+            a: Терминал предоставляется бесплатно. Скачать дистрибутив ТРАНЗАК или ТРАНЗА'К Ю ЭС, можно на сайте фина'м точка ру.
+            a: Для этого выберите раздел, брокерские услуги, в открывшемся поле слева выберите, торговые платформы, выберите ТРАНЗАК, скачайте нужную версию.
+            a: Чтобы продолжить настройки, убедитесь в доступности терминала по вашему брокерскому счёту. При открытии нового брокерского счёта вы можете сразу выбрать терминал ТРАНЗАК.
+            a: А также, вы можете открыть доступ к системе ТРАНЗАК, для уже имеющегося счета, зайдите в личный кабинет на сайте едо'кс точка фина'м точка ру.
+            a: В разделе, торговля, выберите пункт меню, информационно торговые системы, И Т эС, и подключите терминал к желаемому счету. 
+            a: В работе с терминалом ТРАНЗА'К Ю ЭС, обращаем ваше внимание, что торговый сервер ТРАНЗА'К Ю ЭС запускается в 11 часов 30 минут по московскому времени, подключение до этого времени недоступно.
+            a: Обучающее видео по работе с терминалом ТРАНЗАК, вы можете запросить в чате поддержки на сайте фина'м точка ру или в терминале фина'м трейд.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: Установка_ИТС_FT
+            a: Торговая система фина'м трейд не требует установки. Чтобы воспользоваться вэб версией терминала, зайдите в личный кабинет на сайте фина'м точка ру, далее перейдите в раздел, трейдинГ. 
+            a: Мобильное приложение, можно скачать на Android или АйОс в магазине на вашем устройстве, либо на сайте фина'м точка ру. для этого в разделе сайта, брокерские услуги, в открывшемся поле слева выберите, торговые платформы.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: Установка_ИТС_TrConnector
+            a: Установка терминала не требуется. Для подключения к серверу через сторонние системы достаточно подключенного счета. 
+            a: Зайдите в личный кабинет на сайте едо'кс точка фина'м точка ру. в разделе, торговля, выберите пункт меню, информационно торговые системы, И Т эС, и подключите желаемый счет. 
+            a: Доступ к системе бесплатный. После того, как вы подпишете заявление на подключение терминала, вам придет СМС с паролем от системы. 
+            a: Логин находится в личном кабинете на сайте едо'кс точка фина'м точка ру, выберите нужный счет, далее разверните раздел, торговые программы.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: Установка_ИТС_MT5
+            a: Торговая система Meta Trader 5 предназначена для установки на устройства с системой Windows. Терминал предоставляется бесплатно. 
+            a: Скачать дистрибутив Meta Trader 5 можно на сайте фина'м точка ру. Для этого выберите раздел, брокерские услуги, в открывшемся поле слева выберите, торговые платформы. 
+            a: Также, подключить брокерский счет к терминалу Мета Трейдер 5, можно в личном кабинете на сайте едо'кс точка фина'м точка ру.
+            a: В разделе, Торговля, выберите пункт меню, информационно торговые системы, И Т эС, и подключите терминал к желаемому счету. 
+            a: К одному идентификатору, или ло'гину, можно подключить только один брокерский счет. Обращаем ваше внимание, что Договора с раздельными брокерскими счетами недоступны для подключения к Meta Trader 5.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+    
+    state: ИТС
+        intent!: /013 ИТС
+        a: Фина'м предоставляет бесплатный доступ к нескольким торговым системам. Торговая система фина'м трейд представлена в виде веб-версии и мобильного приложения.
+        a: Программы для установки на персональный компьютер пользователя: ТРАНЗАК или ТРАНЗА'К ю эсс, квик, Meta Trader 5.
+        a: А также платное мобильное приложение КВИК ИКС или вэб КВИК за 420 рублей в месяц. Мобильное приложение для Meta Trader 5 не предоставляется.
+        a: Подключить стороннее программное обеспечение можно через ТРАНЗА'К Connector, Комо'н Trade API и квик.
+        a: Если вам интересно узнать подробнее, назовите тему, установка торговых систем или обучающие видео курсы по работе в торговых терминалах.
+        script:
+            $dialer.setNoInputTimeout(15000);
+        q: * установка * ||toState = "/Установка_ИТС"
+        q: * обучение * ||toState = "/Обучение_ИТС"
+        q: * @choice_1 * ||toState = "/Установка_ИТС"
+        q: * @choice_2 * ||toState = "/Обучение_ИТС"
+        q: * @choice_last * ||toState = "/Обучение_ИТС"
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+    state: NLK
+        intent!: /012 NLK
+        
+        script:
+            if ( typeof $parseTree._personalData != "undefined"){
+                $session.personalData = $parseTree._personalData;
+            }
+            if ( typeof $session.personalData == "undefined" ){
+                $reactions.transition("/NLK/Уточнение данных для замены");
+            } else {
+                $reactions.transition("/NLK/ЗаменаДанных_" + $session.personalData.name)
+            } 
+            
+        state: Уточнение данных для замены
+            a: Какие данные нужно заменить? Паспортные данные. Адрес регистрации. Номер телефона. Или электронную почту.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @personalData *
+                script:
+                    $session.personalData = $parseTree._personalData;
+                    $reactions.transition("/NLK");    
+    
+        state: ЗаменаДанных_passport
+            a: Подать поручение на смену паспортных данных, можно в офисе компании, или в личном кабинете на сайте фина'м точка ру.
+            a: Для этого авторизуйтесь в личном кабинете, далее в верхнем правом углу нажмите на иконку профиля, далее выберите, персональные данные, внизу страницы выберите, редактировать данные.
+            a: В зависимости от внесенных изменений, вам перезвонит менеджер поддержки фина'м, чтобы задать три контрольных вопроса, для подтверждения вашей личности.
+            a: Обращаем ваше внимание, для замены паспортных данных, нужно вкладывать копии полных страниц документа, подтверждающих смену данных. Копии должны хорошо читаться, не иметь бликов, посторонних надписей, или рисунков.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: ЗаменаДанных_registration
+            a: Подать поручение на смену адреса регистрации можно в офисе компании, или в личном кабинете на сайте фина'м точка ру.
+            a: Для этого авторизуйтесь в личном кабинете, далее в верхнем правом углу нажмите на иконку профиля, далее выберите, персональные данные, внизу страницы выберите, редактировать данные.
+            a: В зависимости от внесенных изменений, вам перезвонит менеджер поддержки фина'м, чтобы задать три контрольных вопроса, для подтверждения вашей личности.
+            a: Обращаем ваше внимание, для замены паспортных данных, нужно вкладывать копии полных страниц документа, подтверждающих смену данных. Копии должны хорошо читаться, не иметь бликов, посторонних надписей, или рисунков.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: ЗаменаДанных_phoneNumber
+            a: Подать поручение на смену или добавление номера телефона, можно в личном кабинете на сайте фина'м точка ру.
+            a: Для этого авторизуйтесь в личном кабинете, далее в верхнем правом углу нажмите на иконку профиля, далее выберите, персональные данные, внизу страницы выберите, редактировать данные.
+            a: У каждого пользователя должен быть уникальный номер телефона, одновременное использование одного номера для двух аккаунтов невозможно.
+            a: В зависимости от внесенных изменений, вам перезвонит менеджер поддержки фина'м, чтобы задать три контрольных вопроса, для подтверждения вашей личности.
+            a: Обращаем ваше внимание, что смс подпись, будет приходить только на один номер телефона. Выбрать номер для получения смс подписи можно в личном кабинете.
+            a: Для этого авторизуйтесь в личном кабинете на сайте фина'м точка ру, в верхнем правом углу нажмите на значок персоны, и перейдите в личный кабинет. Далее в разделе Сервис, выберите раздел, СМС подпись.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: ЗаменаДанных_email
+            a: Подать поручение на смену или добавление адреса электронной почты, можно в личном кабинете на сайте фина'м точка ру.
+            a: Для этого авторизуйтесь в личном кабинете, далее в верхнем правом углу нажмите на иконку профиля, далее выберите, персональные данные, внизу страницы выберите, редактировать данные.
+            a: В зависимости от внесенных изменений, вам перезвонит менеджер поддержки фина'м, чтобы задать три контрольных вопроса, для подтверждения вашей личности.
+            a: Обращаем ваше внимание, что у каждого клиента должен быть свой уникальный адрес электронной почты, одновременное использование одного адреса для двух и более аккаунтов невозможно.
+            a: После подписания заявления, появится уведомление с просьбой подтвердить указанный адрес электронной почты.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: ЗаменаДанных_fullName
+            a: Подать поручение на смену фамилии, имени, отчества, и других паспортных данных, можно в офисе компании, или в личном кабинете на сайте фина'м точка ру.
+            a: Для этого авторизуйтесь в личном кабинете, далее в верхнем правом углу нажмите на иконку профиля, далее выберите, персональные данные, внизу страницы выберите, редактировать данные.
+            a: В зависимости от внесенных изменений, вам перезвонит менеджер поддержки фина'м, чтобы задать три контрольных вопроса, для подтверждения вашей личности.
+            a: Обращаем ваше внимание, для замены паспортных данных, нужно вкладывать копии полных страниц документа, подтверждающих смену данных.
+            a: Копии должны хорошо читаться, не иметь бликов, посторонних надписей, или рисунков. Если ваш вопрос касается отображения вашего ФИ'Оо в справке w 8 бэн, то нужно написать в поддержку, указав свое полное имя как в загран паспорте.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+    state: Authorization
+        intent!: /015 Авторизация
+        #go!: ./Authorization{{ $parseTree._application.name }}{{ $parseTree._LK ? $parseTree._LK.name : '' }}
+        script:
+            if (typeof $parseTree._application != "undefined " ){
+                $session.application = $parseTree._application;
+            }
+            if ( typeof $session.application == "undefined" ){
+                $reactions.transition("/Authorization/AuthorizationALL");
+            } else {
+                $reactions.transition("/Authorization/Authorization" + $session.application.name);
+            }
+        
+        state: AuthorizationAll
+            a: В какой системе или на каком сайте вы хотите авторизоваться?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            state: AuthorizationAll
+                q: * @application *
+                #go!: /Authorization
+                script:
+                    $session.application = $parseTree._application;
+                    $reactions.transition("/Authorization")
+                
+            state: LocalCatchAll
+                event: noMatch
+                a: Я не поняла вас. Уточните наименование системы или сайта где нужна авторизация? 
+                script:
+                    $dialer.setNoInputTimeout(15000);
+        
+        state: AuthorizationLK
+            a: В личный кабинет какой компании вы хотите зайти, Брокер, банк, кабинет агента или фина'м форекс?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            
+            state: AuthorizationLK
+                q: * @LK *
+                go!: ../../AuthorizationLK{{ $parseTree._LK.name }}
+                
+        state: AuthorizationLKБрокер
+            a: Чтобы зайти в личный кабинет брокера фина'м, зайдите на сайт фина'м точка ру. далее в верхнем правом углу нажмите, Личный кабинет.
+            a: По умолчанию, логином от личного кабинета является номер телефона в международном формате. Для России, номер начинается с цифры, 7.
+            a: Пароль вы задавали самостоятельно, при открытии счёта или при изменении пароля в личном кабинете.
+            a: Некоторые услуги и сервисы временно доступны в старой версии личного кабинета с доменом едо'кс. Чтобы в него перейти, в личном кабинете выберите раздел, Помощь. Далее слева нажмите кнопку перейти в старый дизайн. 
+            a: Если вы не помните учетные данные, то для восстановления доступа, под формой для ввода логина и пароля, нажмите кнопку, Забыли логин или пароль.
+            a: После выполнения инструкций сайта, на вашу электронную почту придет письмо с логином, и ссылкой на создание нового пароля. Если у вас нет доступа к электронной почте и паспортным данным, обратитесь в ближайший офис компании.
+            a: Если у вас нет доступа только к номеру телефона, обратитесь к менеджеру компании.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                    
+        state: AuthorizationLKБанк
+            script:
+                $session.operatorPhoneNumber = '3888';
+            go!: /Оператор/Оператор по номеру
+                
+        state: AuthorizationLKАгент
+            script:
+                $session.operatorPhoneNumber = '1000';
+            go!: /Оператор/Оператор по номеру
+                    
+        state: AuthorizationLKФФ
+            script:
+                $session.operatorPhoneNumber = '3887';
+            go!: /Оператор/Оператор по номеру
+                    
+        state: AuthorizationQuik
+            a: Чтобы зайти в торговую систему КВИК, после запуска системы, в появившемся диалоговом окне Идентификация пользователя, используйте логин и пароль, которые вы задали на этапе регистрации ключей для Квик в программе генераторе ключей, кей ген.
+            a: Для восстановления данных для входа, нужно сгенерировать новую пару ключей, в программе генераторе ключей, кей ген.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: AuthorizationQuikX
+            a: Подключить торговую систему веб квик к брокерскому счету, можно в личном кабинете старого дизайна на сайте едо'кс точка фина'м точка ру.
+            a: Для этого в разделе Торговля, выберите, информационно торговые системы, далее выберите, Подключение платных сервисов. Торговая система платная, 420 рублей в месяц.
+            a: Пароль к терминалу вы получите в СМС при подключении. Чтобы посмотреть Логин в личном кабинете. Нажмите на счет, по которому необходимо уточнить логин. Вы увидите список подключенных ко счету платформ.
+            a: Найдите в открывшемся списке идентификатор терминала квик. В квик икс используются те же логин и пароль, что и в веб квик. После того, как вы подклю'чите счет к терминалу, свяжитесь с менеджером Фина'м. Он поможет активировать квик икс.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"    
+            
+        state: AuthorizationTransaq
+            a: Чтобы зайти в торговую систему транзак, после запуска системы, в появившемся диалоговом окне Идентификация пользователя, используйте пароль, который приходил вам в смс при получении торговой системы.
+            a: Если сообщение было утеряно, восстановить пароль можно в личном кабинете, в разделе Торговля – Информационно торговые системы – Смена пароля на терминал. После первого входа нужно поменять пароль в настройках транзак.
+            a: Посмотреть логин можно в личном кабинете старого дизайна на сайте, едо'кс точка фина'м точка ру. Нажмите на счет, к которому нужен логин от транзак. Вы увидите список подключенных ко счету платформ. Найдите в нем идентификатор транзак.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: AuthorizationTransaqConnector
+            a: Подключить счет к транзак коннектор можно в личном кабинете старого дизайна, на сайте едо'кс точка фина'м точка ру, в разделе Торговля – Информационно торговые системы – Подключение счёта на терминал.
+            a: После того, как вы подпишите заявление на подключение терминала, вам придет СМС с паролем от системы.
+            a: Если сообщение утеряно, вы можете восстановить пароль в личном кабинете, в разделе Торговля – Информационно торговые системы – Смена пароля на терминал.
+            a: Логин находится в этом же личном кабинете. Нажмите на счет, к которому нужен логин от транзак коннектор. Вы увидите список подключенных ко счету платформ. Найдите в нем идентификатор транзак коннектор.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: AuthorizationFT
+            a: Чтобы зайти в терминал Фина'м трейд, авторизуйтесь в личный кабинет на сайте фина'м точка ру. далее выберите раздел, торговля. По умолчанию, логином является номер телефона в международном формате. Для России, номер начинается с цифры, 7.
+            a: Пароль вы задавали самостоятельно, при открытии счёта или при изменении пароля в личном кабинете. Если вы не помните учетные данные, то для восстановления доступа, под формой для ввода логина и пароля, нажмите кнопку, Забыли логин или пароль.
+            a: После выполнения инструкций сайта, на вашу электронную почту придет письмо с логином, и ссылкой на создание нового пароля.
+            a: Если у вас нет доступа к электронной почте и паспортным данным, обратитесь в ближайший офис компании. Если у вас нет доступа только к номеру телефона, обратитесь к менеджеру компании.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: AuthorizationMT4
+            script:
+                    $session.operatorPhoneNumber = '3887';
+            go!: /Оператор/Оператор по номеру
+                
+        state: AuthorizationMT5
+            a: Чтобы зайти в торговую систему мета трейдер 5, после запуска системы, используйте для входа пароль, который приходил в виде СМС после на получение торговой системы.
+            a: Если сообщение утеряно, вы можете восстановить пароль в личном кабинете, в разделе Торговля – Информационно торговые системы – Смена пароля на терминал.
+            a: Логин отображается в личном кабинете старого дизайна на сайте, едо'кс точка фин'ам точка ру.
+            a: Нажмите на счет, по которому необходимо уточнить логин. Вы увидите список подключенных к счету платформ. Найдите в открывшемся списке идентификатор терминала мета трейдер.
+            a: Идентификатор терминала является логином. К одному идентификатору может быть подключен только один брокерский счет.
+            a: Обращаем ваше внимание, что договор с раздельными брокерскими счетами, то есть моносчета'ми, недоступен для подключения к мета трейдер 5.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: AuthorizationComon
+            a: Чтобы зайти в личный кабинет сервиса Автоследования, зайдите на сайт комо'н точка ру. далее в верхнем правом углу нажмите, Вход. Для авторизации используйте логин и пароль от личного кабинета брокера Фина'м.
+            a: По умолчанию, логином от личного кабинета является номер телефона в международном формате. Для России, номер начинается с цифры, 7. Пароль вы задавали самостоятельно, при открытии счёта или при изменении пароля в личном кабинете.
+            a: Если вы не помните учетные данные, то для восстановления доступа, под формой для ввода логина и пароля, нажмите кнопку, Забыли логин или пароль.
+            a: После выполнения инструкций сайта, на вашу электронную почту придет письмо с логином, и ссылкой на создание нового пароля.
+            a: Если у вас нет доступа к электронной почте и паспортным данным, обратитесь в ближайший офис компании. Если у вас нет доступа только к номеру телефона, обратитесь к менеджеру компании.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: AuthorizationComonTradeAPI
+            script:
+                    $session.operatorPhoneNumber = '2222';
+            go!: /Оператор/Оператор по номеру
+            
+        state: AuthorizationDMA
+            script:
+                    $session.operatorPhoneNumber = '3024';
+            go!: /Оператор/Оператор по номеру
+            
+        state: AuthorizationFinamRU
+            a: Чтобы авторизоваться на сайте фина'м точка ру, в верхнем правом углу выберите, вход. После регистрации на сайте фина'м точка ру, вам придет письмо с логином и паролем.
+            a: Для авторизации на сайте, также можно использовать номер телефона в международном формате, электронную почту, или данные от личного кабинета брокера фина'м. Восстановить пароль можно по номеру телефона или по электронной почте.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: AuthorizationFinamBonus
+            a: Чтобы зайти в личный кабинет Фина'м бонус, зайдите на сайт фина'м точка ру, в верхнем правом углу выберите, вход.
+            a: Если ранее вы не регистрировались на сайте фина'м тока ру, то на вашу электронную почту одновременно с письмом о регистрации в акции Фина'м бонус приходило письмо с логином и паролем от сайта.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: AuthorizationDist
+            script:
+                    $session.operatorPhoneNumber = '2222';
+            go!: /Оператор/Оператор по номеру
+            
+    state: Comon
+        intent!: /019 Автоследование
+        script:
+            
+            if(  typeof $parseTree._addAccountComon != "undefined" ){
+                $reactions.transition("./ComonAddAccountComon");
+            } else if(  typeof $parseTree._commission != "undefined" ){
+                $reactions.transition("./ComonCommission");
+            } else if(  typeof $parseTree._synchronization != "undefined" ){
+                $reactions.transition("./ComonSynchronization");
+            } else if(  typeof $parseTree._open_close != "undefined" ){
+                $reactions.transition("./Comon_" + $parseTree._open_close.name);
+            } else {
+                $reactions.transition("/NoMatch");
+            }
+                
+        state: ComonAddAccountComon
+            a: Для использования сервиса Автоследование, необходимо зарегистрироваться и создать учетную запись на сайте комо'н точка ру, с помощью данных для входа в Личный кабинет брокера фина'м.
+            a: Обращаем ваше внимание, что договор с раздельными счетами по секциям, то есть, моносчета'ми, а также счета с установленными нестандартными настройками, недоступны для подключения сервиса.
+            a: Ознакомиться с Детальной информацией и правилами сервиса фина'м Автоследование, можно на сайте коммо'н точка ру в разделе, Правила.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: ComonCommission
+            a: Чтобы узнать тариф по конкретной стратегии Автоследования, на сайте коммо'н точка ру выберите из списка интересующую вас стратегию. Далее откройте вкладку показатели, и нажмите на название тарифа.
+            a: Также, со стоимостью сервиса фина'м Автоследование, по каждому тарифу можно ознакомиться в разделе Правила.
+            a: Списание комиссии происходит ежедневно, и отображается в справке по счету, как, списание по пункту 16 регламента брокерского обслуживания.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: ComonSynchronization
+            a: Для синхронизации со стратегией автора, нужно авторизоваться на сайте коммо'н точка ру.  Далее нажать на значок персоны, в верхнем правом углу, и перейти в раздел, Мои подписки.
+            a: В этом разделе отображается информация о подключенных стратегиях. Далее нажмите на значок шестеренки, отобразится меню, синхронизировать портфель.
+            a: Рекомендуется также проставить галочки, чтобы при пополнении вашего торгового счета, автоматически наращивать позиции по стратегии автоследования, без подачи дополнительных команд.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: Comon_open    
+            a: Подключить к сервису автоследование можно единый брокерский счет, открытый в фина'м. Для подключения стратегии, нужно авторизоваться на сайте коммо'н точка ру. 
+            a: Далее выбрать нужную стратегию, перейти на страницу с ее описанием, и нажать кнопку, подключить. Далее нужно установить синхронизацию, и подписать документы кодом из смс. 
+            a: В зависимости от стратегии, дополнительно может понадобиться пройти тест на инвестиционный профиль, пройти тестирование для неквалифицированных инвесторов, иметь статус квалифицированного инвестора, или статус клиента с повышенным уровнем риска. 
+            a: Обращаем ваше внимание, что не все стратегии подходят для счетов ИИС. А также, договор с раздельными счетами по секциям, то есть, моносчета'ми, а также счета с установленными нестандартными настройками, недоступны для подключения сервиса.
+            a: Ознакомиться с Детальной информацией и правилами сервиса фина'м Автоследование, можно на сайте коммо'н точка ру в разделе, Правила.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: Comon_close    
+            a: Для отключения стратегии Автоследования, нужно авторизоваться на сайте коммо'н точка ру. Далее нажать на значок персоны в верхнем правом углу, и перейти в раздел, Мои подписки. 
+            a: Далее нужно выбрать стратегию и нажать на значок шестеренки, и выбрать, отключить автоследование. 
+            a: Если нужно также закрыть все позиции, то проставьте соответствующие галочки в открывшемся меню. Позиции будут закрыты во время активной торговой сессии на бирже. Если биржа закрыта, то подписка перейдет в статус удаления. 
+            a: Дальнейшие действия будут доступны только после закрытия позиций. Ознакомиться с Детальной информацией и правилами сервиса фина'м Автоследование, можно на сайте коммо'н точка ру в разделе, Правила. 
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+            
+    
+    state: Тарифы 
+        intent!: /020 Тарифы
+        
+        script:
+            if ( typeof $parseTree._tarifs != "undefined"){
+                $session.tarifs = $parseTree._tarifs;
+            }
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $parseTree._rateInformationType != "undefined" ){
+                $session.rateInformationType = $parseTree._rateInformationType;
+            }            
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Тарифы/Уточнение компании");
+            }
+            if ( typeof $session.rateInformationType == "undefined" ){
+                $reactions.transition("/Тарифы/Уточнение типа информации");
+            } else {
+                $reactions.transition("/Тарифы/" + $session.company.name + '_' + $session.rateInformationType.name);
+            }    
+            
+            # $response.replies = $response.replies || [];
+            #                 $response.replies.push({
+            #                     "type": "text",
+            #                     "text": JSON.stringify($parseTree)
+            #                 });
+            
+        state: Уточнение компании
+            a: Информация по тарифам в какой компании вас интересует? Брокер Фина'м, Банк, Управляющая компания или Фина'м форекс?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Тарифы");
+                    
+        state: Уточнение типа информации
+            a: Какая информация по тарифам вас интересует? Смена тарифа, сравнение тарифов, или информация по тарифу?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @rateInformationType *
+                script:
+                    $session.rateInformationType = $parseTree._rateInformationType;
+                    $reactions.transition("/Тарифы");            
+        
+        state: ОпределениеТарифа
+            a: Уточните, пожалуйста, какой тариф Вы подразумеваете?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа от клиента
+                q: * @tarifs *
+                script:
+                    $session.tarifs = $parseTree._tarifs;
+                go!: /Тарифы/Тариф_{{ $session.tarifs.name }}
+                
+                
+        #Информация по Брокеру    
+        state: Брокер_AllRatesList
+            a: Ознакомиться с описанием тарифных планов можно на сайте Фина'м точка ру. Для этого выберите раздел, Брокерские услуги, далее в поле меню, Самостоятельная торговля, выберите, Тарифы или Сравнение. 
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м. Регламент представлен на сайте фина'м точка ру. 
+            a: Чтобы открыть регламент. в верхней части страницы сайта выберите раздел, Брокерские услуги, далее в появившемся меню выберите пункт, Информация. далее выберите, Документы.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана. Списание комиссии происходит в 23 часа 59 минут по московскому времени.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                
+        state: Брокер_ChoosingBestRate
+            a: Сравнить тарифы и выбрать лучший, можно на сайте Фина'м точка ру. Для этого выберите раздел, Брокерские услуги, далее в поле меню, Самостоятельная торговля, выберите, Тарифы или Сравнение. 
+            a: Сравнительная таблица подробно отображает комиссии пяти наиболее популярных у клиентов Фина'м тарифов. Выбирая тариф, учитывайте количество, и объем сделок которые планируете совершать, а также стоимость обслуживания счета. 
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м.
+            a: Регламент представлен на сайте фина'м точка ру. Чтобы открыть регламент. в верхней части страницы сайта выберите раздел, Брокерские услуги, далее в появившемся меню выберите пункт, Информация. далее выберите, Документы.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Брокер_HowToChangeRate
+            a: Изменить тариф можно в личном кабинете, на сайте Фина'м точка ру. Выберите нужный счет, далее выберите раздел, Детали. Чтобы сменить тариф, кликните на текущий тариф по счету, и выберите новый из предложенного списка. 
+            a: Действие нового тарифа начинается, со следующего рабочего дня после подписания заявления на смену тарифа. Количество заявок на смену тарифа неограниченно. Действующим устанавливается тариф из последней подписанной заявки.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Брокер_ClientPersonalRate
+            a: Ваш текущий тарифный план отображается в личном кабинете, на сайте Фина'м точка ру. Просто выберите нужный счет, далее выберите, Детали, на открывшейся странице будет указан ваш тариф в строке, тарифный план. 
+            a: Обращаем ваше внимание, что по каждому счету тариф устанавливается отдельно.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Брокер_RateInformation
+            script:
+                if ( typeof $session.tarifs == 'undefined'){
+                    $reactions.transition("/Тарифы/ОпределениеТарифа");
+                }
+            go!: /Тарифы/Тариф_{{ $session.tarifs.name }}
+            
+            
+        #Информация по Банку
+        state: Банк_AllRatesList
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                
+        state: Банк_ChoosingBestRate
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+
+        state: Банк_HowToChangeRate
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+
+        state: Банк_ClientPersonalRate
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Банк_RateInformation
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+            
+        #Информация по Управляющей Компании
+        state: УК_AllRatesList
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: УК_ChoosingBestRate
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: УК_HowToChangeRate
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: УК_ClientPersonalRate
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+
+        state: УК_RateInformation
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+
+            
+        #Информация по Форекс    
+        state: Форекс_AllRatesList
+            a: Тарифный план при торговле через компанию Фина'м Форекс един для всех клиентов. Чтобы ознакомиться с условиями тарифа, на сайте Фина'м точка ру, зайдите в раздел, Форекс, далее выберите, Торговые условия.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                
+        state: Форекс_ChoosingBestRate
+            a: Тарифный план при торговле через компанию Фина'м Форекс един для всех клиентов. Чтобы ознакомиться с условиями тарифа, на сайте Фина'м точка ру, зайдите в раздел, Форекс, далее выберите, Торговые условия.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Форекс_HowToChangeRate
+            a: Тарифный план при торговле через компанию Фина'м Форекс един для всех клиентов. Чтобы ознакомиться с условиями тарифа, на сайте Фина'м точка ру, зайдите в раздел, Форекс, далее выберите, Торговые условия.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Форекс_ClientPersonalRate
+            a: Тарифный план при торговле через компанию Фина'м Форекс един для всех клиентов. Чтобы ознакомиться с условиями тарифа, на сайте Фина'м точка ру, зайдите в раздел, Форекс, далее выберите, Торговые условия.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Форекс_RateInformation
+            a: Тарифный план при торговле через компанию Фина'м Форекс един для всех клиентов. Чтобы ознакомиться с условиями тарифа, на сайте Фина'м точка ру, зайдите в раздел, Форекс, далее выберите, Торговые условия.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+
+        #Информация по конкретному тарифу    
+        state: Тариф_Стратег
+            a: Абонентская плата в месяц, по тарифу, Стратег, 0 рублей. Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру.
+            a: Для этого выберите раздел, Брокерские услуги, далее в поле меню, Самостоятельная торговля, выберите, Тарифы или Сравнение.
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м. Регламент представлен на сайте фина'м точка ру.
+            a: Чтобы открыть регламент. в верхней части страницы сайта выберите раздел, Брокерские услуги, далее в появившемся меню выберите пункт, Информация. далее выберите, Документы.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: Тариф_Дневной
+            a: Абонентская плата в месяц, по тарифу, Дневной, 177 рублей. И 400 рублей, в случае если сумма чистых активов на счете менее 2х тысяч рублей. Комиссия за обслуживание уменьшается на сумму других уплаченных в текущем месяце брокерских комиссий.
+            a: Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру. Для этого выберите раздел, Брокерские услуги, далее в поле меню, Самостоятельная торговля, выберите, Тарифы или Сравнение.
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м. Регламент представлен на сайте фина'м точка ру.
+            a: Чтобы открыть регламент. в верхней части страницы сайта выберите раздел, Брокерские услуги, далее в появившемся меню выберите пункт, Информация. далее выберите, Документы.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        # state: Тариф_ЕдиныйДневной
+        #     a: Информация по Тариф_ЕдиныйДневной
+        #     a: Чем я могу еще помочь?
+        #     q: @repeat_please * ||toState = "."
+        
+        state: Тариф_ЕдиныйКонсультационный
+            a: Тарифный план, Единый Консультационный, предполагает дополнительное информационное и консультационное обслуживание.
+            a: Абонентская плата в месяц, по тарифу, Единый Консультационный, 177 рублей. И 400 рублей, в случае если сумма чистых активов на счете менее 2х тысяч рублей.
+            a: Комиссия за обслуживание уменьшается на сумму других уплаченных в текущем месяце брокерских комиссий. Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру.
+            a: Для этого выберите раздел, Брокерские услуги, далее в поле меню, Самостоятельная торговля, выберите, Тарифы или Сравнение.
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м. Регламент представлен на сайте фина'м точка ру.
+            a: Чтобы открыть регламент. в верхней части страницы сайта выберите раздел, Брокерские услуги, далее в появившемся меню выберите пункт, Информация. далее выберите, Документы.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Тариф_ЕдиныйТест-Драйв
+            a: При открытии своего первого брокерского счёта в Фина'м, вы можете подключить выгодный тариф с бесплатным обслуживанием, Тест Драйв, сроком на один месяц.
+            a: Через 30 дней с момента открытия счета с тарифом, Тест Драйв, тариф автоматически сменится на другой, также без абонентской платы, тариф Стратег.
+            a: Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру. Для этого выберите раздел, Брокерские услуги, далее в поле меню, Самостоятельная торговля, выберите, Тарифы или Сравнение.
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м. 
+            a: Регламент представлен на сайте фина'м точка ру. Чтобы открыть регламент. в верхней части страницы сайта выберите раздел, Брокерские услуги, далее в появившемся меню выберите пункт, Информация. далее выберите, Документы.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Тариф_ЕдиныйФиксированный
+            a: Тарифный план, Единый Фиксированный, предполагает пониженную ставку от торгового дневного оборота, и фиксированную комиссию, 3540 рублей, при совершении одной и более сделок в течение месяца.
+            a: Абонентская плата в месяц, по тарифу, Единый Фиксированный, 177 рублей. И 400 рублей, в случае если сумма чистых активов на счете менее 2х тысяч рублей.
+            a: Комиссия за обслуживание уменьшается на сумму других уплаченных в текущем месяце брокерских комиссий.
+            a: Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру. Для этого выберите раздел, Брокерские услуги, далее в поле меню, Самостоятельная торговля, выберите, Тарифы или Сравнение.
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м.
+            a: Регламент представлен на сайте фина'м точка ру. Чтобы открыть регламент. в верхней части страницы сайта выберите раздел, Брокерские услуги, далее в появившемся меню выберите пункт, Информация. далее выберите, Документы.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Тариф_Инвестор
+            a: Абонентская плата в месяц, по тарифу, Инвестор, 200 рублей. И 400 рублей, в случае если сумма чистых активов на счете менее 2х тысяч рублей. Комиссия за обслуживание уменьшается на сумму других уплаченных в текущем месяце брокерских комиссий.
+            a: Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру. Для этого выберите раздел, Брокерские услуги, далее в поле меню, Самостоятельная торговля, выберите, Тарифы или Сравнение.
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м.
+            a: Регламент представлен на сайте фина'м точка ру. Чтобы открыть регламент. в верхней части страницы сайта выберите раздел, Брокерские услуги, далее в появившемся меню выберите пункт, Информация. далее выберите, Документы.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        # state: Тариф_Консультационный
+        #     a: Информация по  Тариф_Консультационный
+        #     a: Чем я могу еще помочь?
+        #     q: @repeat_please * ||toState = "."
+            
+        state: Тариф_СтандартныйФортс
+            a: Абонентская плата в месяц, по тарифу, Стандартный Фортс, 177 рублей. И 400 рублей, в случае если сумма чистых активов на счете менее 2х тысяч рублей.
+            a: Комиссия за обслуживание уменьшается на сумму других уплаченных в текущем месяце брокерских комиссий.
+            a: Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру. Полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м. Регламент представлен на сайте фина'м точка ру.
+            a: Чтобы открыть регламент. в верхней части страницы сайта выберите раздел, Брокерские услуги, далее в появившемся меню выберите пункт, Информация. далее выберите, Документы.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        # Тариф удален из сущности    
+        # state: Тариф_Тест-Драйв
+        #     a: Информация по  Тариф_Тест-Драйв
+        #     q: @repeat_please * ||toState = "."
+            
+        state: Тариф_ФриТрейд
+            a: При открытии своего первого брокерского счёта в Фина'м, вы можете подключить выгодный тариф с бесплатным обслуживанием, Фри Трейд 2 ноль, сроком на один месяц.
+            a: Через 30 дней с момента открытия счёта с Фри Трейд, тариф автоматически сменится на другой, также без абонентской платы, тариф Стратег.
+            a: Обращаем ваше внимание, архивный тариф Фри Трейд, недоступен для подключения. Владельцы такого тарифа сохраняют условия до момента смены тарифного плана.
+            a: Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру. Для этого выберите раздел, Брокерские услуги, далее в поле меню, Самостоятельная торговля, выберите, Тарифы или Сравнение. 
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м. Регламент представлен на сайте фина'м точка ру.
+            a: Чтобы открыть регламент. в верхней части страницы сайта выберите раздел, Брокерские услуги, далее в появившемся меню выберите пункт, Информация. далее выберите, Документы.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: Тариф_ЕдиныйOptions
+            a: Абонентская плата в месяц, по тарифу, Единый Дневной Опшенс, 177 рублей. И 400 рублей, в случае если сумма чистых активов на счете менее 2х тысяч рублей.
+            a: Комиссия за обслуживание уменьшается на сумму других уплаченных в текущем месяце брокерских комиссий. При подключении тарифа на cчет, Сегрегированный Глобал, стоимость обслуживания составит 4,5 доллара США.
+            a: Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру. Для этого выберите раздел, Брокерские услуги, далее в поле меню, Самостоятельная торговля, выберите, Тарифы или Сравнение.
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м.
+            a: Регламент представлен на сайте фина'м точка ру. Чтобы открыть регламент. в верхней части страницы сайта выберите раздел, Брокерские услуги, далее в появившемся меню выберите пункт, Информация. далее выберите, Документы.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # Тариф удален из сущности     
+        # state: Тариф_ФриТрейд2.0
+        #     a: Информация по Тариф_ФриТрейд2.0
+        #     q: @repeat_please * ||toState = "."
+
+    
+                
+    state: Налоговые вычеты
+        intent!: /021 Налоговые вычеты
+
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }            
+            if ( typeof $parseTree._deductionType != "undefined" ){
+                $session.deductionType = $parseTree._deductionType;
+            }
+            if ( typeof $parseTree._IISType != "undefined" ){
+                $session.IISType = $parseTree._IISType;
+            }            
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Налоговые вычеты/Уточнение компании");
+            }
+            if ( typeof $session.deductionType == "undefined" ){
+                $reactions.transition("/Налоговые вычеты/Уточнение типа вычета");
+            } else {
+                $reactions.transition("/Налоговые вычеты/" + $session.company.name + "_" + $session.deductionType.name);
+            }
+        
+        state: Уточнение компании
+            a: Информация по налоговым вычетам в какой компании вас интересует? Брокер Фина'м, или Управляющая компания?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Налоговые вычеты");
+                    
+        state: Уточнение типа вычета
+            a: Информация по какому типу налогового вычета вас интересует? Инвестиционный вычет по ИИС. Трёхгодичная льгота. Льгота по бумагам инновационного сектора. Пятилетняя льгота по операциям с эмитентом чьи активы состоят из недвижимости на территории эРэФ не более чем на 50%.
+            script:
+                $dialer.setNoInputTimeout(15000);
+           
+            q: * @choice_1 ||toState = "/Налоговые вычеты/Брокер_IISDeduction"
+            q: * @choice_2 ||toState = "/Налоговые вычеты/Брокер_3YearsBenefit"
+            q: * @choice_3 ||toState = "/Налоговые вычеты/Брокер_InnovationSector"
+            q: * @choice_4 ||toState = "/Налоговые вычеты/Брокер_50%Benefit"
+            q: * @choice_last ||toState = "/Налоговые вычеты/Брокер_50%Benefit"
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @deductionType *
+                script:
+                    $session.deductionType = $parseTree._deductionType;
+                    $reactions.transition("/Налоговые вычеты");                    
+        
+        state: Определение типа вычета по ИИС
+            a: Информация по какому типу вычета, вас интересует? Тип, А, или Бэ?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @IISType *
+                script:
+                    $session.IISType = $parseTree._IISType;
+                    $reactions.transition("/Налоговые вычеты/" + $session.company.name + "_IISDeduction_");                    
+                     
+            
+        #проверка на наличие информации по типу вычета ИИС
+        state: Брокер_IISDeduction
+            script:
+                if ( $session.IISType == "undefined"){
+                    $reactions.transition("/Налоговые вычеты/Определение типа вычета по ИИС");
+                } else {
+                    $reactions.transition("/Налоговые вычеты/" + $session.company.name + "_IISDeduction_" + $session.IISType.name);
+                }
+                
+                
+        state: Брокер_IISDeduction_TypeA
+            a: Максимальная сумма для вычета по типу а, за календарный год составляет 400000 ₽. В зависимости от ставки налога на ваш доход, Государство вернет вам 13% или 15% от той суммы, которую вы внесли на ИИС в отчетном году. 
+            a: Таким образом, максимальная сумма налога, подлежащая возврату, составит до 52000 или до 60000 рублей соответственно. С 2020 года вычет по типу А, можно оформлять в упрощенном порядке. 
+            a: Скачать пакет документов для самостоятельной подачи, или подать заявку на получение вычета в упрощенном порядке, можно в личном кабинете на сайте, фина'м точка ру. 
+            a: Для этого зайдите в личный кабинет, далее выберите раздел, отчёты, далее выберите пункт меню, налоги и справки, далее выберите нужное.
+            a: Обращаем ваше внимание, что для подачи заявления в упрощенном порядке за 2020й и 2021й года' нужно обратиться к менеджеру. 
+            a: Если в личном кабинете налогоплательщика пришел отказ по упрощенной процедуре, а также при оформлении вычета, по стандартной процедуре за более ранние периоды, вам потребуется собрать следующие документы и обратиться в налоговую.
+            a: Справка 2 НДФЛ с места работы. Платежное поручение об отправке денежных средств на ИИС. Пакет документов об открытии счёта и брокерский отчет.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                
+        state: Брокер_IISDeduction_TypeB  
+            a: Максимальная сумма для вычета по типу Бэ, равна доходу, полученному от торговых операций, учтенных на договоре ИИ'С, данная инвестиционная прибыль при вычете по типу Бэ, налогом не облагается. 
+            a: Чтобы оформить вычет по типу Бэ, можно подать заявку на получение вычета в упрощенном порядке, в личном кабинете на сайте, фина'м точка ру. 
+            a: Для этого зайдите в личный кабинет, далее выберите раздел, отчёты, далее выберите пункт меню, налоги и справки, далее выберите нужное. После подачи заявления в течение двух рабочих дней, ожидайте новый статус заявления, Принято к исполнению. 
+            a: После получение данного статуса, в течение 30 дней нужно вывести средства со счёта ИИС и закрыть счет ИИС. Доход, полученный на счете ИИС, не будет облагаться налогом.    
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: Брокер_InnovationSector
+            a: Инвестор освобождается от уплаты 13% НДФЛ по операциям с ценными бумагами высокотехнологичного инновационного сектора. Актуальный перечень таких бумаг представлен на сайте московской биржи.
+            a: Условиями получения такой льготы являются приобретение бумаг не ранее включения эмитента в перечень, и их продажа до исключения из этого перечня.
+            a: И непрерывное владение бумагами более одного года. Льгота предоставляется брокером по умолчанию по итогам года, заявление не требуется.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                
+        state: Брокер_3YearsBenefit
+            a: Инвесторы могут не платить НДФЛ с дохода от продажи ценных бумаг, которыми владели более трех лет. Если у вас в портфеле, за исключением договора ИИС, есть бумаги, приобретенные после 1 января 2014 года.
+            a: И вы владеете ими непрерывно более трех лет, то вы можете претендовать на трех годичную льготу. 
+            a: Проверить наличие бумаг, попадающих под трех годичную льготу на счетах в Фина'м, а также подать заявление на ее предоставление, можно в личном кабинете брокера на сайте, едо'кс точка Фина'м точка ру.
+            a: Для этого выберите меню, Услуги, далее выберите раздел, Налоги, выписки, справки, в поле меню налоги, выберите нужное. 
+            a: Заявление на получение льготы нужно подписать до вывода средств от продажи ценных бумаг. Оно действует в течение одного календарного года.
+            a: Обращаем ваше внимание, если бумаги были приобретены через другого брокера, или получены в дар, и по ним отсутствует возможность подачи заявления в личном кабинете, то для оформления льготы нужно обратиться в налоговую.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Брокер_50%Benefit
+            a: Инвестор освобождается от уплаты 13% НДФЛ по операциям с акциями российских и иностранных организаций, если активы эмитента состоят из недвижимости на территории РФ не более чем на 50%.
+            a: Условиями получения льготы являются непрерывное владение бумагами более 5 лет и отсутствие сделок займа или РЭ'ПО.
+            a: А также необходима справка от эмитента, что на последний день месяца предшествующего месяцу продажи ЦБ, активы эмитента состояли из недвижимости на территории эРэФ не более чем на 50%. отсутствуют.
+            a: Воспользоваться льготой можно через Фина'м, до 31 января года, следующего за годом продажи бумаг. Через ИФНС обращаться можно в течение трёх лет, следующих за отчетным периодом, в котором произошла реализация бумаг.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"            
+            
+        #Информация по УК
+        state: УК_IISDeduction
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: УК_IISDeduction_TypeA
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: УК_IISDeduction_TypeB
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: УК_InnovationSector
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: УК_3YearsBenefit
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");    
+
+ 
+                
+    state: ИИС
+        intent!: /022 ИИС
+        
+        script:
+            if ( typeof $parseTree._IISInformationType != "undefined" ){
+                $session.IISInformationType = $parseTree._IISInformationType;
+            }            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.IISInformationType == "undefined" ){
+                $reactions.transition("/ИИС/Уточнение типа информации по ИИС");
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/ИИС/Уточнение компании");
+            }
+             else {
+                $reactions.transition("/ИИС/" + $session.company.name + "_" + $session.IISInformationType.name);
+            }
+            
+        state: Уточнение компании
+            a: Информация по индивидуальному инвестиционному счету, в какой компании, вас интересует,  Брокер Фина'м, или Управляющая компания?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/ИИС");
+                    
+        state: Уточнение типа информации по ИИС
+            a: Какая информация по ИИС вас интересует? Дата открытия ИИС. Пополнение. Перевод ИИС от брокера к брокеру, или статус налогового вычета.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: * @choice_1 * ||toState = "/ИИС/Брокер_IISOpeningDate"
+            q: * @choice_2 * ||toState = "/ИИС/Брокер_IISReplenishment"
+            q: * @choice_3 * ||toState = "/ИИС/Брокер_IISTransfer"
+            q: * @choice_4 * ||toState = "/ИИС/Брокер_IISStatus"
+            q: * @choice_last * ||toState = "/ИИС/Брокер_IISStatus"
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @IISInformationType *
+                script:
+                    $session.IISInformationType = $parseTree._IISInformationType;
+                    $reactions.transition("/ИИС");                
+
+
+        #Информация по Брокеру    
+        state: Брокер_IISTransfer
+            # a: 222
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                
+        state: Брокер_IISStatus
+            # a: 111
+            a: Статус отправки сведений в ФНС, по упрощенному порядку для получения вычета типа А, можно отслеживать в личном кабинете на сайте, фина'м точка ру.
+            a: Для этого выберите раздел, отчёты, далее выберите пункт меню, налоги и справки, далее выберите, Упрощенный порядок получения вычета.
+            a: Если заявление принято в работу, то федеральная налоговая служба сформирует для вас предварительную декларацию, которую необходимо подписать в личном кабинете налогоплательщика. Срок камеральной проверки после подписания декларации, один месяц. 
+            a: Статус отправки сведений в ФНС, по упрощенному порядку для получения вычета типа Б, можно отслеживать в личном кабинете на сайте, фина'м точка ру, для этого выберите меню, отчёты, далее выберите раздел, документы, журнал поручений.
+            a: Если заявление было принято,а и подтверждено федеральной налоговой службой, то в течение 30 дней, нужно вывести средства и закрыть счет ИИС. Доход, полученный на счете ИИС, не будет облагаться налогом.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                
+        state: Брокер_IISOpeningDate
+            a: Перечень действующих счетов доступен в личном кабинете на сайте, фина'м точка ру. Проверить дату открытия договора ИИС, и актуальный тариф, можно в личном кабинете, для этого выберите счет с названием КЛФ ИИС, далее выберите раздел, детали.
+            a: Если счет ИИС переведен от другого брокера, первичную дату открытия можно уточнить у менеджера фина'м, или в личном кабинете брокера на сайте, едо'кс точка Фина'м точка ру, кликнув на счет с названием КЛФ ИИС. 
+            a: Историю пополнения договора ИИС, вы можете посмотреть в истории операций по счету в личном кабинете на сайте, фина'м точка ру. для этого рядом с разделом портфель, выберите вкладку история.
+            a: Также посмотреть историю пополнения договора ИИС, можно в справке по счету. Заказать справку по брокерскому счету, можно в личном кабинете на сайте, фина'м точка ру, для этого выберите меню отчёты, далее выберите раздел, налоги и справки.
+            a: Максимальный интервал получения справки по счету, 92 дня. При необходимости получить годовой отчет, справку можно сформировать 4 раза. Или запросить заверенный брокерский отчет у менеджера фина'м.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO" 
+                
+        state: Брокер_IISReplenishment
+            a: Обращаем ваше внимание, пополнить счет ИИС можно только в валюте рубль РФ, на сумму не более 1000000 рублей в год, отправителем средств на ИИС должен являться владелец этого счета.
+            a: Рекомендуем пополнять счет ИИС наличными в кассе, безналичным платежом по реквизитам или через систему быстрых платежей.
+            a: При оформлении вычета, налоговая имеет право запросить платежное поручение с подтверждением внесения средств на ИИС.
+            a: Чтобы пополнить счет ИИС по реквизитам, в личном кабинете на сайте, фина'м точка ру, выберите вкладку, пополнение, далее выберите, переводом из другого банка. Под суммой пополнения выберите способ, по реквизитам. Деньги поступят в течение дня.
+            a: Срок может быть увеличен до трех рабочих дней, в зависимости от исполнения платежа банком-отправителем. За данную операцию, фина'м не взимает комиссию. 
+            a: Однако возможна комиссия со стороны банка-отправителя. Через кассу представительства фина'м, можно пополнить ИИС наличными средствами, без комиссии. Для этого вам понадобится действующий паспорт гражданина Российской Федерации.
+            a: Адрес ближайшего офиса можно посмотреть на сайте Фина'м точка ру, в разделе контактная информация, внизу страницы.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        #Информация по УК
+        state: УК_IISTransfer
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                
+        state: УК_IISStatus
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+
+        state: УК_IISOpeningDate
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+
+        state: УК_IISReplenishment
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+    
+    
+    
+    state: Маржинальная торговля
+        intent!: /024 Маржинальная торговля
+        
+        a: Какая информация по маржинальной торговле Вас интересует? Открытие маржинальной позиции, отключение или подключение маржинальной торговли, где посмотреть уровень маржи' по счету, уровни риска КПУР, КСУР, или ставки риска по инструментам?
+        script:
+            $dialer.setNoInputTimeout(15000);
+        
+        q: * @open_margin * ||toState = "/Маржинальная торговля_открытие позиции"
+        q: * @open_close_margin * ||toState = "/Маржинальная торговля_подключение|отключение"
+        q: * @level_margin * ||toState = "/Маржинальная торговля_уровень маржи"
+        q: * @KPUR_KSUR * ||toState = "/Маржинальная торговля_КПУР|КСУР"
+        q: * @risk_rate * ||toState = "/Маржинальная торговля_ставка риска"
+        q: * @choice_1 * ||toState = "/Маржинальная торговля_открытие позиции"
+        q: * @choice_2 * ||toState = "/Маржинальная торговля_подключение|отключение"
+        q: * @choice_3 * ||toState = "/Маржинальная торговля_уровень маржи"
+        q: * @choice_4 * ||toState = "/Маржинальная торговля_КПУР|КСУР"
+        q: * @choice_5 * ||toState = "/Маржинальная торговля_ставка риска"
+        q: * @choice_last * ||toState = "/Маржинальная торговля_ставка риска"
+        q: @repeat_please * ||toState = "."
+        
+    
+    state: Маржинальная торговля_открытие позиции
+        intent!: /024 Маржинальная торговля/Маржинальная торговля_открытие позиции
+        
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Маржинальная торговля_открытие позиции/Уточнение компании");
+            } else {
+                $reactions.transition("/Маржинальная торговля_открытие позиции/Ответ_" + $session.company.name);
+            } 
+        
+        # Можно вынести отдельно чтобы не дублировать в каждом интенте
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Фина'м Брокер или Фина'м Форекс?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Маржинальная торговля_открытие позиции");  
+
+            
+        state: Ответ_Брокер
+            a: Для открытия маржинальной позиции нужно подключить возможность маржинальной торговли по счету. Чтобы подключить маржинальную торговлю авторизуйтесь в личном кабинете на сайте, едо'кс точка фина'м точка ру.
+            a: Далее в разделе, Торговля, выберите, тестирование для неквалифицированного инвестора по категории Необеспеченные сделки.
+            a: Для квалифицированных инвесторов доступ предоставляется автоматически. Обращаем ваше внимание, что маржинальная торговля может быть ограничена по ряду инструментов. Например, на Гонконгской бирже маржинальная торговля не доступна.
+            a: Ознакомиться со списком доступных инструментов для длинных и коротких позиций, а также ставками риска, можно на сайте фина'м точка ру. В верхней части страницы сайта выберите раздел, Брокерские услуги.
+            a: Далее в появившемся меню выберите пункт, Информация. далее выберите, Список маржинальных бумаг.
+            a: Ставки риска могут отличаться на сайте и в торговых системах в зависимости от рыночной ситуации. Самую актуальную информацию по ставкам риска можно узнать в торговой системе Транза'к в Описании инструмента, а также у менеджера Фина'м.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+    
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+    
+    state: Маржинальная торговля_подключение|отключение
+        intent!: /024 Маржинальная торговля/Маржинальная торговля_подключение|отключение
+        
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Маржинальная торговля_подключение|отключение/Уточнение компании");
+            } else {
+                $reactions.transition("/Маржинальная торговля_подключение|отключение/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Фина'м Брокер или Фина'м Форекс?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Маржинальная торговля_подключение|отключение");     
+        
+
+        state: Ответ_Брокер
+            a: Маржинальная торговля или необеспеченные сделки, это операции с использованием заемных средств брокера, которые одновременно повышают потенциальный риск и потенциальную доходность операции.
+            a: Чтобы подключить маржинальную торговлю, нужно пройти тестирование для неквалифицированного инвестора по категории Необеспеченные сделки. Это можно сделать в личном кабинете на сайте фина'м точка ру.
+            a: Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус.
+            a: Далее выберите, пройти тестирование. Для квалифицированных инвесторов доступ предоставляется автоматически. Чтобы отключить маржинальную торговлю обратитесь к менеджеру фина'м.
+            a: После отключения будет заблокирована возможность использования заемных средств брокера по счету, а также доступ к коротким позициям. Узнать, подключена ли у вас маржинальная торговля можно у менеджера.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+    
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        
+    state: Маржинальная торговля_уровень маржи
+        intent!: /024 Маржинальная торговля/Маржинальная торговля_уровень маржи
+        
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Маржинальная торговля_уровень маржи/Уточнение компании");
+            } else {
+                $reactions.transition("/Маржинальная торговля_уровень маржи/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Фина'м Брокер или Фина'м Форекс?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Маржинальная торговля_уровень маржи");    
+
+
+        state: Ответ_Брокер
+            a: Информацию о состоянии портфеля, значениях маржи и запасе портфеля до принудительного закрытия можно посмотреть в личном кабинете на сайте фина'м точка ру.
+            a: Для этого выберите нужный счет, в разделе, детали по счету, раскройте строку, показатели риска.
+            a: В терминале фина'м трейд, начальные требования, суммарную оценку денежных средств, ценных бумаг и обязательств, можно посмотреть в разделе, Аналитика по счету. в мобильном приложении фина'м трейд, в разделе, Детали по счету.
+            a: В терминале КВИК, следить за маржинальными требованиями можно с помощью таблицы, Клиентский портфель. Для этого выберите на панели инструментов, Создать окно, Все типы окон, Клиентский портфель.
+            a: В терминале Meta Trader 5, в строке Баланс, показатели Активы Маржа' Уровень маржи' и другие, будут отображаться только при открытых позициях на фондовой и валютной секциях.
+            a: В случае, если торговля ведется только по фьючерсным контрактам, то за показателями риска можно следить через личный кабинет.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+    
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        
+    state: Маржинальная торговля_КПУР|КСУР
+        intent!: /024 Маржинальная торговля/Маржинальная торговля_КПУР|КСУР
+        
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Маржинальная торговля_КПУР|КСУР/Уточнение компании");
+            } else {
+                $reactions.transition("/Маржинальная торговля_КПУР|КСУР/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Фина'м Брокер или Фина'м Форекс?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Маржинальная торговля_КПУР|КСУР");    
+        
+
+        state: Ответ_Брокер
+            a: При открытии брокерского счёта, инвестору по умолчанию присваивается стандартный уровень риска, или КСУР. Уровни риска влияют на величину кредитного плеча, которое будет доступно при подключении маржинальной торговли.
+            a: Инвестор может получить категорию повышенного уровня риска, или КПУР, если сумма его активов на его брокерских счетах не менее трех миллионов рублей.
+            a: Либо, сумма активов более 600000 рублей, и он является клиентом брокера в течение последних 180 дней и заключал сделки с ценными бумагами или производными финансовыми инструментами на протяжении пяти и более дней.
+            a: Для КПУР применяются ставки маржинального обеспечения ниже, чем для КСУР. Таким образом, статус клиента с повышенным уровнем риска дает больше возможностей для наращивания маржинальных позиций, или размера плеча, но и повышает финансовые риски.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+    
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        
+    state: Маржинальная торговля_ставка риска
+        intent!: /024 Маржинальная торговля/Маржинальная торговля_ставка риска
+        
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Маржинальная торговля_ставка риска/Уточнение компании");
+            } else {
+                $reactions.transition("/Маржинальная торговля_ставка риска/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Фина'м Брокер или Фина'м Форекс?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Маржинальная торговля_ставка риска");
+        
+
+        state: Ответ_Брокер
+            a: Ознакомиться со списком доступных инструментов для длинных и коротких позиций, а также ставками риска, можно на сайте фина'м точка ру. В верхней части страницы сайта выберите раздел, Брокерские услуги.
+            a: Далее в появившемся меню выберите пункт, Информация. далее выберите, Список маржинальных бумаг.
+            a: Ставки риска могут отличаться на сайте и в торговых системах в зависимости от рыночной ситуации. Самую актуальную информацию по ставкам можно узнать в торговой системе Транза'к в Описании инструмента, а также у менеджера Фина'м.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+    
+    
+    
+    state: Срочный рынок  
+        intent!: /026 Срочный рынок
+        
+        a: Какая информация о торговле на срочном рынке Вас интересует? Как узнать гарантийное обеспечение? как уменьшить гарантийное обеспечение? Как посмотреть свой финансовый результат? Узнать подробнее о торговле фьючерсами.
+        script:
+            $dialer.setNoInputTimeout(15000);
+        
+        q: * @which_GO * ||toState = "/Срочный рынок_гарантийное обеспечение по счету"
+        q: * @what_profit_loss * ||toState = "/Срочный рынок_прибыль|убыток по счету"
+        q: * @lower_GO * ||toState = "/Срочный рынок_уменьшение гарантийного обеспечения"
+        q: * @futures_trading * ||toState = "/Срочный рынок_покупка|продажа фьючерса"
+        q: * @choice_1 * ||toState = "/Срочный рынок_гарантийное обеспечение по счету"
+        q: * @choice_2 * ||toState = "/Срочный рынок_уменьшение гарантийного обеспечения"
+        q: * @choice_3 * ||toState = "/Срочный рынок_прибыль|убыток по счету"
+        q: * @choice_4 * ||toState = "/Срочный рынок_покупка|продажа фьючерса"
+        q: * @choice_last * ||toState = "/Срочный рынок_покупка|продажа фьючерса"
+        q: @repeat_please * ||toState = "."
+        
+        
+    state: Срочный рынок_гарантийное обеспечение по счету
+        intent!: /026 Срочный рынок/Срочный рынок_гарантийное обеспечение по счету
+        
+        go!: /Срочный рынок_гарантийное обеспечение по счету/Ответ_Брокер
+        
+        state: Ответ_Брокер
+            a: При открытии позиции по фьючерсу, на счете блокируется гарантийное обеспечение, или ГэО'. При закрытии позиции, заблокированные средства освобождаются.
+            a: Проверить актуальное ГэО' по счету можно в системе Транза'к в информации по инструменту, либо уточнить у менеджера. Величина ГэО' устанавливается биржей и публикуется на сайте мо'екс точка ком.
+            a: По единым брокерским счетам, Размер гарантийного обеспечения формируется на основании ставок риска по инструментам, и категории риска клиента, КСУР или КПУР.
+            a: По умолчанию для счетов со статусом КСУР, ГэО' почти в два раза больше биржевого, в связи с действующими требованиями к риск-менеджменту.
+            a: При выставлении рыночной заявки гарантийное обеспечение увеличивается в 1,5 раза. Рекомендуется использовать лимитные заявки.
+            a: Хотите узнать способы, как уменьшить гарантийное обеспечение?
+            script:
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @agree ||toState = "/Срочный рынок_уменьшение гарантийного обеспечения"
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            q: @repeat_please * ||toState = "."
+        
+    
+    state: Срочный рынок_прибыль|убыток по счету
+        intent!: /026 Срочный рынок/Срочный рынок_прибыль|убыток по счету
+        
+        go!: /Срочный рынок_прибыль|убыток по счету/Ответ_Брокер
+        
+        state: Ответ_Брокер
+            a: Прибыль или убыток по фьючерсам и опционам, зачисляется или списывается в виде вариационной маржи'. Позиционная вариационная маржа' начисляется на контракты, которые есть в портфеле на утро.
+            a: Посделочная вариационная маржа' начисляется в день открытия позиции по фьючерсу или опциону. На следующий день, и до момента закрытия позиции начисляется позиционная вариационная маржа'.
+            a: Если позиция открыта и закрыта внутри торговой сессии, то будет зачислена посделочная маржа'.
+            a: Фактическое зачисление вариационной маржи' на счет происходит в основной клиринг в 19 ноль пять по московскому времени. Движение маржи' отображается в справке по счету, а также в истории операций по счету.
+            a: Параметры инструментов для расчета вариационной маржи' доступны на сайте Московской биржи.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+    
+    state: Срочный рынок_уменьшение гарантийного обеспечения
+        intent!: /026 Срочный рынок/Срочный рынок_уменьшение гарантийного обеспечения
+        
+        script:
+            if ( typeof $parseTree._GOreductionType != "undefined" ){
+                $session.GOreductionType = $parseTree._GOreductionType;
+            }
+            if ( typeof $session.GOreductionType == "undefined" ){
+                $reactions.transition("/Срочный рынок_уменьшение гарантийного обеспечения/Уточнение способа уменьшения");
+            } else {
+                $reactions.transition("/Срочный рынок_уменьшение гарантийного обеспечения/Ответ_" + $session.GOreductionType.name);
+            }
+        
+            
+        state: Ответ_Открытие моносчета
+            a: В рамках договора с раздельными моносчета'ми, по счету для срочного рынка размер гарантийного обеспечения равен биржевому. Для открытия моносче'та, нужно авторизоваться в личном кабинете на сайте фина'м точка ру.
+            a: Нажать кнопку, Открыть новый счет, далее выбрать, Показать все продукты, далее выбрать Брокерскую компанию, Договор с отдельными брокерскими счетами.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+                
+        state: Ответ_Отключение ФС и ВС
+            a: Чтобы отключить фондовую и валютную секцию по единому счету, нужно проверить счет на соответствие следующим требованиям. Сумма средств на счете должна быть более 10000 рублей.
+            a: По счету отсутствуют сделки с ценными бумагами и валютой. Ваш инвестиционный профиль должен быть умеренный или агрессивный.
+            a: Для смены инвест профиля, нужно авторизоваться в личном кабинете на сайте фина'м точка ру, в правом верхнем углу личного кабинета нажать на значок персоны, далее выбрать, Инвестиционный профиль.
+            a: Если счет соответствует всем требованиям, обратитесь к менеджеру фина'м для отключения фондовой и валютной секции.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+
+            
+        state: Ответ_Подключение ПГО
+            a: Узнать условия подключения, подключить или отключить услугу пониженного гарантийного обеспечения, можно в личном кабинете на сайте едо'кс точка фина'м точка ру.
+            a: Для этого в разделе, Услуги, выберите пункт меню Прочие операции, далее выберите, Услуга Пониженное ГэО'.
+            a: Услуга действует в будние дни, с семи утра до девятнадцати тридцати по московскому времени, по ограниченному списку инструментов. Ознакомиться со списком можно на сайте фина'м точка ру.
+            a: Для этого в разделе, Брокерские услуги, выберите пункт, Информация. Далее выберите, Список маржинальных бумаг. Далее скачайте файл с названием, Параметры используемые фина'м для обслуживания по Единому счету и счетам срочного рынка.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+            
+        state: Ответ_Получение КПУР
+            a: Инвестор может получить категорию повышенного уровня риска, или КПУР, если сумма его активов на его брокерских счетах не менее трех миллионов рублей.
+            a: Либо, сумма активов более 600000 рублей, и он является клиентом брокера в течение последних 180 дней и заключал сделки с ценными бумагами или производными финансовыми инструментами на протяжении пяти и более дней.
+            a: Для КПУР гарантийное обеспечение ниже, чем для КСУР. Таким образом, статус клиента с повышенным уровнем риска дает больше возможностей для наращивания маржинальных позиций, или размера плеча, но и повышает финансовые риски.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+                
+ 
+        state: Уточнение способа уменьшения
+            a: Есть четыре способа снизить гарантийное обеспечение.
+            a: Использовать услугу Пониженное гарантийное обеспечение; открыть договор с раздельными моносчета'ми, или отключить фондовую и валютную секцию на едином счете; также можно получить статус клиента с повышенным уровнем риска, КПУР.
+            a: Какой способ вас интересует?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @GOreductionType *
+                script:
+                    $session.GOreductionType = $parseTree._GOreductionType;
+                    $reactions.transition("/Срочный рынок_уменьшение гарантийного обеспечения");
+            
+        
+    state: Срочный рынок_покупка|продажа фьючерса
+        intent!: /026 Срочный рынок/Срочный рынок_покупка|продажа фьючерса
+        
+        go!: /Срочный рынок_покупка|продажа фьючерса/Ответ_Брокер
+        
+        state: Ответ_Брокер
+            a: Для торговли инструментами срочного рынка нужно пройти тестирование для неквалифицированных инвесторов по категории Производные финансовые инструменты.
+            a: Пройти тестирование можно в личном кабинете на сайте фина'м точка ру. Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус. Далее выберите, пройти тестирование.
+            a: Для квалифицированных инвесторов доступ предоставляется автоматически.
+            a: Выставить заявку на покупку или продажу фьючерса можно через любую торговую систему, с учетом параметров фьючерсного контракта, таких как гарантийное обеспечение, шаг цены и другие.
+            a: Ознакомиться со спецификацией фьючерсных контрактов можно на сайте московской биржи.
+            a: Обращаем ваше внимание, что Торговая сессия на срочном рынке начинается вечером и длится с 19:05 до 23:50, и продолжается на следующий день — с 10:00 до 14:00 и с 14:05 до 18:50 по московскому времени.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"        
+            
+    
+    
+    state: Валюта
+        intent!: /027 Валюта    
+        
+        a: Какая информация по валютным операциям Вас интересует? Купить или продать валюту. Купить или продать неполный лот валюты. Комиссии за хранение валют.
+        script:
+            $dialer.setNoInputTimeout(15000);
+        
+        q: * @currency_buy_sell * ||toState = "/Валюта_покупка|продажа"
+        q: * @incomplete_lot * ||toState = "/Валюта_неполный лот"
+        q: * @currency_storage * ||toState = "/Валюта_стоимость хранения"
+        q: * @choice_1 * ||toState = "/Валюта_покупка|продажа"
+        q: * @choice_2 * ||toState = "/Валюта_неполный лот"
+        q: * @choice_3 * ||toState = "/Валюта_стоимость хранения"
+        q: * @choice_last * ||toState = "/Валюта_стоимость хранения"
+        q: @repeat_please * ||toState = "."
+        
+        
+    state: Валюта_покупка|продажа
+        intent!: /027 Валюта/Валюта_покупка|продажа
+        
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Валюта_покупка|продажа/Уточнение компании");
+            } else {
+                $reactions.transition("/Валюта_покупка|продажа/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: Вы хотите совершить операции с валютой на Брокерском счете, или в Банке фина'м?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Валюта_покупка|продажа");    
+
+
+        state: Ответ_Брокер
+            a: Валютные пары торгуются на валютной секции московской биржи. Торговля валютными парами также доступна для счетов ИИС.
+            a: Чтобы купить или продать валюту, нужно воспользоваться поиском по инструменту в любой торговой системе, и выставить заявку с учетом лотности контракта.
+            a: В системе фина'м трейд можно выбрать инструмент из раздела, Валюты. В разделе, Мировые валюты, транслируются индикативные форекс-котировки, торги такими валютными парами недоступны.
+            a: Размер одного лота валюты отображается в поле выставления заявки, и в информации по инструменту в торговой системе. Стандартный размер одного лота валюты равен одной тысяче условных единиц, но есть исключения.
+            a: Полные лоты валюты доступны в виде контрактов с окончанием ТОДЪ, то есть биржевые расчеты пройдут в текущий рабочий день после 23 часов 50 минут по московскому времени.
+            a: Также полные лоты валюты доступны в виде контрактов с окончанием TOM, то есть расчеты пройдут на следующий рабочий день после 23 часов 50 минут.
+            a: Неполные лоты валют доступны в виде контрактов с окончанием ТэМэ ЭС, такие контракты торгуются кратно 0,01 единицы валюты.
+            a: Минимальная заявка от одной единицы валюты, расчеты на следующий рабочий день после 23 часов 50 минут по московскому времени.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+            
+        state: Ответ_Банк  
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        
+        
+    state: Валюта_неполный лот
+        intent!: /027 Валюта/Валюта_неполный лот
+        
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Валюта_неполный лот/Уточнение компании");
+            } else {
+                $reactions.transition("/Валюта_неполный лот/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: Операции с валютой в какой компании вас интересуют, Фина'м Брокер, Фина'м Банк или Фина'м Форекс?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Валюта_неполный лот");    
+
+
+        state: Ответ_Брокер
+            a: Валютные пары торгуются на валютной секции московской биржи. Торговля валютными парами также доступна для счетов ИИС.
+            a: Чтобы купить или продать валюту, нужно воспользоваться поиском по инструменту в любой торговой системе, и выставить заявку с учетом лотности контракта.
+            a: Неполные лоты валют доступны в виде контрактов с окончанием ТэМэ ЭС, такие контракты торгуются кратно 0,01 единицы валюты.
+            a: Минимальная заявка от одной единицы валюты, расчеты на следующий рабочий день после 23 часов 50 минут по московскому времени.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+            
+        state: Ответ_Банк  
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        
+        
+    state: Валюта_стоимость хранения
+        intent!: /027 Валюта/Валюта_стоимость хранения
+        
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Валюта_стоимость хранения/Уточнение компании");
+            } else {
+                $reactions.transition("/Валюта_стоимость хранения/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: Операции с валютой в какой компании вас интересуют, Фина'м Брокер, Фина'м Банк или Фина'м Форекс?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Валюта_стоимость хранения");    
+
+
+        state: Ответ_Брокер
+            a: Комиссия за хранение долларов СэШэА, и фунтов стерлингов, на брокерских счетах в фина'м, не взымается при хранении до 10 000 единиц валюты включительно. Комиссия взымается при хранении более 10000 единиц валюты.
+            a: Если сумма хранения от 10 до 100000 единиц валюты то комиссия 5% годовых.
+            a: Если свыше 100000 единиц валюты то комиссия 3% годовых. Комиссия за хранение удерживается в рублях по курсу Банка России на дату списания, расчет осуществляется исходя из количества валюты на счете по состоянию на конец календарного дня.
+            a: Списание происходит не позднее окончания соответствующего дня. Комиссия за хранение долларов СэШэА не взимается по счетам Сегрегированный Global, и по счетам, Иностранные биржи, в период действия акции.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        
+        state: Ответ_Форекс
+            script:
+               $session.operatorPhoneNumber =  $session.company.phoneNumber;
+               $reactions.transition("/Оператор/Оператор по номеру");
+            
+            
+        state: Ответ_Банк  
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+            
+            
+        
+    state: Контакты  
+        intent!: /030 Контакты
+        
+        a: Какая информация о компании вас интересует? электронная почта или чат с поддержкой? адреса офисов? реквизиты компании? лицензии компании фина'м.
+        script:
+            $dialer.setNoInputTimeout(15000);
+        
+        q: * почта * ||toState = "/Контакты_Почта"
+        q: * реквизиты * ||toState = "/Контакты_Реквизиты"
+        q: * юридический адрес * ||toState = "/Контакты_Юридический адрес"
+        q: * лицензии * ||toState = "/Контакты_Лицензии"
+        q: * @choice_1 * ||toState = "/Контакты_Почта"
+        q: * @choice_2 * ||toState = "/Контакты_Реквизиты"
+        q: * @choice_3 * ||toState = "/Контакты_Юридический адрес"
+        q: * @choice_4 * ||toState = "/Контакты_Лицензии"
+        q: * @choice_last * ||toState = "/Контакты_Лицензии"
+        q: @repeat_please * ||toState = "."
+        
+        
+    state: Контакты_Почта
+        intent!: /030 Контакты/Контакты_Почта
+        
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Контакты_Почта/Уточнение компании");
+            } else {
+                $reactions.transition("/Контакты_Почта/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: Информация о какой компании Вас интересует, Фина'м Брокер, Фина'м Банк, Фина'м Форекс или Управляющая компания Фина'м.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Контакты_Почта");    
+        
+        state: Ответ_Брокер
+            a: Служба технической поддержки работает в режиме 24/7. Написать сообщение или направить документы в поддержку брокера фина'м можно в чат или на электронную почту.
+            a: Адрес электронной почты поддержки доступен на сайте фина'м точка ру, в разделе сайта, о компании, в поле меню контакты и информация.
+            a: Чтобы написать в чат с поддержкой, можно воспользоваться чатом в торговой системе фина'м трейд. Либо воспользоваться чатом на сайте фина'м точка ру, для этого в верхнем правом углу нажмите, Ещё.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Ответ_Банк
+            a: Адрес электронной почты, часы работы и прочая контактная информация банка представлены на сайте фина'м точка ру. В разделе сайта Банк, контактная информация.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Ответ_Форекс
+            a: Служба технической поддержки работает в режиме 24/7. Адрес электронной почты и прочая контактная информация фина'м форекс представлены на сайте фина'м точка ру. В разделе сайта Форекс, контакты.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Ответ_УК
+            a: Адрес электронной почты и прочая контактная информация Управляющей компании фина'м, представлены на сайте фина'м точка ру. В разделе сайта Управление активами, о компании.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"            
+        
+    
+    state: Контакты_Реквизиты
+        intent!: /030 Контакты/Контакты_Реквизиты
+        
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Контакты_Реквизиты/Уточнение компании");
+            } else {
+                $reactions.transition("/Контакты_Реквизиты/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: Информация о какой компании Вас интересует, Фина'м Брокер, Фина'м Банк, Фина'м Форекс или Управляющая компания Фина'м.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Контакты_Реквизиты");    
+        
+        state: Ответ_Брокер
+            a: Реквизиты для перевода денежных средств и ценных бумаг на брокерские счета фина'м, можно найти в личном кабинете на сайте, фина'м точка ру, в разделе, детали по счету.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Ответ_Банк
+            a: Реквизиты ваших банковских счетов отображаются как в личном кабинете брокера так и в интернет банке фина'м. Юридические реквизиты Банка фина'м, представлены на сайте фина'м точка ру. В разделе сайта Банк, О Банке.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Ответ_Форекс
+            a: Реквизиты для пополнения фина'м форекс, представлены в личном кабинете на сайте, фина'м форекс. В разделе мои счета, пополнение счета.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Ответ_УК
+            a: Реквизиты Управляющей компании фина'м, для перевода средств по договорам доверительного управления, можно найти в личном кабинете на сайте, едо'кс фина'м точка ру, в разделе помощь.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"       
+            
+            
+    state: Контакты_Юридический адрес
+        intent!: /030 Контакты/Контакты_Юридический адрес
+        
+        go!: /Контакты_Юридический адрес/Ответ_Брокер
+        
+        state: Ответ_Брокер
+            a: Юридический адрес группы компаний фина'м. Москва, почтовый индекс 12 70 06, Настасьинский переулок, дом 7 строение 2. Адреса и режим работы офисов компании представлены на сайте, фина'м точка ру.
+            a: В разделе сайта, о компании, контакты. Перед визитом в центральный офис в Москве, на Настасьинском переулке дом 7, строение 2, можно заказать парковочное место, обратившись к менеджеру компании.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+            
+
+    state: Контакты_Лицензии
+        intent!: /030 Контакты/Контакты_Лицензии
+        
+        go!: /Контакты_Лицензии/Ответ_Брокер
+        
+        state: Ответ_Брокер
+            a: Перечень лицензий компаний группы фина'м представлен на сайте фина'м точка ру, внизу страницы. А также в разделе сайта, о компании. Для фина'м форекс лицензия находится в разделе, форекс.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+    
+    state: Комиссии
+        intent!: /007 Комиссии
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Комиссии/Уточнение компании");
+            } else {
+                $reactions.transition("/Комиссии_" + $session.company.name);
+            }
+
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Фина'м Брокер, Фина'м Банк, Фина'м Форекс или Управляющая компания Фина'м.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: повтори ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Комиссии");
+
+    state: Комиссии_Брокер
+        intent!: /007 Комиссии/Комиссии_Брокер
+        script:
+            if (typeof $parseTree._comission_type != "undefined"){
+                $session.comission_type = $parseTree._comission_type;
+                $reactions.transition("/Комиссии_Брокер/Комиссия_" + $session.comission_type.name)
+            }
+            
+        a: Размер биржевых, брокерских, депозитарных или комиссий за кредитование, зависит от тарифного плана установленного по счету, рынка ценных бумаг, даты открытия счета.
+        a: Ознакомиться с описанием тарифных планов: ФриТрэйд, Стратег, Инвестор, Единый дневной, Единый консультационный, можно на сайте Фина'м точка ру. В разделе сайта Брокерские услуги, во вкладке Тарифы, либо Сравнение тарифов.
+        a: Списание комиссии происходит в 23:59 по московскому времени. Размер комиссии за обслуживание брокерского счёта уменьшается на сумму других уплаченных брокерских комиссий.
+        a: Депозитарный тариф зависит от даты открытия счёта и даты последней смены тарифа. То есть по счетам, открытым или измененным после 26 ноября 2020 года применяется депозитарный Тарифный план номер 2 с бесплатным обслуживанием.
+        a: Полные условия всех тарифных планов приведены в Приложении № 7 Регламента брокерского обслуживания Фина'м. С которым можно ознакомиться на сайте Фина'м точка ру. В разделе Брокерские услуги, пункте меню, Информация, Документы.
+        a: Про какую комиссию вы хотите узнать подробнее? Про комиссию за обслуживание брокерского счета, или про комиссии за депозитарий.
+        script:
+            $dialer.setNoInputTimeout(15000);
+        q: * сделки * ||toState = "/Комиссии_Брокер/Комиссия_сделки"
+        q: * обслуживание * ||toState = "/Комиссии_Брокер/Комиссия_обслуживание"
+        q: * депозитарная * ||toState = "/Комиссии_Брокер/Комиссия_депо"
+        q: * @choice_1 * ||toState = "/Комиссии_Брокер/Комиссия_обслуживание"
+        q: * @choice_2 * ||toState = "/Комиссии_Брокер/Комиссия_депо"
+        q: * @choice_last * ||toState = "/Комиссии_Брокер/Комиссия_депо"
+        q: @repeat_please * ||toState = "."
+
+        state: Комиссия_сделки
+            a: Размер биржевых, брокерских, депозитарных или комиссий за кредитование, зависит от тарифного плана установленного по счету, рынка ценных бумаг, даты открытия счета.
+            a: Ознакомиться с описанием тарифных планов: ФриТрэйд, Стратег, Инвестор, Единый дневной, Единый консультационный, можно на сайте Фина'м точка ру.
+            a: В разделе сайта Брокерские услуги, во вкладке Тарифы, либо Сравнение тарифов. Списание комиссии происходит в 23:59 по московскому времени.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Комиссия_обслуживание
+            a: Размер комиссии за обслуживание брокерского счета, зависит от выбранного тарифного плана, и уменьшается на размер брокерской комиссии, удержанной за операции, совершенные в течение месяца.
+            a: Списание в последний день месяца. Комиссии за обслуживание самых популярных тарифов. Для счетов новых клиентов Фина'м, в первые 30 дней обслуживания применяется тариф фри трейд, без абонентской платы.
+            a: Через 30 дней с момента открытия счета, тариф Фри трейд автоматически меняется на тариф стратег. Обслуживание по тарифному плану, Стратег, ноль рублей. Тарифный план Инвестор, 200 рублей.
+            a: Тарифные планы, Дневной, Консультационный и другие, 177 рублей в месяц.
+            a: Обращаем ваше внимание, если на момент удержания комиссии за обслуживание, сумма чистых активов на счете менее 2000 рублей, то комиссия взымается в размере 400 рублей в месяц вне зависимости от тарифного плана.
+            a: Ознакомиться подробнее можно на сайте Фина'м точка ру. В разделе сайта Брокерские услуги, во вкладке Тарифы, либо Сравнение тарифов.
+            a: Полные условия всех тарифных планов приведены в Приложении № 7 Регламента брокерского обслуживания Фина'м. С которым можно ознакомиться на сайте Фина'м точка ру. В разделе Брокерские услуги, пункте меню, Информация, Документы.
+            a: Хотите узнать подробнее про комиссии депозитария?
+            script:
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @agree ||toState = "/Комиссии_Брокер/Комиссия_депо"
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                
+        state: Комиссия_депо
+            a: Депозитарный тариф зависит от даты открытия счёта и даты последней смены тарифа. То есть по счетам, открытым или измененным после 26 ноября 2020 года применяется депозитарный Тарифный план номер 2, без абонентской платы.
+            a: С тарифами на услуги депозитария можно ознакомиться на сайте Фина'м точка ру, в разделе Брокерские услуги. Во вкладке Информация, Услуги депозитария.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+    state: Комиссии_Форекс
+        intent!: /007 Комиссии/Комиссии_Форекс
+        a: При торговле с Фина'м Форекс всегда выгодные спрэды, и отсутствуют комиссии за сделки и обслуживание счёта. Обращаем ваше внимание на условия торговли, такие как спрэд, то есть разница покупки и продажи.
+        a: И своп, иными словами форвардные пункты; то есть перенос позиции через ночь, выходные или праздничные дни.
+        a: Актуальные условия торговли можно посмотреть на сайте Фина'м точка ру, в разделе сайта Форекс, в поле меню Трейдерам, Торговые условия.
+        a: А также информация об актуальном спрэде транслируется в терминале Meta Trader 4, в разделе Обзор рынка.
+        a: Чем я могу еще помочь?
+        script:
+            $context.session = {};
+            $dialer.setNoInputTimeout(15000);
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+    state: Комиссии_Банк
+        intent!: /007 Комиссии/Комиссии_Банк
+        script:
+            $session.operatorPhoneNumber =  '3888';
+            $reactions.transition("/Оператор/Оператор по номеру");
+        
+    state: Комиссии_УК
+        intent!: /007 Комиссии/Комиссии_УК
+        script:
+            $session.operatorPhoneNumber =  '2222';
+            $reactions.transition("/Оператор/Оператор по номеру");        
+
+    state: EDOX
+        intent!: /008 EDOX
+        a: Некоторые услуги и сервисы временно доступны в старой версии личного кабинета с доменом едо'кс. Зайти в новую, или старую версию личного кабинета можно на сайте фина'м точка ру.
+        a: В верхнем правом углу сайта нажмите, Личный кабинет, и авторизуйтесь. По умолчанию, логином от личного кабинета является номер телефона в международном формате. Для России, номер начинается с цифры, 7.
+        a: Далее выберите раздел кабинета Помощь. Далее слева нажмите кнопку перейти в старый дизайн.
+        a: Чем я могу еще помочь?
+        script:
+            $dialer.setNoInputTimeout(15000);
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+
+  
+   
+    state: Обучение
+        intent!: /028 Обучение   
+        
+        a: Учебный центр фина'м предоставляет видео курсы по торговым системам, услуги онлайн обучения, и услуги очного обучения и встреч для инвесторов. О чем вы хотите узнать подробнее?
+        script:
+            $dialer.setNoInputTimeout(15000);
+        q: * @ITS * ||toState = "/Обучение_ИТС"
+        q: * @learning_online * ||toState = "/Обучение_онлайн"
+        q: * @learning_offline * ||toState = "/Обучение_офлайн"
+        q: * @choice_1 * ||toState = "/Обучение_ИТС"
+        q: * @choice_2 * ||toState = "/Обучение_онлайн"
+        q: * @choice_3 * ||toState = "/Обучение_офлайн"
+        q: * @choice_last * ||toState = "/Обучение_офлайн"
+        q: @repeat_please * ||toState = "." 
+    
+    
+    state: Обучение_ИТС
+        intent!: /028 Обучение/Обучение_ИТС
+        script:
+            if ( typeof $parseTree._ITS != "undefined" ){
+                $session.ITS = $parseTree._ITS;
+            }
+            if ( typeof $session.ITS == "undefined" ){
+                $reactions.transition("/Обучение_ИТС/Уточнение по ИТС");
+            } else {
+                $reactions.transition("/Обучение_ИТС/ИТС_" + $session.ITS.name);
+            }
+        
+        state: Уточнение по ИТС
+            a: Какая торговая система вас интересует? Фина'м трейд, Транза'к, Квик, сервис транза'к коннектор, или мета трейдер 5.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            state: Ожидание ответа
+                q: * @ITS *
+                script:
+                    $session.ITS = $parseTree._ITS;
+                    $reactions.transition("/Обучение_ИТС");
+                
+        state: ИТС_Quik
+            a: Просмотреть бесплатный видео курс по торговой системе КВИК, можно на портале учебного центра фина'м.
+            # a: Для этого, на сайте фина'м точка ру, выберите раздел Обучение, и нажмите на название раздела Дистанционное обучение.
+            # a: После авторизации на портале учебного центра, пролистайте страницу сайта вниз, и выберите видео курс, Как настроить торговый терминал КВИК.
+            # a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                
+        state: ИТС_Transaq
+            a: Просмотреть бесплатный видео курс по торговой системе Транза'к, можно на портале учебного центра фина'м.
+            a: Для этого, на сайте фина'м точка ру, выберите раздел Обучение, и нажмите на название раздела Дистанционное обучение. После авторизации на портале учебного центра выберите раздел База знаний.
+            a: Видео курс по торговой системе Транза'к находится внизу страницы.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                
+        state: ИТС_FT
+            a: Просмотреть бесплатный видео курс по торговой системе Фина'м трейд, можно на портале учебного центра фина'м.
+            a: Для этого, на сайте фина'м точка ру, выберите раздел Обучение, и нажмите на название раздела Дистанционное обучение.
+            a: После авторизации на портале учебного центра, пролистайте страницу сайта вниз, и выберите видео курс, Как начать пользоваться Фина'м трейд, или отдельный подробный курс по Мобильному приложению Фина'м трейд.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                
+        state: ИТС_TrConnector
+            a: Подробную информацию по сервису транза'к коннектор можно посмотреть на сайте фина'м точка ру, в разделе, Брокерские услуги, Программы для автоматической торговли.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                
+        state: ИТС_MT5
+            script:
+                $session.operatorPhoneNumber = '2222'
+                $reactions.transition("/Оператор/Оператор по номеру")
+                
+         
+    state: Обучение_онлайн
+        intent!: /028 Обучение/Обучение_онлайн
+        a: На портале учебного центра фина'м представлены бесплатные и платные курсы и вебинары, для начинающих и опытных инвесторов. Для начинающих инвесторов доступен бесплатный Online-курс Первые шаги.
+        a: Чтобы ознакомиться с курсами и их расписанием, на сайте фина'м точка ру, выберите раздел Обучение, и нажмите на название раздела Дистанционное обучение.
+        a: Чтобы открыть расписание видеосеминаров и присоединиться, на сайте фина'м точка ру, выберите раздел Обучение, и в поле меню,  Дистанционное обучение, выберите, вебинары.
+        a: Чем я могу еще помочь?
+        script:
+            $dialer.setNoInputTimeout(15000);
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+    state: Обучение_офлайн
+        intent!: /028 Обучение/Обучение_офлайн
+        a: В учебном центре фина'м проводятся очные занятия, курсы и встречи для начинающих и опытных инвесторов.
+        a: Чтобы посмотреть расписание и присоединиться, на сайте фина'м точка ру, выберите раздел Обучение, и в поле меню, Очное обучение, выберите, секреты инвестирования.
+        a: Чем я могу еще помочь?
+        script:
+            $dialer.setNoInputTimeout(15000);
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+
+
+
+    state: Overnight
+        intent!: /029 Overnight
+        a: Какая информация по займу ценных бумаг брокером, или операции овернайт, вас интересует? Информация по займу ценных бумаг брокером? отключение займа ценных бумаг? информация о сделках РЕПО'.
+        script:
+            $dialer.setNoInputTimeout(15000);
+        q: * информация * ||toState = "/Overnight_info"
+        q: * отключение * ||toState = "/Overnight_off"
+        q: * репо * ||toState = "/Overnight_REPO"
+        q: * @choice_1 * ||toState = "/Overnight_info"
+        q: * @choice_2 * ||toState = "/Overnight_off"
+        q: * @choice_3 * ||toState = "/Overnight_REPO"
+        q: * @choice_last * ||toState = "/Overnight_REPO"
+        q: @repeat_please * ||toState = "."
+        
+    
+    state: Overnight_info
+        intent!: /029 Overnight/Overnight_info
+        a: Согласно пункту 17 точка 12 регламента брокерского обслуживания, брокер имеет право брать бумаги клиентов для внутреннего учета. Это не приводит к потере права совершать действия с ценными бумагами.
+        a: Данная операция отображается в справке по счету, в графе, Сделки РЕПО', сделки СВОП, сделки займа ЦБ! За предоставление бумаг для внутреннего учета, вы получаете дополнительное вознаграждение, 0,05% годовых от стоимости ценных бумаг.
+        a: Если ценные бумаги находились на внутреннем учете компании в момент дивидендной отсечки, брокер возместит вам сумму дивидендов, увеличенную в 1,15 раза.
+        a: Если вы планируете участвовать в собрании акционеров, то за несколько дней до даты фиксации обратитесь к менеджеру, и установите запрет на использование ваших ценных бумаг на период корпоративного события.
+        a: Чем я могу еще помочь?
+        script:
+            $dialer.setNoInputTimeout(15000);
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+    
+    state: Overnight_off
+        intent!: /029 Overnight/Overnight_off
+        a: Согласно пункту 17 точка 12 регламента брокерского обслуживания, брокер имеет право брать бумаги клиентов для внутреннего учета. Это не приводит к потере права совершать действия с ценными бумагами.
+        a: Данная операция отображается в справке по счету, в графе, Сделки РЕПО', сделки СВОП, сделки займа ЦБ! За предоставление бумаг для внутреннего учета, вы получаете дополнительное вознаграждение, 0,05% годовых от стоимости ценных бумаг.
+        a: Если ценные бумаги находились на внутреннем учете компании в момент дивидендной отсечки, брокер возместит вам сумму дивидендов, увеличенную в 1,15 раза.
+        a: Если вы планируете участвовать в собрании акционеров, то за несколько дней до даты фиксации обратитесь к менеджеру, и установите запрет на использование ваших ценных бумаг на период корпоративного события.
+        a: Чем я могу еще помочь?
+        script:
+            $dialer.setNoInputTimeout(15000);
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+    state: Overnight_REPO
+        intent!: /029 Overnight/Overnight_REPO
+        a: Сделки РЕПО', являются сделками переноса ваших необеспеченных позиций.
+        a: В брокерском отчете отображаются две сделки: сделка предоставления займа, то есть продажа или покупка ценных бумаг, и сделка возврата займа, то есть сделка обратного откупа, или продажи.
+        a: С помощью данных сделок вы получаете возможность взять в займ ценные бумаги у брокера, либо денежные средства под покупку ценных бумаг.
+        a: Сделки РЕПО' проводятся брокером автоматически, и фактически в них заложена комиссия по тарифу за займ денежных средств и ценных бумаг.
+        a: Обращаем ваше внимание, что с помощью сделок РЕПО' брокер не берет ваши ценные бумаги в займ.
+        a: Хотите получить информацию по займу брокером Ценных бумаг?
+        script:
+            $dialer.setNoInputTimeout(15000);
+        q: @agree ||toState = "/Overnight_info"
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        
+    #Нецензурная брань
+    state: Censored
+        intent!: /031 Censored
+        script:
+            $session.operatorPhoneNumber = '1000'
+            $reactions.transition("/Оператор/Оператор по номеру")
+
+
+    #WORK IN PROGRESS
+    state: КВАЛ
+        intent!: /023 КВАЛ
+        script:
+            $session.company = $parseTree._company;
+        a: Уточните ваш вопрос, вы хотите узнать: как получить статус квалифицированного инвестора? как перенести статус от другого брокера? или как проверить свой инвестиционный статус в фина'м.
+        script:
+            $dialer.setNoInputTimeout(15000);
+        q: * @kval_dokumenty * ||toState = "/КВАЛ_документы"
+        q: * @kval_perenos * ||toState = "/КВАЛ_перенос"
+        q: * @kval_sootvetstvie * ||toState = "/КВАЛ_соответствие"
+        q: * @choice_1 * ||toState = "/КВАЛ_документы"
+        q: * @choice_2 * ||toState = "/КВАЛ_перенос"
+        q: * @choice_3 * ||toState = "/КВАЛ_соответствие"
+        q: * @choice_last * ||toState = "/КВАЛ_соответствие"
+        q: @repeat_please * ||toState = "."
+        
+    state: КВАЛ_документы
+        intent!: /023 КВАЛ/КВАЛ_документы
+        script:
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if (  typeof $session.company  == "undefined" ){
+                $reactions.transition("/КВАЛ_документы/Уточнение компании");
+            } else { 
+                $reactions.transition("/КВАЛ_документы/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: В рамках какой компании вас интересует информация по статусу Квалифицированного инвестора? Брокер Фина'м, Фина'м Форекс или Управляющая компания.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: повтори ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/КВАЛ_документы");
+            
+        state: Ответ_Брокер
+            a: Есть четыре способа получить статус квалифицированного инвестора в фина'м.
+            a: По торговому обороту от шести миллионов рублей; по сумме активов от шести миллионов рублей; по образованию; или по опыту работы. Так же вы можете перенести статус от другого брокера. Какой способ вас интересует?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            
+            state: Оборот
+                q: * @kval_conditions_Оборот *
+                a: Чтобы получить статус квалифицированного инвестора по обороту, за последние четыре квартала, должен быть выполнен торговый оборот на сумму более 6 миллионов рублей, в фина'м или у другого брокера, оборот можно суммировать из разных организаций.
+                a: А также должно быть совершено не менее одной сделки в месяц, и не менее 10 сделок в квартал.
+                a: Для подтверждения оборота нужно предоставить заверенный брокерский отчет в электронном виде, и договор об открытии счета, содержащий номер брокерского счёта и паспортные данные.
+                a: Отправить документы в отдел поддержки можно в чате или на электронную почту.
+                a: Проверить свой инвестиционный статус можно в личном кабинете на сайте фина'м точка ру. Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус.
+                a: Чем я могу еще помочь?
+                script: 
+                    $dialer.setNoInputTimeout(15000);
+                    $context.session = {};
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+            state: Активы
+                q: * @kval_conditions_Активы *
+                a: Чтобы получить статус квалифицированного инвестора по сумме активов более шести миллионов, нужно предоставить соответствующие документы в отдел поддержки, в чате или на электронную почту.
+                a: Чтобы заявить денежные средства на банковских счетах нужно предоставить выписку с банковского счёта с паспортными данными.
+                a: Чтобы заявить денежные средства на брокерских счетах нужно предоставить заверенный брокерский отчет в электронном виде, и договор об открытии счета, содержащий номер брокерского счёта и паспортные данные.
+                a: Чтобы заявить активы на счетах, нужно предоставить выписку по счету ДЕПО, либо выписку по лицевому счету в реестре. Все документы должны быть на одну дату, и не старше 5 рабочих дней.
+                a: Проверить свой инвестиционный статус можно в личном кабинете на сайте фина'м точка ру. Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус.
+                a: Чем я могу еще помочь?
+                script: 
+                    $dialer.setNoInputTimeout(15000);
+                    $context.session = {};
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+            state: Образование
+                q: * @kval_conditions_Образование *
+                a: Чтобы получить статус квалифицированного инвестора по образованию или квалификации, нужно предоставить соответствующие документы в отдел поддержки, в чате или на электронную почту.
+                a: Диплом о высшем экономическом образовании государственного образца выданный организацией, которая на момент выдачи диплома осуществляла аттестацию граждан в сфере профессиональной деятельности на рынке ценных бумаг.
+                a: А также можно предоставить свидетельство о квалификации, или международный сертификат.
+                a: Проверить свой инвестиционный статус можно в личном кабинете на сайте фина'м точка ру. Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус.
+                a: Чем я могу еще помочь?
+                script: 
+                    $dialer.setNoInputTimeout(15000);
+                    $context.session = {};
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                
+            state: Работа
+                q: * @kval_conditions_Работа *
+                a: Чтобы получить статус квалифицированного инвестора по опыту работы, нужно предоставить соответствующие документы в отдел поддержки, в чате или на электронную почту.
+                a: Рассматривается опыт работы от двух лет, непосредственно связанный с совершением сделок с финансовыми инструментами, или подготовкой индивидуальных инвестиционных рекомендаций.
+                a: А также опыт работы от трех лет в должности, при назначении на которую требовалось согласование с Банком России.
+                a: Предоставить нужно скан подтверждающих документов, таких как трудовая книжка, трудовой договор с описанием деятельности, или уведомление о согласовании Банком России кандидата на должность.
+                a: Проверить свой инвестиционный статус можно в личном кабинете на сайте фина'м точка ру. Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус.
+                a: Чем я могу еще помочь?
+                script: 
+                    $dialer.setNoInputTimeout(15000);
+                    $context.session = {};
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+
+            
+        state: Ответ_Форекс
+            script:
+               
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Ответ_Банк
+            script:
+                
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                
+    state: КВАЛ_перенос
+        intent!: /023 КВАЛ/КВАЛ_перенос
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if (  typeof $session.company  == "undefined" ){
+                $reactions.transition("/КВАЛ_перенос/Уточнение компании");
+            } else { 
+                $reactions.transition("/КВАЛ_перенос/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: В рамках какой компании вас интересует информация по статусу Квалифицированного инвестора? Брокер Фина'м, Фина'м Форекс или Управляющая компания.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: повтори ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/КВАЛ_перенос");
+
+        state: Ответ_Брокер    
+            a: Чтобы перенести статус квалифицированного инвестора от другого брокера, нужно предоставить в отдел поддержки, в чате или на электронную почту, заверенную выписку из реестра квалифицированных инвесторов.
+            a: В выписке должны быть указаны ваши паспортные данные, должно быть незаполненное поле Исключен из реестра, а также должно быть указание на совершение Всех видов сделок со Всеми финансовыми инструментами для квалифицированного инвестора.
+            a: Срок выписки не старше 5 рабочих дней.
+            a: Проверить свой инвестиционный статус можно в личном кабинете на сайте фина'м точка ру. Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус.
+            script: 
+                    $dialer.setNoInputTimeout(15000);
+                    $context.session = {};
+            q: @agree ||toState = "/КВАЛ_документы"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Ответ_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+    state: КВАЛ_соответствие
+        intent!: /023 КВАЛ/КВАЛ_соответствие
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if (  typeof $session.company  == "undefined" ){
+                $reactions.transition("/КВАЛ_соответствие/Уточнение компании");
+            } else { 
+                $reactions.transition("/КВАЛ_соответствие/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: В рамках какой компании вас интересует информация по статусу Квалифицированного инвестора? Брокер Фина'м, Фина'м Форекс или Управляющая компания.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: повтори ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/КВАЛ_соответствие");
+                    
+        state: Ответ_Брокер  
+            a: Проверить свой инвестиционный статус можно в личном кабинете на сайте фина'м точка ру. Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус. 
+            a: Чем я могу еще помочь?
+            script: 
+                    $dialer.setNoInputTimeout(15000);
+                    $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Ответ_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+    
+    state: Налоги
+        intent!: /025 Налоги
+        a: Уточните ваш вопрос. Вас интересуют, Документы для налоговой? налоговые ставки? предварительный расчет налога? методика расчета налога? или возврат налога.
+        script:
+             $dialer.setNoInputTimeout(15000);
+        q: * @ndfl_documents_for_tax * ||toState = "/Документы для налоговой"
+        q: * @ndfl_tax_rates * ||toState = "/Налоговые ставки"
+        q: * @ndfl_tax_calculation * ||toState = "/Предварительный расчет"
+        q: * @ndfl__tax_calculation_method * ||toState = "/Методика расчета ндфл"
+        q: * @ndfl_tax_refund * ||toState = "/Возврат ндфл"
+        q: * @choice_1 * ||toState = "/Документы для налоговой"
+        q: * @choice_2 * ||toState = "/Налоговые ставки"
+        q: * @choice_3 * ||toState = "/Предварительный расчет"
+        q: * @choice_4 * ||toState = "/Методика расчета ндфл"
+        q: * @choice_5 * ||toState = "/Возврат ндфл"
+        q: * @choice_last * ||toState = "/Возврат ндфл"
+        q: @repeat_please * ||toState = "."
+        
+    state: Документы для налоговой
+        intent!: /025 Налоги/Документы для налоговой
+        script:
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+           
+            if (  typeof $session.company  == "undefined" ){
+                $reactions.transition("/Документы для налоговой/Уточнение компании");
+            } else { 
+                $reactions.transition("/Документы для налоговой/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Фина'м Брокер, Фина'м Банк, Фина'м Форекс или Управляющая компания Фина'м.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: повтори ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Документы для налоговой");
+            
+        state: Ответ_Брокер
+            a: Для оформления налоговой декларации 3-НДФЛ через налоговый орган, Вам могут потребоваться документы от брокера, которые легко заказать в личном кабинете на сайте, фина'м точка ру, в разделе, Отчеты, Налоги и справки.
+            a: Например. Для получения налогового вычета по ИИС по стандартной процедуре можно заказать готовый Пакет документов для налогового вычета, содержащий заверенные документы об открытии ИИС и брокерский отчет.
+            a: Дополнительно могут понадобиться: Справка 2 НДФЛ с места работы, и платежное поручение об отправке денежных средств на ИИС.
+            a: А также, при необходимости просальдировать налог за счет убытков прошлых лет по обычному брокерскому счету, могут потребоваться такие документы, как 2 НДФЛ и справка об убытках.
+            a: Для отчетности по доходам по иностранным ценным бумагам на московской и спб биржах, нужны документы об открытии брокерского счета, и справка по форме 10 42 эс.
+            a: Но, если доход был получен через иностранные биржи, дополнительно запросите у менеджера уведомление о присвоении торгового кода, и уведомление о дивидендах налогах и комиссиях.
+            a: Чем я могу еще помочь?
+
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Ответ_Форекс
+            script:
+               
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Ответ_Банк
+            script:
+                
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Ответ_УК
+            script:
+                # $context.session = {};
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                
+        # state: Ответ_undefined
+        #     script:
+                
+        #         $context.session = {};
+        #         $reactions.transition("/NoMatch");        
+        
+    state: Налоговые ставки
+        intent!: /025 Налоги/Налоговый ставки
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Налоговые ставки/Уточнение компании");
+            } else { 
+                $reactions.transition("/Налоговые ставки/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Фина'м Брокер, Фина'м Банк, Фина'м Форекс или Управляющая компания Фина'м.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: повтори ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Налоговые ставки");
+            
+        state: Ответ_Брокер
+            a: Расчет налога по доходу физических лиц, полученного от инвестиций, производится по следующим ставкам. Для налоговых резидентов российской федерации, налоговая ставка составляет 13% на доход до пяти миллионов рублей включительно.
+            a: Если суммарно доходы превышают 5 миллионов рублей, то налоговая ставка 15%. Прогрессивная ставка налога 15% применяется только к той сумме дохода, которая превышает 5 миллионов рублей в отчетном периоде.
+            a: Для налоговых нерезидентов российской федерации, ставка НДФЛ составляет 30%.
+            a: Хотите узнать подробную информацию о ставках налога при получении купонов и дивидендов?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: * @agree * ||toState = "/Налоговые ставки/Уточнение_налоги_купоны_дивиденды"
+            q: * @disagree * ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+        
+        state: Уточнение_налоги_купоны_дивиденды
+            a: По купонам, выплаченным и в рублях и в иностранной валюте, брокер удерживает и уплачивает налоги. Отчитываться в налоговую самостоятельно нет необходимости.
+            a: Налоговая ставка по купонам для резидентов эРэФ составляет 13%, и 30% для нерезидентов. По дивидендам, выплаченным в рублях, брокер удерживает и уплачивает налоги.
+            a: Отчитываться в налоговую самостоятельно нет необходимости. Налоговая ставка по дивидендам для резидентов эРэФ составляет 13%, и 15% для нерезидентов.
+            a: Но, по дивидендам выплаченным в иностранной валюте, брокер не удерживает и не уплачивает налоги. Отчитываться в налоговую службу нужно самостоятельно.
+            a: Ставки налога по дивидендам в иностранной валюте могут отличаться в зависимости от биржи.
+            a: Чем я могу еще помочь?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Ответ_Форекс
+            script:
+                # $context.session = {};
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Ответ_Банк
+            script:
+                # $context.session = {};
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Ответ_УК
+            script:
+                # $context.session = {};
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                
+        state: Ответ_undefined
+            script:
+                $context.session = {};
+                $reactions.transition("/NoMatch");
+        
+    state: Предварительный расчет
+        intent!: /025 Налоги/Предварительный расчет
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Предварительный расчет/Уточнение компании");
+            } else { 
+                $reactions.transition("/Предварительный расчет/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Фина'м Брокер, Фина'м Банк, Фина'м Форекс или Управляющая компания Фина'м.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: повтори ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Предварительный расчет");
+            
+        state: Ответ_Брокер
+            a: Текущий предварительный расчет налога доступен в личном кабинете на сайте фина'м точка ру. Для этого выберите меню, отчёты, далее выберите раздел, налоги и справки, во вкладке налоги, расчет налога по эмитентам.
+            a: Документ будет сформирован в течение нескольких минут. Рекомендуем обновить страницу.
+            a: Обращаем ваше внимание, что результаты расчета носят предварительный характер, и могут отличаться от фактического финансового результата для целей налогообложения.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Ответ_Форекс
+            script:
+                # $context.session = {};
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Ответ_Банк
+            script:
+                # $context.session = {};
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Ответ_УК
+            script:
+                # $context.session = {};
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                
+        # state: Ответ_undefined
+        #     script:
+        #         $context.session = {};
+        #         $reactions.transition("/NoMatch");
+        
+    state: Методика расчета ндфл
+        intent!: /025 Налоги/Методика расчета ндфл
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Методика расчета ндфл/Уточнение компании");
+            } else { 
+                $reactions.transition("/Методика расчета ндфл/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Фина'м Брокер, Фина'м Банк, Фина'м Форекс или Управляющая компания Фина'м.
+            q: повтори ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Методика расчета ндфл");
+            
+        state: Ответ_Брокер
+            a: Фина'м является налоговым агентом в отношении инвестиционных доходов, кроме доходов, полученных на валютной секции Московской биржи, и кроме дивидендов и купонов по иностранным ценным бумагам.
+            a: Брокер сам рассчитывает и удерживает налог. По итогам года, при выводе денег, либо ценных бумаг со счета, или при расторжении брокерского договора.
+            a: Налог рассчитывается отдельно за каждый календарный год. Обращаем ваше внимание, что по счетам ИИС, нет ежегодной отчетности. Налог рассчитывается и удерживается при расторжении договора ИИС.
+            a: Подробнее про методику расчёта НДФЛ можно прочитать в личном кабинете на сайте, едо'кс точка Фина'м точка ру, в разделе сайта, Помощь, Инструкции шаблоны, расчет ндфл.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Ответ_Форекс
+            script:
+                # $context.session = {};
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Ответ_Банк
+            script:
+                # $context.session = {};
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Ответ_УК
+            script:
+                # $context.session = {};
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                
+        # state: Ответ_undefined
+        #     script:
+        #         $context.session = {};
+        #         $reactions.transition("/NoMatch");
+        
+    state: Возврат ндфл
+        intent!: /025 Налоги/Возврат ндфл
+        script:
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Возврат ндфл/Уточнение компании");
+            } else { 
+                $reactions.transition("/Возврат ндфл/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Фина'м Брокер, Фина'м Банк, Фина'м Форекс или Управляющая компания Фина'м.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: повтори ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Возврат ндфл");
+            
+        state: Ответ_Брокер
+            a: При пересчете актуальной налоговой базы, может возникнуть ситуация излишне удержанного налога. Брокер обязательно уведомит об этом в личном кабинете клиента на сайте Фина'м точка ру.
+            a: После получения такого Уведомления об излишне удержанном налоге, можно сформировать Заявление на его возврат, в разделе личного кабинета Отчеты, в меню Налоги и справки.
+            a: Подписать заявление можно в течение трёх лет с момента завершения отчетного периода. Средства поступят по указанным в заявлении реквизитам в течение трёх месяцев.
+            a: Чтобы вернуть налог за счет убытков прошлых лет, нужно обратиться в налоговую службу. Налоговый кодекс позволяет учитывать убытки, образовавшиеся за предыдущие десять лет.
+            a: Для этого нужно заказать у брокера справку об убытках, и справку 2-НДФЛ в личном кабинете, в разделе Отчеты. По необходимости вы можете выбрать получение справки в электронном или бумажном виде.
+            a: Чем я могу еще помочь?
+            script: 
+                $dialer.setNoInputTimeout(15000);
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            
+        state: Ответ_Форекс
+            script:
+                # $context.session = {};
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Ответ_Банк
+            script:
+                # $context.session = {};
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+            
+        state: Ответ_УК
+            script:
+                # $context.session = {};
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                
+    state: Санкции_СПБ_биржа
+        intent!: /033 Санкции_СПБ биржа
+        a: Приостановлены торги Иностранными ценными бумагами на СПБ Бирже. Биржа предпринимает все возможные действия, чтобы предоставить доступ к активам с учетом введенных ограничений.
+        a: И взаимодействует с российскими и иностранными контрагентами, чтобы установить порядок действий в сложившихся условиях. Официальный комментарий СПБ Биржа планирует предоставить не ранее 13 ноября.
+        a: Информация будет размещена на официальном сайте СПБ Биржи в разделе, новости. Ставки риска по американским ценным бумагам, торгуемым на СПБ Бирже, повышены до 100%, в связи с исключением из обеспечения Биржи.
+        a: Обращаем ваше внимание, при торговле, на иностранных биржах, через брокера Фина'м, инфраструктура СПБ Биржи не задействована.
+        a: Вышестоящий брокер партнёр не раскрывает перед американскими биржами гражданство своих клиентов, поэтому риски в данном направлении минимальны.
+        a: Чем я могу еще помочь?
+        script: 
+            $dialer.setNoInputTimeout(15000);    
+            $context.session = {};
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        
+    state: Котировки
+        intent!: /034 Котировки
+        script:
+            $session.operatorPhoneNumber = '1000';
+            $reactions.transition("/Оператор/Оператор по номеру")
+            $analytics.setSessionResult("Котировки")
+        
+    # state: AdditionalTelephone
+    #     script:
+    #         $session.operatorPhoneNumber = $parseTree._additionalTelephone.phoneNumber;
+    #         $reactions.transition("/Оператор/Оператор по номеру")
+    #         $analytics.setSessionResult("ОператорAddTel")
+    #     q!: * @additionalTelephone *
+    
+    # state: AdditionalTelephoneOffice
+    #     intent!: /032 Представительства
+    #     # a: Перевод на региональный офис.
+    #     script:
+    #         $analytics.setSessionResult("ОператорAddTel");
+    #         $session.officePhone = $parseTree._officePhone.phoneNumber;
+    #         $response.replies = $response.replies || [];
+    #         $session.officePhone = regionalOfficeCall($session.officePhone, $response, $client);
+    #     a: Перевожу вас на {{ $session.officePhone }}. Пожалуйста, оставайтесь на линии.
+    state: Оператор
+        intent!: /010 Оператор
+        # a: 111
+        script:
+            $analytics.setSessionResult("ОператорCall");
+            if( typeof $parseTree._company != "undefined"){
+                if( $parseTree._company.name  == 'Банк'){
+                    $reactions.transition("./Оператор_Банк");
+                } else {
+                    $session.operatorPhoneNumber =  $parseTree._company.phoneNumber;
+                    $reactions.transition("./Оператор по номеру");
+                }  
+            } 
+            else if( typeof $parseTree._department != "undefined"){
+                $reactions.transition("/Оператор/Отдел");
+            }
+            
+            else if( typeof $parseTree._additionalTelephone != "undefined"){
+                
+                //$reactions.answer("5");
+                $reactions.transition("./Личные добавочные");
+            }
+            
+            else if( typeof $parseTree._officePhone != "undefined"){
+                
+               //$reactions.answer("4");
+                $reactions.transition("./Регион добавочные");
+            }
+            
+            else {
+                //$reactions.answer("6");
+                $reactions.transition("./Уточнение отдела");
+            }
+            
+        state: Уточнение отдела
+            a: Уточните название отдела с которым вы хотите связаться: поддержка брокера, голосовой трейдинг, банковские услуги, фина'м форекс, управляющая компания?
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: * @officePhone * ||toState = "/Оператор/Регион добавочные"
+            q: * @additionalTelephone * ||toState = "/Оператор/Личные добавочные"
+            q: * @company * ||toState = "/Оператор/Уточнение отдела/Выбрана компания"
+            q: * @department * ||toState = "/Оператор/Отдел"
+            q: * @repeat_please * ||toState = "."
+            
+            state: Выбрана компания
+                script:
+                    if( $parseTree._company.name  == 'Банк'){
+                        $reactions.transition("../../Оператор_Банк");
+                    } else {
+                        $session.operatorPhoneNumber =  $parseTree._company.phoneNumber;
+                        $reactions.transition("../../Оператор по номеру");
+                    } 
+            # Для того, что бы не сработало распознание родительского (не было цикла) 
+            state: Оператор
+                intent: /010 Оператор
+                go!: ../../NoMatchOperator
+                            
+            # state: noMatch
+            #     event: noMatch
+            #     go!: ../../NoMatchOperator
+                
+        state: Оператор_Банк 
+            a: Уточните, Вас интересует обслуживание физических, или юридических лиц.
+            script:
+                $dialer.setNoInputTimeout(15000);
+            q: @repeat_please * ||toState = "."
+            
+            state: FL_YL
+                q: * @FL_YL *
+                script:
+                    $session.operatorPhoneNumber = $parseTree._FL_YL.phoneNumber;
+                go!: ../../Оператор по номеру
+            
+            # Для того, что бы не сработало распознание родительского (не было цикла) 
+            state: Оператор
+                intent: /010 Оператор
+                go!: ../../NoMatchOperator
+            
+            # state: noMatch
+            #     event: noMatch
+            #     go!: ../../NoMatchOperator
+                    
+        state: Личные добавочные
+            script:
+                # $reactions.answer("2");
+                $analytics.setSessionResult("ОператорAddTel");    
+                $session.operatorPhoneNumber = $parseTree._additionalTelephone.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Регион добавочные
+            script:
+                # $reactions.answer("1");
+                $analytics.setSessionResult("ОператорAddTel");
+                $session.officePhone = $parseTree._officePhone.phoneNumber;
+                $session.PhoneNumber = $parseTree._officePhone.phoneNumber;
+                $response.replies = $response.replies || [];
+                $session.officePhone = regionalOfficeCall($session.officePhone, $response, $client);    
+            # a: Перевожу вас на {{ $session.officePhone }} {{ $session.PhoneNumber }}. Пожалуйста, оставайтесь на линии.
+            a: Перевожу вас на {{ $session.officePhone }}. Пожалуйста, оставайтесь на линии.
+            
+        state: Отдел
+            script:
+                #  $reactions.answer("3");
+                $analytics.setSessionResult("ОператорAddTel");    
+                $session.operatorPhoneNumber = $parseTree._department.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Оператор по номеру
+            script:
+                var getPhoneByDateTimeResault = getPhoneByDateTime($session.operatorPhoneNumber);
+                $session.operatorPhoneNumber = getPhoneByDateTimeResault.phoneNumber;
+                $response.replies = $response.replies || [];
+                callProcessing($session.operatorPhoneNumber, $response, $client);
+                $session.departmentName = getPhoneByDateTimeResault.departmentName;
+                $analytics.setSessionResult("ОператорALL");        
+            a: Перевожу вас на {{ $session.departmentName }}. Пожалуйста, оставайтесь на линии.
+            # a: Перевожу вас на {{ $session.operatorPhoneNumber }}. Пожалуйста, оставайтесь на линии.
+            script:
+                 $context.session = {};
+                 $dialer.setNoInputTimeout(15000);
+            go!: / 
+                    
+        state: NoMatchOperator
+            event: noMatch
+            script:
+                $analytics.setSessionResult("ОператорNoMatch")
+                $session.operatorPhoneNumber = '1000';
+            go!: ../Оператор по номеру
+    
+    state: Bye    
+        q!: @goodbye
+        go!: /Могу еще чем то помочь?/NO/Yes/Нет оценки
+                     
+    state: Могу еще чем то помочь?
+        a: Я могу еще чем то помочь?
+        script:
+            $dialer.setNoInputTimeout(15000);
+        
+        state: Yes
+            q: * @agree *
+            a: Уточните, пожалуйста, ваш вопрос.
+            script:
+                $dialer.setNoInputTimeout(15000);
+        state: NO
+            q: * @disagree *
+            a: Нам удалось ответить на ваш вопрос?
+            script:
+                $dialer.setNoInputTimeout(15000);
+        # state: BYE
+            
+            state: Yes
+                q: *  @agree *
+                script:
+                    $analytics.setMessageLabel("Good_ansver", "Voice_Finam")
+                    $analytics.setSessionResult("Вопрос решен")
+                a: Пожалуйста, оцените консультацию от одного до пяти, если пять это отлично.
+                script:
+                    $dialer.setNoInputTimeout(15000);
+                state: Оценка
+                    q: * @grade *
+                    a: Были рады помочь вам! Если понадобится помощь, пожалуйста, позвоните снова. Всего доброго, до свидания!
+                    script:
+                        $analytics.setMessageLabel("Grade", "Voice_Finam")
+                        $dialer.hangUp();
+                state: Нет оценки    
+                    event: noMatch
+                    a: Спасибо за обращение! Если понадобится помощь, пожалуйста, позвоните снова. Всего доброго, до свидания!
+                    script:
+                        $dialer.hangUp();
+                        
+            state: NO
+                q: * @disagree *
+                script:
+                    $analytics.setSessionResult("Вопрос не решен")
+                    $analytics.setMessageLabel("Good_ansver", "Voice_Finam")
+                a: Вы хотите продолжить диалог с оператором для решения вашего вопроса?
+                script:
+                    $dialer.setNoInputTimeout(15000);
+                state: Yes
+                    q: * @agree *
+                    go!: /Оператор/NoMatchOperator
+                state: NO
+                    q: * @disagree *    
+                    a: Спасибо за обращение! Если понадобится помощь, пожалуйста, позвоните снова. Всего доброго, до свидания!
+                    script:
+                        $dialer.hangUp();
+                state: NoMatch
+                    event: noMatch
+                    a: Спасибо за обращение! Если понадобится помощь, пожалуйста, позвоните снова. Всего доброго, до свидания!
+                    script:
+                        $dialer.hangUp();
+    
+            state: Bye
+                q: * @goodbye *
+                a: Спасибо за обращение! Если понадобится помощь, пожалуйста, позвоните снова. Всего доброго, до свидания!
+                script:
+                    $analytics.setSessionResult("Нет оценки")
+                    $analytics.setMessageLabel("Good_ansver", "Voice_Finam")
+                    $dialer.hangUp();
+                    
+            state: NoMatch
+                event: noMatch
+                a: Спасибо за обращение! Если понадобится помощь, пожалуйста, позвоните снова. Всего доброго, до свидания!
+                script:
+                    $analytics.setMessageLabel("Good_ansver", "Voice_Finam")
+                    $dialer.hangUp();
+                    
     state: NoMatch
         event!: noMatch
-        a: Я не понял. Вы сказали: {{$request.query}}
+        a: Возможно я не так вас поняла. Пожалуйста, перефразируйте свой вопрос.
+        script:
+            $dialer.setNoInputTimeout(15000);
+            $analytics.setSessionResult("Не распознан 1")
+        
+        state: InnerNoMatch
+            event: noMatch
+            a: По данному вопросу вас проконсультирует менеджер.
+            go!: /Оператор/NoMatchOperator
+            script:
+                $analytics.setSessionResult("Не распознан 2")
 
     state: Match
         event!: match
-        a: {{$context.intent.answer}}
+        # a: Не распознал. 
+        # {{ $context.currentState }} {{$context.intent.answer}}
+        script:
+            $analytics.setSessionResult("Нет четкого распознавания")
+            $reactions.transition($nlp.match($request.query, "/").targetState);
+            
+         
+     # Нераспознанная речь   
+    state: VoiceNoInput || noContext = true
+        event!: speechNotRecognized
+        script:
+            $session.noInputCounter = $session.noInputCounter || 0;
+            $session.noInputCounter++;
+        if: $session.noInputCounter >= 10
+            a: Похоже проблема со связью. Перезвоните, пожалуйста, еще раз. 
+            script:
+                $analytics.setSessionResult("Плохая связь, диалог не состоялся");
+                $dialer.hangUp();
+        else:
+            random:
+                a: Пожалуйста, опишите коротко суть вопроса.
+                a: Позвольте мне вам помочь. Какой у вас вопрос?
+                a: Повторите пожалуйста!
+                
+    state: TransferEvent
+        event: transfer
+        if: $dialer.getTransferStatus().status === 'FAIL'
+            a: Приносим свои извинения мы вынуждены завершить звонок. Нам важна каждая минута вашего времени. Сейчас все операторы заняты. 
+            a: Пожалуйста, обратитесь к нам в чат поддержки на сайте фина'м ру, или в терминале фина'м трейд. Или перезвоните позднее.
+            script:
+                $analytics.setSessionResult("Ошибка перевода на оператора");
+                $dialer.hangUp();
+            
+                
+    

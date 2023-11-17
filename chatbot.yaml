@@ -7,9 +7,16 @@ language: ru
 
 tests:
   include:
-    - test.xml
+    - margin_trading.xml
+    - obuchenie.xml
 
 nlp:
   intentNoMatchThresholds:
-    phrases: 0.2
-    patterns: 0.2
+    phrases: 0.3
+    patterns: 0.5
+
+injector:
+  slotfilling:
+    maxSlotRetries: 3
+    stopOnAnyIntent: false
+    stopOnAnyIntentThreshold: 0.2
