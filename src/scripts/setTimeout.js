@@ -1,3 +1,8 @@
 bind("postProcess", function($context) {
-    $dialer.setNoInputTimeout(15000);
+
+    if ($context.currentState == "/Start"){
+        $dialer.setNoInputTimeout(25000);   
+    } else {
+        $dialer.setNoInputTimeout(15000);
+    }
 });

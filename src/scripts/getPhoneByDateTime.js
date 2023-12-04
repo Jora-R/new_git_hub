@@ -75,7 +75,7 @@ function getPhoneByDateTime(operatorPhoneNumber){
         }
     }
     
-    if(operatorPhoneNumber == '9022') {
+    if(operatorPhoneNumber == '3822') {
         if((day == 'воскресенье') || (day == 'суббота')){
             operatorPhoneNumber = '1000';
         } else {
@@ -117,7 +117,7 @@ function getPhoneByDateTime(operatorPhoneNumber){
             departmentName = "Отдел поддержки";
             break;
         case '1000':
-            departmentName = "Оператора";
+            departmentName = "Оператора контакт центра";
             break;
         case '3024':
             departmentName = "Отдел по работе с ДМА сервисами";
@@ -129,7 +129,7 @@ function getPhoneByDateTime(operatorPhoneNumber){
             departmentName = "Отдел поддержки";
             break;
         case '3888':
-            departmentName = "Оператора банка";
+            departmentName = "Оператора";
             break;
         case '3820':
             departmentName = "Оператора банка";

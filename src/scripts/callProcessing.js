@@ -1,5 +1,7 @@
 function callProcessing(phoneNumber, response, client){
-    
+    // $analytics.setSessionResult(phoneNumber)
+    // $analytics.setMessageLabel("phoneNumber", "Добавочные")
+    // $analytics.setSessionResult("Нет оценки")
     // response.replies = response.replies || [];
     response.replies.push({
         type: "switch",
