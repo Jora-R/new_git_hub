@@ -134,6 +134,9 @@ function getPhoneByDateTime(operatorPhoneNumber){
         case '3820':
             departmentName = "Оператора банка";
             break;
+        case '7924':
+            departmentName = "Оператора тестирования";
+            break;    
         default:
             departmentName = "Оператора";
     }

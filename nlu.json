@@ -204,7 +204,7 @@
     "priority" : 0
   }, {
     "path" : "/003 Согласие",
-    "enabled" : true,
+    "enabled" : false,
     "shared" : false,
     "phrases" : [ {
       "text" : "да"
@@ -248,9 +248,12 @@
     "shared" : false,
     "phrases" : [ ],
     "classificationRules" : {
-      "refs" : [ ]
+      "refs" : [ {
+        "entityName" : "product_iis",
+        "predicate" : "CONTAINS_NOT"
+      } ]
     },
-    "patterns" : [ "[еще] [вчера|вечер*|днем] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на] [свой] [@product] [до сих пор] [не вижу|не отображ*|не пришл*] [@money|@currency] [на] [мой|мое*] [@product]", "[могу|можн*|возможн*|есть [*возможн*]|хоч*|доступ*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [с] [прост*|одного] [@product] [на] [другой] [как] [мне] [это] [сдела*|делат*]", "[как] [быстро] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [с|на] [@product] [при] [(@moneyTransferType|@moneyTransferType_r)|(@moneyTransferType|@moneyTransferType_r)_r] [c|по] [@moneyTransferMethod]", "[какая] @commission [будет] [если] [я] [оформ*|сдел*|закаж*] [за] @moneyTransferMethod [с] [@product]", "(@moneyTransferType|@moneyTransferType_r)", "(@moneyTransferType|@moneyTransferType_r) [@product_iis|@product] [по|через] @moneyTransferMethod", "@moneyTransferMethod", "[какие|скольк*] @commission [за] (@moneyTransferType|@moneyTransferType_r)", "[как] [сделат*|делат*|осуществ*] (@moneyTransferType|@moneyTransferType_r)", "[как] [сделат*|делат*|осуществ*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [без] [комисс*]", "* [как|каким образ*] (@moneyTransferType|@moneyTransferType_r) [@product_iis|@product] * [со|с] (сторонн* банк*|банк*|Финам)", "[как] (@moneyTransferType|@moneyTransferType_r) [@product_iis|@product] [финам*] [без комисс*] [через] [@moneyTransferMethod|finam trade]", "[как] (@moneyTransferType|@moneyTransferType_r) [@product_iis|@product] [по] [@moneyTransferMethod|реквизит*]", "[как] (@moneyTransferType|@moneyTransferType_r) [в] [[мобил*] приложении] [@product_iis|@product] [финам*]", "[как] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [с] [одного] [@product_iis|@product] [финам*] [на] [другой|второй] [@product_iis|@product] [финам*]", "* [как] [могу|можн*|возможн*|есть [*возможн*]|хоч*|доступ*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на|с|из] [другог*] [банк*]", "* [как] [можн*|возможн*] (@moneyTransferType|@moneyTransferType_r) [@product_iis|@product] [без комис*]", "* [как] [могу|можн*|возможн*|есть [*возможн*]|хоч*|доступ*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [с] [@product_iis|@product] [на] [@product_iis|@product] [срочн* [рынк*]]", "* [как] [могу|можн*|возможн*|есть [*возможн*]|хоч*|доступ*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на|с] [@product_iis|@product] [или|на] [@product_iis|@product] [другог*] [банк*]", "[как] [мне] (@moneyTransferType|@moneyTransferType_r) [@product_iis|@product] [в] [@money|@currency] [для] [дальнейш*] [работ*]", "[как] [мне] (@moneyTransferType|@moneyTransferType_r) [@product_iis|@product] [в] [@money|@currency]", "[как] [мне] (@moneyTransferType|@moneyTransferType_r) [к|в] [вам|Финам*] [@money|@currency] [из|со|от] [ВТБ|Альф*|сбер*|тинькоф*|[другог*] брокер*]", "[как] [к|в] [вам|Финам*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [из|со|от] [ВТБ|Альф*|сбер*|тинькоф*|[другог*] брокер*]", "[как] [их|[@money|@currency]] (@moneyTransferType|@moneyTransferType_r) [на] [друг*] [@product_iis|@product]", "[как] [из] [[мобильн*] приложен*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [(@moneyTransferType|@moneyTransferType_r)|(@moneyTransferType|@moneyTransferType_r)_r]", "[как] [долго] [будет] (идти|производит*|осуществл*|проход*|исполн*) (@moneyTransferType|@moneyTransferType_r) [личн*] [кабин*]", "[как] [дешевл*|без @commission] [всего] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на] [сво*] [@product_iis|@product]", "[как] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на] [сво*] [@product_iis|@product] [не могу|не cмог*] [найти]", "[как] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [с|из] [@product_iis|@product] [после] [продаж*] [актив*]", "[как] (@moneyTransferType|@moneyTransferType_r) [все] [@money|@currency] [себе] [на] [@product_iis|@product]", "[как] (воспользов*|использ*) [@moneyTransferMethod] [при] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на] [@product_iis|@product]", "* [как] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на] [@product_iis|@product] [в] [Финам*]", "* [как] [в|с] [приложен*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [с] [@product_iis|@product] *", "[как] [скор*|быстр*] [присход*|приход*] [зачислен*] [@money|@currency] [дс]", "[как] [быстро] [осуществл*] @moneyTransferMethod [и] [какая] [@commission]", "[как] [быстро] [осуществл*] [@money|@currency] [попад*] [на|со] [@product_iis|@product] [при] [оплат*] [по] @moneyTransferMethod", "[как] [быстро] [@money|@currency] (@moneyTransferType|@moneyTransferType_r) [на|со] [@product_iis|@product]", "[как] [@money|@currency] (@moneyTransferType|@moneyTransferType_r) [на] [@product_iis|@product]", "* [где] [могу|можн*|возможн*|есть [*возможн*]|хоч*|доступ*] (ознакомит*|посмотрет*) [с] [вашим*] [правил*|тариф*] [@commission] [по|за] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс] [@product_iis|@product]", "(@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на] [@product_iis|@product] [в|через] [ЛК|[личн*] кабин* [Финам*]]", "(@moneyTransferType|@moneyTransferType_r) [в] [@money|@currency] [на] [@product_iis|@product] [возмож*|не появилс*]", "(@moneyTransferType|@moneyTransferType_r) [в] [@money|@currency] [у вас|в Финам*] [сейчас] [могу|можн*|возможн*|есть [*возможн*]|хоч*|доступ*] [сделат*|оформит*|подат*] [и] [получит*] [в] [офис*]", "(@moneyTransferType|@moneyTransferType_r) [@money|@currency] [у вас|в Финам*] [сейчас] [могу|можн*|возможн*|есть [*возможн*]|хоч*|доступ*]", "(@moneyTransferType|@moneyTransferType_r) [могу|можн*|возможн*|есть [*возможн*]|хоч*]", "(@moneyTransferType|@moneyTransferType_r) [@money|@currency] * [на] [@product_iis|@product] [могу|можн*|возможн*|есть [*возможн*]] [только]", "(@moneyTransferType|@moneyTransferType_r) [@money|@currency] * [на] [@product_iis|@product] [могу|можн*|возможн*|есть [*возможн*]] [через|с] [приложен*]", "[могу|можн*|возможн*|есть [*возможн*]] [ли] [у Вас|в Финам*] (@moneyTransferType|@moneyTransferType_r) [в] [@money|@currency]", "[могу|можн*|возможн*|есть [*возможн*]] [ли] [у Вас|в Финам*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс] [рубл*] [со] [@product_iis|@product] [на] [@product_iis|@product]", "[могу|можн*|возможн*|есть [*возможн*]] [ли] [у Вас|в Финам*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс] [на] [@product_iis|@product]", "[могу|можн*|возможн*|есть [*возможн*]] [ли] [подат*|оформит*|сделат*|оставит*|создат*] [заявк*|поручен*] [на] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс] [с] [[мобильн*] приложен*] [Финам*]", "[могу|можн*|возможн*|есть [*возможн*]] [ли] (@moneyTransferType|@moneyTransferType_r) [@product_iis|@product] [с] [@product_iis|@product]", "[могу|можн*|возможн*|есть [*возможн*]] [ли] (@moneyTransferType|@moneyTransferType_r) [@product_iis|@product] [в] [@money|@currency] [дс|налич*]", "[какие|каким] [вариант*|способ*] [я] [мог*|можн*|возможн*] (@moneyTransferType|@moneyTransferType_r) [сво*|мои*] [@product_iis|@product] [в|у] [[ао] Финам*|вас] [есть|имеет*]", "[@money|@currency] [дс] [могу|можн*|возможн*|есть [*возможн*]] (@moneyTransferType|@moneyTransferType_r) [на] [@product_iis|@product] [РФ|России]", "[в] [[мобильн*] приложен*] [нельзя|есть|можн*|возможн*|доступен*|могу|тольк*] [функц*|кнопк*] [подат*|оформит*|сделат*|оставит*] [заявк*|поручен*] [на] (@moneyTransferType|@moneyTransferType_r) [а] [где] [функц*|кнопк*](@moneyTransferType|@moneyTransferType_r)", "[в] [[мобильн*] приложен*] [нельзя|есть|можн*|возможн*|доступен*|могу] [функц*] [подат*|оформит*|сделат*|оставит*] [заявк*|поручен*] [на] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс]", "[в] [[мобильн*] приложен*] [кнопк*|функц*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс] [я] [не нашл*|не нашел]", "[в] [[мобильн*] приложен*] [как то|как-то] [нельзя|есть|можн*|возможн*|доступен*|могу] [функц*] [подат*|оформит*|сделат*] [заявк*|поручен*] [на] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс]", "[в] [[мобильн*] приложен*] [[новом*] (ЛК|[личн*] кабин*)] [нельзя|есть] [функц*] [подат*|оформит*|сделат*] [заявк*|поручен*] [на] (@moneyTransferType|@moneyTransferType_r) [межд*] [@product_iis|@product]", "[в] [каких|какой] [@money|@currency] [могу|можн*|возможн*|есть [*возможн*]] (@moneyTransferType|@moneyTransferType_r) [@product_iis|@product]", "[будут] [ли] [дополнител*] [@commission] [при|за] (использов*) @moneyTransferMethod", "(взимает*|удерживает*|списыв*|берет*) [за] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс] [средств*] [@commission]", "[а] [я] [могу|можн*|возможн*|есть [*возможн*]] [через|с] [касс*] [банк*] [Финам*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [с] [@product_iis|@product]", "[а] [я] [могу|можн*|возможн*|есть [*возможн*]] (@moneyTransferType|@moneyTransferType_r) [с] (@product_iis|@product) [счет*] [или] [только] [через|с] [касс*]", "[а] [@money|@currency] [могу|можн*|возможн*|есть [*возможн*]] (@moneyTransferType|@moneyTransferType_r) [в] [банк]", "[а] [могу|можн*|возможн*|есть [*возможн*]] [я] [на] [карт*] [как] (@moneyTransferType|@moneyTransferType_r) [@money|@currency]", "[а] [могу|можн*|возможн*|есть [*возможн*]] [ли] [я] (@moneyTransferType|@moneyTransferType_r) [сраз*] [на] [зарубеж*] [карт*]", "[а] [могу|можн*|возможн*|есть [*возможн*]] [ли] [я] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [к] [себе] [на] (@product_iis|@product) [в] [финам] [банке] [в] [@money|@currency]", "[а] (@moneyTransferType|@moneyTransferType_r) [можн*|возможн|есть [*возможн*]] [@money|@currency] [дс] [средств*] [переводит*|перекинут*|перевест*]", "[а] [какой|какая] @commission * [за] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [какая|какой] [дс] [средств*] [подскажи*]", "[а] [какой|какая] @commission (взимает*|удерживает*|списыв*|берет*) [за] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс] [средств*]", "[а] [как] [мне] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] (@product_iis|@product)", "[а] [как] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [совершит*|осуществ*|сделат*|оформит*]", "[@moneyTransferMethod] [для] @moneyTransferMethod", "[@money|@currency] [сразу] [на] [зарубеж*] [банк*] [можно|возможн*] [(@moneyTransferType|@moneyTransferType_r)|(@moneyTransferType|@moneyTransferType_r)_r]", "(@moneyTransferType|@moneyTransferType_r) [по] @moneyTransferMethod", "перевод между счетами", "* [интересуют] @period * (@moneyTransferType|@moneyTransferType_r) * @currency", "* [интересуют] @period * (@moneyTransferType|@moneyTransferType_r) * @money", "* @currency * [так и] [не] [пришл*|дошл*]", "* @money * [так и] [не] [пришл*|дошл*]", "* [когда] @money * (придут*|поступ|зачислят*|поступ*|увиж*|отразят*|упад*|отправ*) [на] (@product_iis|@product)", "* [когда] (@moneyTransferType|@moneyTransferType_r) * @currency * [по] [поручен*|заявк*]", "* [когда] (@moneyTransferType|@moneyTransferType_r) * @money * [по] [поручен*|заявк*]", "* @period [занимает] (@moneyTransferType|@moneyTransferType_r) *", "* [какой] @period * (@moneyTransferType|@moneyTransferType_r) *", "* [какие] [сейчас] [у вас] (услов*|услов* вывод*|правил*|правил* вывод*) @currency *", "* [какие] [сейчас] [у вас] (услов*|услов* вывод*|правил*|правил* вывод*) @money *", "* [вы] (удержив*|берет*|взымает*|списыв*) @commission [за] (@moneyTransferType|@moneyTransferType_r) *", "* [будет*|будут] [ли] [дополнит*] @commission [при|c] @moneyTransferMethod *", "* [будет*|будут] [ли] [дополнит*] @commission [при|c] (@moneyTransferType|@moneyTransferType_r) * @money *", "* [какой] @commission [за] (@moneyTransferType|@moneyTransferType_r) @money *", "* [какая|какой] @commission [за] (@moneyTransferType|@moneyTransferType_r) @money * [на] (сторонн* банк*|банк*|Финам)", "* [какая|какой] @commission [за] (@moneyTransferType|@moneyTransferType_r) @currency [на] (сторонн* банк*|банк*|Финам)", "* [хочу] @moneyTransferMethod *", "* [как] (@moneyTransferType|@moneyTransferType_r) @currenty * [без комис*|онлайн|бесплат*]", "* [как] [мне] (осуществ*|сдела*|оформ*|сформ*|получ*|направ*|соверш*|выполн*|испол*|*вести|*вед*|*вод*|*мож*|отправ*|воспольз*) * (@moneyTransferType|@moneyTransferType_r) * @money * @currenty [без комис*]", "* [как] (@moneyTransferType|@moneyTransferType_r) * [@money] [в|с|через] ([мобильн*] приложени*|личн* кабин*|edox)", "* [как] [бесплатн*] (@moneyTransferType|@moneyTransferType_r) * @currency [с|со] (@product_iis|@product) *", "* [как] [бесплатн*] (@moneyTransferType|@moneyTransferType_r) * @money [с|со] (@product_iis|@product) *", "* [как] (@moneyTransferType|@moneyTransferType_r) * @money [на] @moneyTransferMethod *", "* {[есть] [возможн*|доступн*] [ли]} * @moneyTransferMethod * @currency", "* @money [можно*] (@moneyTransferType|@moneyTransferType_r) [на] moneyTransferMethod *", "* @currency [доступ*|свобод*] [для|к] (@moneyTransferType|@moneyTransferType_r) *", "* @money [доступ*|свобод*] [для|к] (@moneyTransferType|@moneyTransferType_r) *", "* {[есть] [возможн*|доступн*] [ли]} (@moneyTransferType|@moneyTransferType_r) [в] @currency *", "* [как|где*] [могу] (@moneyTransferType|@moneyTransferType_r) [счет|заявку|поручение*]", "* [какая|сколько|размер] * @commission (@moneyTransferType|@moneyTransferType_r) * [@currency] * [@moneyTransferMethod] *", "* [какая|сколько|размер] * @commission (@moneyTransferType|@moneyTransferType_r) * [@currency|@money] * [через|с помощью] * [@moneyTransferMethod] * {[брок*|банк*] счет*} *", "* (как|хочу|можно|каким) (@moneyTransferType|@moneyTransferType_r) (@currency|@money) * [брок*|банк*] * [счет*|догов*] *", "* (как|хочу|можно|каким) (осуществ*|сдела*|оформ*|сформ*|получ*|направ*|соверш*|выполн*|испол*|*вести|*вед*|*вод*|*мож*|отправ*|воспольз*) * [поручен*|заяв*] * (@moneyTransferType|@moneyTransferType_r) * (@currency|@money) *", "* как * перев* * [@money|@currency] * [брок*|банк*] * (счет*|догов*|карт*) *", "* (хочу|как) * (перевести|перевод) * (денег|средств|валют*) * между * брокерскими * (счетами|договорами) *", "* как * пополнить * @company *", "* каким * способом * можно * пополнить * @company *", "* нужно * (осуществ*|сдела*|оформ*|сформ*|получ*|направ*|соверш*|выполн*|испол*|*вести|*вед*|*вод*|*мож*|отправ*|воспольз*) * перевод * @currency * @money *", "* как * перевести * @currency * @money *", "* хочу * (осуществ*|сдела*|оформ*|сформ*|получ*|направ*|соверш*|выполн*|испол*|*вести|*вед*|*вод*|*мож*|отправ*|воспольз*) * перевод * @currency * @money *", "* как * перевести * @money *", "* нужно * (осуществ*|сдела*|оформ*|сформ*|получ*|направ*|соверш*|выполн*|испол*|*вести|*вед*|*вод*|*мож*|отправ*|воспольз*) * перевод * @money *", "* нужно * (осуществ*|сдела*|оформ*|сформ*|получ*|направ*|соверш*|выполн*|испол*|*вести|*вед*|*вод*|*мож*|отправ*|воспольз*) * перевод * @money * @currency * ", "* как * перевести * @money * @currency * ", "* хочу * (осуществ*|сдела*|оформ*|сформ*|получ*|направ*|соверш*|выполн*|испол*|*вести|*вед*|*вод*|*мож*|отправ*|воспольз*) * перевод * @money * @currency * ", "* (как|хочу) * (снять|вывести|забрать) * (деньги|средства|валюту|валюты) * (счета|счетов) *", "* нужно * (поручение|заявку|заявление) * (вывод|снятие) * (средств|денег|валют|валюты) *", "как пополнить брокерский счет картой", "(перевод|ввод|вывод) @assetType", "[как] (сделат*|делат*|осуществ*) (@moneyTransferType|@moneyTransferType_r) [на] @product", "[как|каким] [образ*] [можн*] @moneyTransferType @assetType", "[можно] [ли] @moneyTransferType [свои] @assetType", "@moneyTransferType @assetType [как] [это] [сделат*|делат*|осуществ*]", "[как|каким образом] @moneyTransferType", "[как] @moneyTransferType [в|к] [[ао] Финам*|вас|вам]" ],
+    "patterns" : [ "[еще] [вчера|вечер*|днем] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на] [свой] [@product] [до сих пор] [не вижу|не отображ*|не пришл*] [@money|@currency] [на] [мой|мое*] [@product]", "[могу|можн*|возможн*|есть [*возможн*]|хоч*|доступ*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [с] [прост*|одного] [@product] [на] [другой] [как] [мне] [это] [сдела*|делат*]", "[как] [быстро] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [с|на] [@product] [при] [(@moneyTransferType|@moneyTransferType_r)|(@moneyTransferType|@moneyTransferType_r)_r] [c|по] [@moneyTransferMethod]", "[какая] @commission [будет] [если] [я] [оформ*|сдел*|закаж*] [за] @moneyTransferMethod [с] [@product]", "(@moneyTransferType|@moneyTransferType_r)", "(@moneyTransferType|@moneyTransferType_r) [@product] [по|через] @moneyTransferMethod", "@moneyTransferMethod", "[какие|скольк*] @commission [за] (@moneyTransferType|@moneyTransferType_r)", "[как] [сделат*|делат*|осуществ*] (@moneyTransferType|@moneyTransferType_r)", "[как] [сделат*|делат*|осуществ*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [без] [комисс*]", "* [как|каким образ*] (@moneyTransferType|@moneyTransferType_r) [@product] * [со|с] (сторонн* банк*|банк*|Финам)", "[как] (@moneyTransferType|@moneyTransferType_r) [@product] [финам*] [без комисс*] [через] [@moneyTransferMethod|finam trade]", "[как] (@moneyTransferType|@moneyTransferType_r) [@product] [по] [@moneyTransferMethod|реквизит*]", "[как] (@moneyTransferType|@moneyTransferType_r) [в] [[мобил*] приложении] [@product] [финам*]", "[как] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [с] [одного] [@product] [финам*] [на] [другой|второй] [@product] [финам*]", "* [как] [могу|можн*|возможн*|есть [*возможн*]|хоч*|доступ*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на|с|из] [другог*] [банк*]", "* [как] [можн*|возможн*] (@moneyTransferType|@moneyTransferType_r) [@product] [без комис*]", "* [как] [могу|можн*|возможн*|есть [*возможн*]|хоч*|доступ*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [с] [@product] [на] [@product] [срочн* [рынк*]]", "* [как] [могу|можн*|возможн*|есть [*возможн*]|хоч*|доступ*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на|с] [@product] [или|на] [@product] [другог*] [банк*]", "[как] [мне] (@moneyTransferType|@moneyTransferType_r) [@product] [в] [@money|@currency] [для] [дальнейш*] [работ*]", "[как] [мне] (@moneyTransferType|@moneyTransferType_r) [@product] [в] [@money|@currency]", "[как] [мне] (@moneyTransferType|@moneyTransferType_r) [к|в] [вам|Финам*] [@money|@currency] [из|со|от] [ВТБ|Альф*|сбер*|тинькоф*|[другог*] брокер*]", "[как] [к|в] [вам|Финам*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [из|со|от] [ВТБ|Альф*|сбер*|тинькоф*|[другог*] брокер*]", "[как] [их|[@money|@currency]] (@moneyTransferType|@moneyTransferType_r) [на] [друг*] [@product]", "[как] [из] [[мобильн*] приложен*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [(@moneyTransferType|@moneyTransferType_r)|(@moneyTransferType|@moneyTransferType_r)_r]", "[как] [долго] [будет] (идти|производит*|осуществл*|проход*|исполн*) (@moneyTransferType|@moneyTransferType_r) [личн*] [кабин*]", "[как] [дешевл*|без @commission] [всего] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на] [сво*] [@product]", "[как] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на] [сво*] [@product] [не могу|не cмог*] [найти]", "[как] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [с|из] [@product] [после] [продаж*] [актив*]", "[как] (@moneyTransferType|@moneyTransferType_r) [все] [@money|@currency] [себе] [на] [@product]", "[как] (воспользов*|использ*) [@moneyTransferMethod] [при] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на] [@product]", "* [как] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на] [@product] [в] [Финам*]", "* [как] [в|с] [приложен*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [с] [@product] *", "[как] [скор*|быстр*] [присход*|приход*] [зачислен*] [@money|@currency] [дс]", "[как] [быстро] [осуществл*] @moneyTransferMethod [и] [какая] [@commission]", "[как] [быстро] [осуществл*] [@money|@currency] [попад*] [на|со] [@product] [при] [оплат*] [по] @moneyTransferMethod", "[как] [быстро] [@money|@currency] (@moneyTransferType|@moneyTransferType_r) [на|со] [@product]", "[как] [@money|@currency] (@moneyTransferType|@moneyTransferType_r) [на] [@product]", "* [где] [могу|можн*|возможн*|есть [*возможн*]|хоч*|доступ*] (ознакомит*|посмотрет*) [с] [вашим*] [правил*|тариф*] [@commission] [по|за] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс] [@product]", "(@moneyTransferType|@moneyTransferType_r) [@money|@currency] [на] [@product] [в|через] [ЛК|[личн*] кабин* [Финам*]]", "(@moneyTransferType|@moneyTransferType_r) [в] [@money|@currency] [на] [@product] [возмож*|не появилс*]", "(@moneyTransferType|@moneyTransferType_r) [в] [@money|@currency] [у вас|в Финам*] [сейчас] [могу|можн*|возможн*|есть [*возможн*]|хоч*|доступ*] [сделат*|оформит*|подат*] [и] [получит*] [в] [офис*]", "(@moneyTransferType|@moneyTransferType_r) [@money|@currency] [у вас|в Финам*] [сейчас] [могу|можн*|возможн*|есть [*возможн*]|хоч*|доступ*]", "(@moneyTransferType|@moneyTransferType_r) [могу|можн*|возможн*|есть [*возможн*]|хоч*]", "(@moneyTransferType|@moneyTransferType_r) [@money|@currency] * [на] [@product] [могу|можн*|возможн*|есть [*возможн*]] [только]", "(@moneyTransferType|@moneyTransferType_r) [@money|@currency] * [на] [@product] [могу|можн*|возможн*|есть [*возможн*]] [через|с] [приложен*]", "[могу|можн*|возможн*|есть [*возможн*]] [ли] [у Вас|в Финам*] (@moneyTransferType|@moneyTransferType_r) [в] [@money|@currency]", "[могу|можн*|возможн*|есть [*возможн*]] [ли] [у Вас|в Финам*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс] [рубл*] [со] [@product] [на] [@product]", "[могу|можн*|возможн*|есть [*возможн*]] [ли] [у Вас|в Финам*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс] [на] [@product]", "[могу|можн*|возможн*|есть [*возможн*]] [ли] [подат*|оформит*|сделат*|оставит*|создат*] [заявк*|поручен*] [на] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс] [с] [[мобильн*] приложен*] [Финам*]", "[могу|можн*|возможн*|есть [*возможн*]] [ли] (@moneyTransferType|@moneyTransferType_r) [@product] [с] [@product]", "[могу|можн*|возможн*|есть [*возможн*]] [ли] (@moneyTransferType|@moneyTransferType_r) [@product] [в] [@money|@currency] [дс|налич*]", "[какие|каким] [вариант*|способ*] [я] [мог*|можн*|возможн*] (@moneyTransferType|@moneyTransferType_r) [сво*|мои*] @product [в|у] [[ао] Финам*|вас] [есть|имеет*]", "[@money|@currency] [дс] [могу|можн*|возможн*|есть [*возможн*]] (@moneyTransferType|@moneyTransferType_r) [на] @product [РФ|России]", "[в] [[мобильн*] приложен*] [нельзя|есть|можн*|возможн*|доступен*|могу|тольк*] [функц*|кнопк*] [подат*|оформит*|сделат*|оставит*] [заявк*|поручен*] [на] (@moneyTransferType|@moneyTransferType_r) [а] [где] [функц*|кнопк*](@moneyTransferType|@moneyTransferType_r)", "[в] [[мобильн*] приложен*] [нельзя|есть|можн*|возможн*|доступен*|могу] [функц*] [подат*|оформит*|сделат*|оставит*] [заявк*|поручен*] [на] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс]", "[в] [[мобильн*] приложен*] [кнопк*|функц*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс] [я] [не нашл*|не нашел]", "[в] [[мобильн*] приложен*] [как то|как-то] [нельзя|есть|можн*|возможн*|доступен*|могу] [функц*] [подат*|оформит*|сделат*] [заявк*|поручен*] [на] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс]", "[в] [[мобильн*] приложен*] [[новом*] (ЛК|[личн*] кабин*)] [нельзя|есть] [функц*] [подат*|оформит*|сделат*] [заявк*|поручен*] [на] (@moneyTransferType|@moneyTransferType_r) [межд*] @product", "[в] [каких|какой] [@money|@currency] [могу|можн*|возможн*|есть [*возможн*]] (@moneyTransferType|@moneyTransferType_r) @product", "[будут] [ли] [дополнител*] [@commission] [при|за] (использов*) @moneyTransferMethod", "(взимает*|удерживает*|списыв*|берет*) [за] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс] [средств*] [@commission]", "[а] [я] [могу|можн*|возможн*|есть [*возможн*]] [через|с] [касс*] [банк*] [Финам*] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [с] @product", "[а] [я] [могу|можн*|возможн*|есть [*возможн*]] (@moneyTransferType|@moneyTransferType_r) [с] @product [счет*] [или] [только] [через|с] [касс*]", "[а] [@money|@currency] [могу|можн*|возможн*|есть [*возможн*]] (@moneyTransferType|@moneyTransferType_r) [в] [банк]", "[а] [могу|можн*|возможн*|есть [*возможн*]] [я] [на] [карт*] [как] (@moneyTransferType|@moneyTransferType_r) [@money|@currency]", "[а] [могу|можн*|возможн*|есть [*возможн*]] [ли] [я] (@moneyTransferType|@moneyTransferType_r) [сраз*] [на] [зарубеж*] [карт*]", "[а] [могу|можн*|возможн*|есть [*возможн*]] [ли] [я] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [к] [себе] [на] @product [в] [финам] [банке] [в] [@money|@currency]", "[а] (@moneyTransferType|@moneyTransferType_r) [можн*|возможн|есть [*возможн*]] [@money|@currency] [дс] [средств*] [переводит*|перекинут*|перевест*]", "[а] [какой|какая] @commission * [за] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [какая|какой] [дс] [средств*] [подскажи*]", "[а] [какой|какая] @commission (взимает*|удерживает*|списыв*|берет*) [за] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [дс] [средств*]", "[а] [как] [мне] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] @product", "[а] [как] (@moneyTransferType|@moneyTransferType_r) [@money|@currency] [совершит*|осуществ*|сделат*|оформит*]", "[@moneyTransferMethod] [для] @moneyTransferMethod", "[@money|@currency] [сразу] [на] [зарубеж*] [банк*] [можно|возможн*] [(@moneyTransferType|@moneyTransferType_r)|(@moneyTransferType|@moneyTransferType_r)_r]", "(@moneyTransferType|@moneyTransferType_r) [по] @moneyTransferMethod", "перевод между счетами", "* [интересуют] @period * (@moneyTransferType|@moneyTransferType_r) * @currency", "* [интересуют] @period * (@moneyTransferType|@moneyTransferType_r) * @money", "* @currency * [так и] [не] [пришл*|дошл*]", "* @money * [так и] [не] [пришл*|дошл*]", "* [когда] @money * (придут*|поступ|зачислят*|поступ*|увиж*|отразят*|упад*|отправ*) [на] @product", "* [когда] (@moneyTransferType|@moneyTransferType_r) * @currency * [по] [поручен*|заявк*]", "* [когда] (@moneyTransferType|@moneyTransferType_r) * @money * [по] [поручен*|заявк*]", "* @period [занимает] (@moneyTransferType|@moneyTransferType_r) *", "* [какой] @period * (@moneyTransferType|@moneyTransferType_r) *", "* [какие] [сейчас] [у вас] (услов*|услов* вывод*|правил*|правил* вывод*) @currency *", "* [какие] [сейчас] [у вас] (услов*|услов* вывод*|правил*|правил* вывод*) @money *", "* [вы] (удержив*|берет*|взымает*|списыв*) @commission [за] (@moneyTransferType|@moneyTransferType_r) *", "* [будет*|будут] [ли] [дополнит*] @commission [при|c] @moneyTransferMethod *", "* [будет*|будут] [ли] [дополнит*] @commission [при|c] (@moneyTransferType|@moneyTransferType_r) * @money *", "* [какой] @commission [за] (@moneyTransferType|@moneyTransferType_r) @money *", "* [какая|какой] @commission [за] (@moneyTransferType|@moneyTransferType_r) @money * [на] (сторонн* банк*|банк*|Финам)", "* [какая|какой] @commission [за] (@moneyTransferType|@moneyTransferType_r) @currency [на] (сторонн* банк*|банк*|Финам)", "* [хочу] @moneyTransferMethod *", "* [как] (@moneyTransferType|@moneyTransferType_r) @currenty * [без комис*|онлайн|бесплат*]", "* [как] [мне] (осуществ*|сдела*|оформ*|сформ*|получ*|направ*|соверш*|выполн*|испол*|*вести|*вед*|*вод*|*мож*|отправ*|воспольз*) * (@moneyTransferType|@moneyTransferType_r) * @money * @currenty [без комис*]", "* [как] (@moneyTransferType|@moneyTransferType_r) * [@money] [в|с|через] ([мобильн*] приложени*|личн* кабин*|edox)", "* [как] [бесплатн*] (@moneyTransferType|@moneyTransferType_r) * @currency [с|со] @product *", "* [как] [бесплатн*] (@moneyTransferType|@moneyTransferType_r) * @money [с|со] @product *", "* [как] (@moneyTransferType|@moneyTransferType_r) * @money [на] @moneyTransferMethod *", "* {[есть] [возможн*|доступн*] [ли]} @moneyTransferMethod @currency", "* @money [можно*] (@moneyTransferType|@moneyTransferType_r) [на] moneyTransferMethod *", "* @currency [доступ*|свобод*] [для|к] (@moneyTransferType|@moneyTransferType_r) *", "* @money [доступ*|свобод*] [для|к] (@moneyTransferType|@moneyTransferType_r) *", "* {[есть] [возможн*|доступн*] [ли]} (@moneyTransferType|@moneyTransferType_r) [в] @currency *", "* [как|где*] [могу] (@moneyTransferType|@moneyTransferType_r) [счет|заявку|поручение*]", "* [какая|сколько|размер] * @commission (@moneyTransferType|@moneyTransferType_r) * [@currency] * [@moneyTransferMethod] *", "* [какая|сколько|размер] * @commission (@moneyTransferType|@moneyTransferType_r) * [@currency|@money] * [через|с помощью] * [@moneyTransferMethod] * {[брок*|банк*] счет*} *", "* (как|хочу|можно|каким) (@moneyTransferType|@moneyTransferType_r) (@currency|@money) * [брок*|банк*] * [счет*|догов*] *", "* (как|хочу|можно|каким) (осуществ*|сдела*|оформ*|сформ*|получ*|направ*|соверш*|выполн*|испол*|*вести|*вед*|*вод*|*мож*|отправ*|воспольз*) * [поручен*|заяв*] * (@moneyTransferType|@moneyTransferType_r) * (@currency|@money) *", "* как * перев* * [@money|@currency] * [брок*|банк*] * (счет*|догов*|карт*) *", "* (хочу|как) * (перевести|перевод) * (денег|средств|валют*) * между * брокерскими * (счетами|договорами) *", "* как * пополнить * @company *", "* каким * способом * можно * пополнить * @company *", "* нужно * (осуществ*|сдела*|оформ*|сформ*|получ*|направ*|соверш*|выполн*|испол*|*вести|*вед*|*вод*|*мож*|отправ*|воспольз*) * перевод * @currency * @money *", "* как * перевести * @currency * @money *", "* хочу * (осуществ*|сдела*|оформ*|сформ*|получ*|направ*|соверш*|выполн*|испол*|*вести|*вед*|*вод*|*мож*|отправ*|воспольз*) * перевод * @currency * @money *", "* как * перевести * @money *", "* нужно * (осуществ*|сдела*|оформ*|сформ*|получ*|направ*|соверш*|выполн*|испол*|*вести|*вед*|*вод*|*мож*|отправ*|воспольз*) * перевод * @money *", "* нужно * (осуществ*|сдела*|оформ*|сформ*|получ*|направ*|соверш*|выполн*|испол*|*вести|*вед*|*вод*|*мож*|отправ*|воспольз*) * перевод * @money * @currency * ", "* как * перевести * @money * @currency * ", "* хочу * (осуществ*|сдела*|оформ*|сформ*|получ*|направ*|соверш*|выполн*|испол*|*вести|*вед*|*вод*|*мож*|отправ*|воспольз*) * перевод * @money * @currency * ", "* (как|хочу) * (снять|вывести|забрать) * (деньги|средства|валюту|валюты) * (счета|счетов) *", "* нужно * (поручение|заявку|заявление) * (вывод|снятие) * (средств|денег|валют|валюты) *", "как пополнить брокерский счет картой", "(перевод|ввод|вывод) @assetType", "[как] (сделат*|делат*|осуществ*) (@moneyTransferType|@moneyTransferType_r) [на] @product", "[как|каким] [образ*] [можн*] @moneyTransferType @assetType", "[можно] [ли] @moneyTransferType [свои] @assetType", "@moneyTransferType @assetType [как] [это] [сделат*|делат*|осуществ*]", "[как|каким образом] @moneyTransferType", "[как] @moneyTransferType [в|к] [[ао] Финам*|вас|вам]" ],
     "slots" : [ {
       "name" : "currency",
       "entity" : "currency",
@@ -310,7 +313,7 @@
     "priority" : 0
   }, {
     "path" : "/009 Как_купить",
-    "enabled" : true,
+    "enabled" : false,
     "shared" : false,
     "phrases" : [ {
       "text" : "хочу купить"
@@ -329,7 +332,7 @@
     "priority" : 0
   }, {
     "path" : "/002 Прощание",
-    "enabled" : true,
+    "enabled" : false,
     "shared" : false,
     "phrases" : [ {
       "text" : "пока"
@@ -395,7 +398,7 @@
     "priority" : 0
   }, {
     "path" : "/001 Приветствие",
-    "enabled" : true,
+    "enabled" : false,
     "shared" : false,
     "phrases" : [ {
       "text" : "привет"
@@ -443,7 +446,7 @@
     "priority" : 0
   }, {
     "path" : "/004 Отказ",
-    "enabled" : true,
+    "enabled" : false,
     "shared" : false,
     "phrases" : [ {
       "text" : "нет"
@@ -486,7 +489,7 @@
     "classificationRules" : {
       "refs" : [ ]
     },
-    "patterns" : [ "[@transfer_operator] [на|в|с|к] [@operator] [на|в|с|к] ([регионал*] (представит*|офис|резиденц*|кабинет*|фирм*|контор*|бюро))", "{[@transfer_operator] [на|в|с|к] ([регионал*] (представит*|офис|резиденц*|кабинет*|фирм*|контор*|бюро))}", "[на|в|с|к] ([регионал*] (представит*|офис|резиденц*|кабинет*|фирм*|контор*|бюро))", "{[регионал*] (представит*|офис|резиденц*|кабинет*|фирм*|контор*|бюро)}", "[@transfer_operator] [на|в|с|к] [@operator] [на|в|с|к] (@officePhone)", "{[@operator] [на|в|с|к] (@officePhone)}", "{[@transfer_operator] [на|в|с|к] (@officePhone)}", "[на|в|с|к] (@officePhone)", "* переведите * на * представительство *", "@operator", "[с|к|на|через] @operator", "[как] @transfer_operator [с| к| на| через] @operator", "[*мож*] [с|* к|* на|* через*] @operator", "{буд* [*мож*]} @transfer_operator [с|к|на|через] @operator", "{есть* [возмож*]} @transfer_operator [с| к| на| через] @operator", "(необход*) @operator", "[необход*] @transfer_operator [с| к| на| через] @operator", "(нуж*) [с| к| на| через] @operator", "[нуж*] @transfer_operator [с| к| на| через] @operator", "[мне] (хоч*|хот*) [с| к| на| через] @operator", "[хоч*|хот*] @transfer_operator [с| к| на| через] @operator", "(треб*) @transfer_operator [с| к| на| через] @operator", "[треб*] @transfer_operator [с| к| на| через] @operator", "(где) [мой|моя] @operator", "(когда) @transfer_operator [с|к|на| через] @operator", "[когда] @transfer_operator [с|к|на| через] @operator", "(пусть) @operator", "[пусть] @transfer_operator [с| к| на| через] @operator", "(жду) @operator", "[жду] @transfer_operator [с| к| на| через] @operator", "* *дай* * [@operator] * (@operator|@company) * [поддержк*] *", "* [как] * [мне] * (позови*|позв*|подключ*|перев*|связат*|свяж*|связыв*|соедин*|дай*|давай*|попасть|услыш*) * [с|на|к] * [живо*] * [@operator] * (@operator|@company) * [поддержк*] *", "* [живо*] * @operator * [поддержк*] *", "* {@operator * [@company] * [поддержк*]} *", "* [мне] * @transfer_operator * (@operator|@operator) *", "* [меня] * @emergency *", "* [очень] * @emergency *", "@quality", "* {[вы] [ничем] [никто]} * @quality", "* @quality * (сервис*|поддержк*|бот*|робот)", "* {[у] [вас] [все] [так] [что-то]} * @quality *", "* [это] [же] [какой-то] * @quality *", "* @additionalTelephone *", "* ((контакт*|кол*) центр*|кц|горяч* лини*|справочн* [служб*]|десять два нуля|тысяч*|один три ноля|один ноль ноль ноль) @transfer_operator", "(голосов* (трейд*|поручен*|заявк*|покупк*|продаж*|торг*)|(трейд*|поручен*|заявк*|покупк*|продаж*|торг*) [c|по|через|с помощью] (голос*|телефон*|трейд*)|(телеф*|номер*|добавочн*|коммутатор*) [для] [голос*] (трейд*|поручен*|заявк*|покупк*|продаж*|торг*)|трейдинг*|голосов*|двадцать два два ноля|двадцать два два нуля|с трейдер*) [@transfer_operator]", "(брокер* [финам*|ао]|(финам*|ао|инвестиц*) брокер*|(брокерск*|инвестиц*) (компан*|услуг*)|ао финам*|финам* ао|[технич*] поддерж*|[оператор*|человек*|консультант*|менеджер] [отдел*](поддержк*|техподдержк*|техническ* поддержк*)|техподдержк*|двадцать два двадцать два|четыре двойки|двойк*) [@transfer_operator]", "Контакт центр", "банковск* услуг*", "(добавочн*|коммутатор*) номер*", "дополнительн* номер*", "* @department *", "* @officePhone *", "мне нужен (добавочный|коммутатор*) * (@department|@additionalTelephone|@officePhone) *", "(добавочный|коммутатор*) * (@department|@additionalTelephone|@officePhone) *", "дополнительный * (@department|@additionalTelephone|@officePhone) *", "(1945|тысяча девятьсот сорок пят*|девятнадцать сорок пят*)", "[мне] [хочу|нужен*|нужн*|необходим*] (говорит*|переговор*|проконсультир*|консультир*|обсудит*|поговорит*) [со] [своим] @operator @officePhone", "[мне] [нужен*|нужн*|необходим*] @operator [добавочн*|коммутатор*] [на|в|с|к] [@officePhone|@department]", "{[мне] [на|в|с|к] (@officePhone)}", "@department (добавочн*|коммутатор*) @department", "@transfer_operator [меня] [на] @department", "{[мне] (нужен*|нужн*|необходим*) [совершит*|сдел*] @department} [для] [купл*] [продаж*] [@instruments]", "позови [мне] @operator", "@transfer_operator [с|на] @department", "* [с] @department [меня|чтоб*] @transfer_operator *", "[мне] (нужен|нужн*|необход*) @company", "[я] (хочу) [в] @company", "@transfer_operator [мне] @company", "[мне] [нужен*|нужн*|необходим*] @operator @operator", "{помощь нужна}", "[@transfer_operator] [с] [добавочн*] [номер*] @additionalTelephone", "* [а] [оператор*] (мне) звонил*", "[да] [хочу|хочет*] получ* @operator", "(позови*|позв*|подключ*|перев*|связат*|свяж*|связыв*|соедин*|дай*|давай*|попасть|услыш*) * [с|на|к] (@operator|@company)", "@callback", "(можн*|возможн*) @transfer_operator [с] @operator", "{меня [с] @operator @transfer_operator}" ],
+    "patterns" : [ "[@transfer_operator] [на|в|с|к] [@operator|@officePhone_question] [на|в|с|к] ([регионал*] (представит*|офис|резиденц*|кабинет*|фирм*|контор*|бюро))", "{[@transfer_operator] [на|в|с|к] ([регионал*] (представит*|офис|резиденц*|кабинет*|фирм*|контор*|бюро))}", "[на|в|с|к] ([регионал*] (представит*|офис|резиденц*|кабинет*|фирм*|контор*|бюро))", "{[регионал*] (представит*|офис|резиденц*|кабинет*|фирм*|контор*|бюро)}", "[@transfer_operator] [на|в|с|к] [@operator] [на|в|с|к] (@officePhone|@officePhone_question)", "{[@operator] [на|в|с|к] (@officePhone|@officePhone_question)}", "{[@transfer_operator] [на|в|с|к] (@officePhone|@officePhone_question)}", "[на|в|с|к] (@officePhone)", "* переведите * на * представительство *", "@operator", "[с|к|на|через] (@operator|@officePhone_question)", "[как] @transfer_operator [с| к| на| через] (@operator|@officePhone_question)", "[*мож*] [с|* к|* на|* через*] (@operator|@officePhone_question)", "{буд* [*мож*]} @transfer_operator [с|к|на|через] (@operator|@officePhone_question)", "{есть* [возмож*]} @transfer_operator [с| к| на| через] (@operator|@officePhone_question)", "необход* (@operator|@officePhone_question)", "[необход*] @transfer_operator [с| к| на| через] (@operator|@officePhone_question)", "(нуж*) [с| к| на| через] (@operator|@officePhone_question)", "[нуж*] @transfer_operator [с| к| на| через] (@operator|@officePhone_question)", "[мне] (хоч*|хот*) [с| к| на| через] (@operator|@officePhone_question)", "[хоч*|хот*] @transfer_operator [с| к| на| через] (@operator|@officePhone_question)", "(треб*) @transfer_operator [с| к| на| через] (@operator|@officePhone_question)", "[треб*] @transfer_operator [с| к| на| через] (@operator|@officePhone_question)", "(где) [мой|моя] (@operator|@officePhone_question)", "(когда) @transfer_operator [с|к|на| через] (@operator|@officePhone_question)", "[когда] @transfer_operator [с|к|на| через] (@operator|@officePhone_question)", "(пусть) (@operator|@officePhone_question)", "[пусть] @transfer_operator [с| к| на| через] (@operator|@officePhone_question)", "(жду) (@operator|@officePhone_question)", "[жду] @transfer_operator [с| к| на| через] (@operator|@officePhone_question)", "* *дай* * [@operator] * (@operator|@company|@officePhone_question) * [поддержк*] *", "* [как] * [мне] * (позови*|позв*|подключ*|перев*|связат*|свяж*|связыв*|соедин*|дай*|давай*|попасть|услыш*) * [с|на|к] * [живо*] * [@operator] * (@operator|@company|@officePhone_question) * [поддержк*] *", "* [живо*] * (@operator|@officePhone_question) * [поддержк*] *", "* {(@operator|@officePhone_question) * [@company] * [поддержк*]} *", "* [мне] * @transfer_operator * (@operator|@officePhone_question) *", "* [меня] * @emergency *", "* [очень] * @emergency *", "@quality", "* {[вы] [ничем] [никто]} * @quality", "* @quality * (сервис*|поддержк*|бот*|робот)", "* {[у] [вас] [все] [так] [что-то]} * @quality *", "* [это] [же] [какой-то] * @quality *", "* @additionalTelephone *", "* ((контакт*|кол*) центр*|кц|горяч* лини*|справочн* [служб*]|десять два нуля|тысяч*|один три ноля|один ноль ноль ноль) @transfer_operator", "(голосов* (трейд*|поручен*|заявк*|покупк*|продаж*|торг*)|(трейд*|поручен*|заявк*|покупк*|продаж*|торг*) [c|по|через|с помощью] (голос*|телефон*|трейд*)|(телеф*|номер*|добавочн*|коммутатор*) [для] [голос*] (трейд*|поручен*|заявк*|покупк*|продаж*|торг*)|трейдинг*|голосов*|двадцать два два ноля|двадцать два два нуля|с трейдер*) [@transfer_operator]", "(брокер* [финам*|ао]|(финам*|ао|инвестиц*) брокер*|(брокерск*|инвестиц*) (компан*|услуг*)|ао финам*|финам* ао|[технич*] поддерж*|[оператор*|человек*|консультант*|менеджер] [отдел*](поддержк*|техподдержк*|техническ* поддержк*)|техподдержк*|двадцать два двадцать два|четыре двойки|двойк*) [@transfer_operator]", "Контакт центр", "банковск* услуг*", "(добавочн*|коммутатор*) номер*", "дополнительн* номер*", "* @department *", "* @officePhone *", "мне нужен (добавочный|коммутатор*) * (@department|@additionalTelephone|@officePhone|@officePhone_question) *", "(добавочный|коммутатор*) * (@department|@additionalTelephone|@officePhone|@officePhone_question) *", "дополнительный * (@department|@additionalTelephone|@officePhone|@officePhone_question) *", "(1945|тысяча девятьсот сорок пят*|девятнадцать сорок пят*)", "[мне] [хочу|нужен*|нужн*|необходим*] (говорит*|переговор*|проконсультир*|консультир*|обсудит*|поговорит*) [со] [своим] (@operator| @officePhone|@officePhone_question)", "[мне] [нужен*|нужн*|необходим*] @operator [добавочн*|коммутатор*] [на|в|с|к] [@officePhone|@department|@officePhone_question]", "{[мне] [на|в|с|к] @officePhone}", "(@department|@officePhone_question) (добавочн*|коммутатор*) (@department|@officePhone_question)", "@transfer_operator [меня] [на] (@department|@officePhone_question)", "{[мне] (нужен*|нужн*|необходим*) [совершит*|сдел*] (@department|@officePhone_question)} [для] [купл*] [продаж*] [@instruments]", "позови [мне] (@operator|@officePhone_question)", "@transfer_operator [с|на] (@department|@officePhone_question)", "* [с] (@department|@officePhone_question) [меня|чтоб*] @transfer_operator *", "[мне] (нужен|нужн*|необход*) @company", "[я] (хочу) [в] @company", "@transfer_operator [мне] (@company|@officePhone_question)", "[мне] [нужен*|нужн*|необходим*] @operator @operator", "{помощь нужна}", "[@transfer_operator] [с] [добавочн*] [номер*] (@additionalTelephone|@officePhone_question)", "* [а] [оператор*] (мне) звонил*", "[да] [хочу|хочет*] получ* (@operator|@officePhone_question)", "(позови*|позв*|подключ*|перев*|связат*|свяж*|связыв*|соедин*|дай*|давай*|попасть|услыш*) * [с|на|к] (@operator|@company|@department|@officePhone_question)", "@callback", "(можн*|возможн*) @transfer_operator [с] (@operator|@officePhone_question)", "{меня [с] (@operator|@officePhone_question) @transfer_operator}", "@officePhone_question" ],
     "slots" : [ {
       "name" : "company",
       "entity" : "company",
@@ -532,6 +535,11 @@
       "entity" : "callback",
       "required" : false,
       "prompts" : [ ]
+    }, {
+      "name" : "officePhone_question",
+      "entity" : "officePhone_question",
+      "required" : false,
+      "prompts" : [ ]
     } ],
     "priority" : 0
   }, {
@@ -540,7 +548,10 @@
     "shared" : false,
     "phrases" : [ ],
     "classificationRules" : {
-      "refs" : [ ]
+      "refs" : [ {
+        "entityName" : "product_iis",
+        "predicate" : "CONTAINS_NOT"
+      } ]
     },
     "patterns" : [ "[хоч*|мог*|как*|каким образом] [я*|мне*] [можн*|возмож*] (стать*|быть*) [вашим] [клиент*] [компании*|Финам]", "* [что|как] * нужно * [для] @open_close * (договор*|счет*|депозит*) *", "* {(без визита в офис|онлайн|дистанцион*) [можно] @open_close *}", " * (открыт*|зарегистр*|закрыт*|удалит*|сдела*|оформ*|получ*|заказ*|запрос*|откро*|предостав*|мог*|*мож*|*дат*|запрос*|подключ*|выбрат*|дай*|включит*|активиров*|воспольз*) * дополнительн* счет*", "* [я|мне] * (нужен *|хоч*|хот*) счет [в] * [@currency|@money]", "* @open_close *  * [для] [торговл*] [на] (Мосбирж*|бирж*|акци*|валют|облигац*)", "как * открыть счет * @company *", "[вы] (работ*|сотруднич*) [с] [иностранц*]", "[есть] [ли](возможн*|можн*|могу) [делат*|@open_close] [субсчет*]", "[как] (стат*|оформит*|быть) [клиент*] [[брокер*] финам* [ао]]", "[как] [начат*|приступ*|старт*] [к] (торгов*) [на] [форекс*]", "[со|с|в] [скольк*|какого|каком] [лет|возраст*] (можно|возможн*) (начат*|начинат*) (инвестир*|торгов*)", "@open_close @product", "* [как] * @open_close * @product *", "* [как] * @open_close * (договор*|счет*|депозит*|отдельн* счет*) * @product *", "* [где] [я] [мог*|мож*] [в личном кабинете|ЛК] * @open_close * @product *", "* [как] [можно] [мне] @open_close @product * [в] * [@currency|@money]", "* [есть] [*мож*] * @open_close * @product *", "* необход* * @open_close * @product *", "* (нуж*|надо) * @open_close * @product *", "* хоч* * @open_close * @product *", "* хот* * @open_close * @product *", "* [мне] треб* * @open_close * @product *", "* @open_close * @product *", "* заявка [на] * @open_close * @product", "[подскажите] [как] * (закрыт*|удалит*|отключ*|исключ*) * [не] [нужн*|ненуж*] @product [номинирован*] [в] * [@currency|@money]", "* [мне] * (открыт*|зарегистр*|закрыт*|удалит*|сдела*|оформ*|получ*|заказ*|запрос*|откро*|предостав*|мог*|*мож*|*дат*|запрос*|подключ*|выбрат*|дай*|включит*|активиров*|воспольз*) * @product [в] * [@currency|@money]", "* мне * нужен * @product *", "* [скольк*|как долго] [по] [врем*|дней] * (займ*|занят*|*ждат*|заним*) * [процесс|процедур*|открыт*] @open_close * @product *", "* [какой] [порядок] * [при] * @open_close * @product *", "* [подскаж*] [пожалуйста] [как] [мож*] * (открыт*|зарегистр*|закрыт*|удалит*|сдела*|оформ*|получ*|заказ*|запрос*|откро*|предостав*|мог*|*мож*|*дат*|запрос*|подключ*|выбрат*|дай*|включит*|активиров*|воспольз*) * @product * [в] * [@currency|@money]", "* @open_close * @product * [для] [торговл*|сделок]", "открытие  * @product * @company *", "[а] @product [можно|возможн*] @open_close [с] [водительским*] [удостовер*] [или] [только] [паспорт*]", "[а] [если] [я] (хочу|хотел*|желаю*) [из] @open_close  @product [как] [мне] [это] [сделать]", "[а] [как] @open_close [отдельн*] @product", "[а] [со] [скольк*] [лет] (можно|возможн*) [у] [вас] (зарегистрироват*|@open_close) [@product]", "[брокерск*] [договор*] [@product] [вообще] (можно|возможн*) @open_close", "[в] (армен*|беларус*|казахстан|азербайджан|армен*|молдов*|таджикистан*|туркменистан*|узбекистан*) [можем|возможн*] @open_close ([брокерск*]договор*|@product)", "[валютн*] [@product] (можн*|возможн*|могу) [могу] @open_close", "(можн*|возможн*|могу) [ли] [могу] @open_close @product [в] [доллар*] [евро] [рубл*] [юан*] [@money|@currency]", "[где] [в] [ЛК|[личн*]кабинет*] @open_close @product", "[где] (сделат*|оставит*) [заявк*|поручен*] [на] @open_close [договор*|@product]", "[дистанцион*] @open_close [договор*|@product] [возможн*]", "[для] @open_close [[брокерск*]договор*|@product] [нужно|необходим*] [в] [офис*] [приезж*|приех*]", "* @open_close (дополнительн*) [[брокерск*]договор*|@product]", "[есть] [интерес*] [в] @open_close ([брокерск*]договор*|@product) [для] [торгов*] [на] [фьючерс*]", "@open_close [мой|мои*] ([брокерск*]договор*|@product)", "[имеет*|есть] [пустой|нулев*] ([брокерск*]договор*|@product) [хочу|хочет*|необход*|надо|нужн*] [его] @open_close", "[есть] (интерес*) [в] ([брокерск*]договор*|@product)", "[как] [в] [[брокер] финам*[ао]|брокер*|у вас] @open_close ([брокерск*]договор*|@product)", "[как] @open_close [два|три|нескольк*] ([брокерск*]договор*|@product) [на] [которых] [у] [меня] [были] [остат*]", "[как] @open_close [у вас|[в] [брокер] Финам* [ао]] [обычный] [[брокерск*]договор*|@product] [в] [[брокер* ]финам* [ао]] [в|через] [онлайн*|приложен*]", "[как] (иностран*) @open_close [обычный] ([брокерск*]договор*|@product)", "[как] [мне] @open_close ([брокерск*]договор*|@product) [с|по] [тариф*] @tarifs", "[как] [мне] @open_close ([брокерск*]договор*|@product) [и] [удалит*] [свой] [профил*] [тут]", "[как] @open_close [новый] ([брокерск*]договор*|@product) [для]", "[как] [возможн*|можн*] [ли] @open_close ([брокерск*]договор*|@product) [лицам] [до] [18|16|14] [лет] [на|для] [ребенк*|дет*|юр* [лиц*]|юридическ* [лиц*]]", "[как] @open_close ([брокерск*]договор*|@product) [на] {[Найс*|nyse] [и] [Насдак*|nasdaq]}", "[как] @open_close ([брокерск*]договор*|@product) [на] [срочн* [рынк*|секц*]|фонд* [рынк*|секц*]]", "[как] @open_close ([брокерск*]договор*|@product) [номинирован*] [в] [валют*] [@money|@currency]", "[как] @open_close ([брокерск*]договор*|@product) [с] [вашей|вам*|финам [ао]] [компан*]", "[как] @open_close [новый|отдел*]  (портфел*|[брокерск*]договор*|@product)", "[как] (удалит*|отключит*) [лишн*|пуст*|стар*] [@product] [котор*] [не нужен*|не пользую*|не использ*]", "[какие] [мне] [бы] [необход*|надо|нужн*] [документ*] [хочет*|необход*|надо|нужн*] [прост*] [для] @open_close @product  [в|через|без] [дистанцион*|онлайн*|удален*|сайт*|посещен* [офис*]]", "[как|каким образом] (возможн*|можн*|могу) @open_close [мой|мои*] @product [в] [@money|@currency]", "[куда] (зайт*|перейти*) [в] [ЛК|[личн*] кабин*] [чтобы] @open_close [@product] [в] [@money|@currency]", "[мне] [необход*|надо|нужн*|хочет*|нужен*] (еще [один]|второй|третий|дополнит*) @product [мог*|можн*|возможн*] [сделат*|оформит*|осуществ*|делат*] [в|через|без|это] [дистанцион*|онлайн*|удален*|сайт*|посещен* [офис*]]", "[мне] [необход*|надо|нужн*|хочет*|нужен*] @open_close (@product|[новы*] договор*) [в|через|без|это] [дистанцион*|онлайн*|удален*|сайт*|посещен* [офис*]|ЛК|[личн*] кабин*]", "[мог*|можн*] [ли] [я] @open_close ([брокерск*]договор*|@product) [как] [иностран*]", "[мог*|можн*|возможн*] [ли] [я] @open_close [еще [один]|второй|третий|дополнит*] @product [с] [подключ*|включен*] [срочн* [рынк*|секц*]|фонд* [рынк*|секц*]]", "[мог*|можн*] [ли] [я] @open_close [[брокерск*]договор*|@product] [если] [я] (не являюс*|не) [гражданин* [РФ]]", "[могу|возможн*] [ли] [я] [в|через|без|это] (дистанцион*|онлайн*|удален*|сайт*|посещен* [офис*]|телефон*) @open_close [новый] [@product]", "[могу|возможн*] [ли] [я] @open_close @product [в|через|без|это] [дистанцион*|онлайн*|удален*|сайт*|посещен* [офис*]|телефон*|ЛК|[личн*] кабине*]", "[могу|возможн*] [ли] [я] @open_close [[еще] один|второй|третий|[еще] они] [@product|портфел*]", "[мне] [необход*|надо|нужн*|хочет*|нужен*|можн*] [в|через|без|это] [дистанцион*|онлайн*|удален*|сайт*|посещен* [офис*]] @open_close @product [в] [банк*]", "[могу|возможн*|можн*] @open_close [один|два|три|четыр*] [@product] [и] [оставит*] [один|два|три|четыр*]", "[могу|возможн*|можн*] [ли] @open_close [@product] [граждан*] [армен*|беларус*|казахстан|азербайджан|армен*|молдов*|таджикистан*|туркменистан*|узбекистан*]", "[можн*|возможн*] [ли] @open_close [два|три|нескольк*] [[брокерск*]договор*|портф*|@product]", "[как] @open_close [все] [@product] [во] [всем] [Финам*|брокер*]", "[как] (заключ*|@open_close) [от] [@product]", "[интересует*] [@product] [для] (торгов*|сделок*) [на] [бирж*|фондов* [бирж*|секц*]|срочн*[бирж*|секц*]|валют* [бирж*|секц*]]", "* [как] * @open_close [@product] [в|на] [@company] *", "@open_close @product", "[необход*|надо|нужн*|хочет*|нужен*|можн*] (взят*|оформ*) @product", "[помог*] @open_close @product" ],
     "slots" : [ {
@@ -577,7 +588,7 @@
     "priority" : 0
   }, {
     "path" : "/018 Банковские карты",
-    "enabled" : true,
+    "enabled" : false,
     "shared" : false,
     "phrases" : [ ],
     "classificationRules" : {
@@ -907,7 +918,7 @@
         "predicate" : "CONTAINS_NOT"
       } ]
     },
-    "patterns" : [ "[какие] [тариф*|тариф* план*|комисс*|услов*|ТП|@tarifs] [есть|имеют*]", "[тариф*|тариф* план*|комисс*|услов*|ТП|@tarifs] * [не] * [самый] * [выгодн*|лучш*|правильн*] * [тариф*|тариф* план*|комисс*|услов*|ТП|@tarifs] * [если] * [продаж|покуп*|сделок|сделк*] * [мало|нет|не мног*] *", "[где] [я] [могу|можн*] [изучит*|ознаком*] [c] [информ*] [о] [тариф*|тариф* план*|комисс*|услов*|ТП|@tarifs]", "[есть] [ли] [тариф*|тариф* план*|комисс*|услов*|ТП] * [без] [@commission_service]", "[что] [нужно] [сделать|делат*] [чтобы] [останов*|прекрат*] @commission_service [по] [тариф*] @tarifs", "[на] [каком] (тариф*|тариф* план*|комисс*|услов*|@tarifs) [выгодн*|лучш*|правильн*] [всего] [торгов*] [@instruments] [@tarifs] [или] [@tarifs]", "[нашл*|нашел] @commission_service [вроде] [@product_iis|@product] бесплатный [как] [отписат*|отключ*] [от] [плат*|оплат*]", "(тариф*|тариф* план*|комисс*|услов*|@tarifs) [на] [покупк*|продаж*] [@instruments] [какая]", "[посоветуй*] [самый] [посовет*|совет*|лучш*|выгодн*|правильн*] (тариф*|тариф* план*|комисс*|услов*|@tarifs) [для] [начинающ*]", "[в] [чем] [разница|отлич*] (тариф*|тариф* план*|комисс*|услов*|@tarifs)", "[на] [какой] (тариф*|тариф* план*|комисс*|услов*) [переключ*|подключ*]", "[какой] (тариф*|тариф* план*|комисс*|услов*|@tarifs) [самый] [посовет*|совет*|лучш*|выгодн*] [если] [торг*] [нечаст*]", "@open_close [@product_iis|@product] [но] [нигде] [не] [видел*|увидел*] [какой] [у] [меня] (тариф*|тариф* план*|комисс*|услов*|@tarifs)", "[я] [бы] [хотел*|хочет*] [узнат*| ознаком*] [какой] [у] [меня] (тариф*|тариф* план*|комисс*|услов*|@tarifs) [в|на] [данный|текущ*] [момент]", "[прошу|просьб*] [уточнит*|подсказ*] [как] [я] [могу|можн*|возможн*] [меняет*|измен*|переход*|переключ*|сменит*] (@tarifs|тариф*|тариф* план*|комисс*|услов*|ТП)", "[подскаж*] [как|какой] [называет*|назван*] [у] [вас] [самый] [выгодн*|оптимал*] [тариф* [план*]|@tarifs] [в] [{Финам [ао]}]", "[меня|мне] [интерес*|нужн*] (тариф*|тариф* план*|комисс*|услов*|@tarifs) [брокер*]", "[у] [меня] (@product_iis|@product) [какие|какой] [по] [ним|нему] (тариф*|тариф* план*|комисс*|услов*|@tarifs) [как] [они] [называют*]", "[сориентир*|уточн*] [по] (тариф*|тариф* план*|комисс*|услов*|@tarifs) [пожалуйста]", "[с] [каким|каком] (тариф*|тариф* план*|комисс*|услов*|ТП|@tarifs) [у] [меня] [откроет*|будет] (@product_iis|@product)", "[прошу|просьб*] [сообщ*|уведом*|проинформ*] [мой] (тариф*|тариф* план*|комисс*|услов*)", "[пришли*|вышл*|направ*|отправ*] [пожалуйста] [условия] [по] [моему] (тариф*|тариф* план*|комисс*|услов*)", "[подскаж*] [как|какой] [называет*|назван*] [у] [мой|свой|свои*|меня] [подключ*] [тариф* [план*]|@tarifs] [в] [{Финам [ао]} ]", "[подскаж*] [где] [я] [можно|возможн*|могу] [провер*] [посмотр*|увидет*|указан*|уточн*|ознакомит*] [в] [[мобильн*] прилож*] [что] [у] [мой|свой|свои*|меня] [подключ*] [тариф* [план*]|@tarifs]", "[а] [почему] [у] [меня] [на] [@product_iis|@product] (списывает*|удержив*|взимает*|взимают*) * [за|по] * (тариф*|тариф* план*|комисс*|услов*|ТП|@tarifs)", "[тариф*|@tarifs] [брокер*|Финам*]", "[подскаж*] [где] [я] [можно|возможн*|могу] [посмотр*|увидет*|указан*|уточн*|ознакомит*] [с|со] [мой|свой|свои*] [тариф* [план*]|@tarifs] [@commission] [за] [сделк*|операц*] *[плеч*|марж*]", "[подскажи*] [хочу|хочет*|необход*|требует*|можн*|возможн*] [уточн*|провер*|узнат*] {[моего|свой|мой] (тариф*|тариф* план*|комисс*|услов*) [на|по] [@product_iis|@product]}", "[где] [я] [могу] @get_info [в] [мобильн* приложен*|прилож*] [мой|мои|свой|свою|моего] [с] (тариф*|тариф* план*|комисс*|услов*)", "[как] @get_info [услов*] [мой|мои|свой|свою|моего] [с] (тариф*|тариф* план*|комисс*) [в|у] [Финам|вас]", "{[где] @get_info [мой|мои|свой|свою|моего] (тариф*|тариф* план*|комисс*|услов*)}", "[где|как] @get_info [мой|мои|свой|свою|моего] (тариф*|тариф* план*|комисс*|услов*|ТП) [по|для] (тариф*|тариф* план*|комисс*|услов*|ИИС)", "[где] @get_info [про] [тариф*|тариф* план*|комисс*|услов*|ТП] * [на] (валют*|фондов*|срочн*) [рынк*]", "[сколько] [стоит|удерживает*|какая комиссия при] [маржинал*|марж*] [кредитов*|торговл*]", "{[какой] (тариф*|тариф* план*|комисс*|услов*|ТП) [мог*|можн*]} @choose_TP", "{[какой] (тариф*|тариф* план*|комисс*|услов*|ТП) @choose_TP} [для] [торгов*|работ*] [с] @instruments", "[как] @choose_TP [услов*] [мой|мои|свой|свою|моего] [с] (тариф*|тариф* план*|комисс*) [в|у] [Финам|вас]", "[где] [я] [могу] @choose_TP [в] [мобильн* приложен*|прилож*] [мой|мои|свой|свою|моего] [с] (тариф*|тариф* план*|комисс*|услов*)", "{[где] @choose_TP [мой|мои|свой|свою|моего] (тариф*|тариф* план*|комисс*|услов*)}", "[где|как] @choose_TP [мой|мои|свой|свою|с моим|моего] (тариф*|тариф* план*|комисс*|услов*|ТП) * [в|на|по] [Финам|обслужив*|брокерск* обслуж*] [на] [счет*]", "[есть] [ли] [возможност*] @choose_TP [мой|мои|свой|свою|моего] (тариф*|тариф* план*|комисс*|услов*)", "[как] [долго] @choose_TP (тариф*|тариф* план*|комисс*|услов*|ТП)", "[как] [мне] (@choose_TP) (@tarifs)", "[как] [мне] @choose_TP [с одного|одних] [тариф*|тариф* план*|комисс*|услов*] [на другой] [в] [приложен*|ЛК]", "[как] [я] [могу] @choose_TP [на] (@tarifs|тариф*|тариф* план*|комисс*|услов*|ТП) [дистанционно]", "[просьба] @choose_TP [на] (@tarifs|тариф*|тариф* план*|комисс*|услов*|ТП)", "@send_me [пожалуйст*] [ссылку] [на] (тариф*|тариф* план*|комисс*|услов*|ТП|@tarifs) * [для] (@product_iis|@product) [в] [Финам]", "[вопрос*|описан*|отлич*|сравнен*] [по] (тариф*|тариф* план*|комисс*|услов*|ТП)", "[другие|разные] [тариф*|тариф* план*|комисс*|услов*|ТП]", "[какие] [есть] (тариф*|тариф* план*|комисс*|услов*|ТП) [у|в] [Финам|вас] [для] [торговли] @instruments", "{[какие] [есть] (тариф*|тариф* план*|комисс*|услов*|ТП) [у|в] [Финам|вас]}", "[есть] [где-нибудь] [свод|таблиц*] (тариф*|тариф* план*|комисс*|услов*|ТП)", "[в] [чем] [разниц|отлич*] (тариф*|тариф* план*|комисс*|услов*|ТП)", "[нуж*] [помощь] [в|при] [выбор*] (тариф*|тариф* план*|комисс*|услов*|ТП)", "[консерват*] (тариф*|тариф* план*|комисс*|услов*|ТП)", "[мне] [надо|нуж*] [на] @tarifs", "[как] [сменит*|изменит*] (тариф*|тариф* план*|комисс*|услов*|ТП) @tarifs [на] @tarifs", "[как] [мне] [подключ*|включит*|активироват*|перейт*] [с одного|одних] [тариф*|тариф* план*|комисс*|услов*] [на другой] [в] [приложен*|ЛК]", "[как] [мне] [подключ*|включит*|активироват*|перейт*] @tarifs", "[как] [долго] [меняет*|измен*|переход*|переключ*] (тариф*|тариф* план*|комисс*|услов*|ТП)", "[выбор*|смен*] [мой|мои|свой|свою|моего] (тариф*|тариф* план*|комисс*|услов*|ТП)", "@tarifs", "[мой] [текущ*] (тариф*|тариф* план*) [предусматрив*] [абонентск* плат*]", "[какой|текущ*] [у] [меня] (тариф*|услов*) [по] [счет*]", "@commission [за] [торгов* оборот*]", "[какая|какие] @commission [за|на] [@tarifs] [при] [торговлю|покупк*|работ*] [с] @instruments", "какой [сейчас|установлен*] @rateInformationType", "[какие] (условия|информация) по [моему] (тариф*|@tarifs)", "как я могу @rateInformationType", "можно @rateInformationType по счету", "@rateInformationType", "как узнать какой @rateInformationType", "где мне (найти|посмотреть|узнать) @rateInformationType", "помогите (найти|выбрать|подобрать|поставить|установить) @rateInformationType", "[какие] (условия|информация) [по] [моему] тариф* [план*] @tarifs", "[какие|какой] (тариф*|тарифн* [план*]|@tarifs) [актуальны] [для] (@product_iis|product)", "[интерес*|нужн*] (тариф*|тариф* план*|комисс*|услов*) @tarifs", "[где] [я] [могу|возмож*] (@rateInformationType|@tarifs)", "@rateInformationType @tarifs" ],
+    "patterns" : [ "[какие] [тариф*|тариф* план*|комисс*|услов*|ТП|@tarifs] [есть|имеют*]", "[тариф*|тариф* план*|комисс*|услов*|ТП|@tarifs] * [не] * [самый] * [выгодн*|лучш*|правильн*] * [тариф*|тариф* план*|комисс*|услов*|ТП|@tarifs] * [если] * [продаж|покуп*|сделок|сделк*] * [мало|нет|не мног*] *", "[где] [я] [могу|можн*] [изучит*|ознаком*] [c] [информ*] [о] [тариф*|тариф* план*|комисс*|услов*|ТП|@tarifs]", "[есть] [ли] [тариф*|тариф* план*|комисс*|услов*|ТП] * [без] [@commission_service]", "[что] [нужно] [сделать|делат*] [чтобы] [останов*|прекрат*] @commission_service [по] [тариф*] @tarifs", "[на] [каком] (тариф*|тариф* план*|комисс*|услов*|@tarifs) [выгодн*|лучш*|правильн*] [всего] [торгов*] [@instruments] [@tarifs] [или] [@tarifs]", "[нашл*|нашел] @commission_service [вроде] [@product_iis|@product] бесплатный [как] [отписат*|отключ*] [от] [плат*|оплат*]", "(тариф*|тариф* план*|комисс*|услов*|@tarifs) [на] [покупк*|продаж*] [@instruments] [какая]", "[посоветуй*] [самый] [посовет*|совет*|лучш*|выгодн*|правильн*] (тариф*|тариф* план*|комисс*|услов*|@tarifs) [для] [начинающ*]", "[в] [чем] [разница|отлич*] (тариф*|тариф* план*|комисс*|услов*|@tarifs)", "[на] [какой] (тариф*|тариф* план*|комисс*|услов*) [переключ*|подключ*]", "[какой] (тариф*|тариф* план*|комисс*|услов*|@tarifs) [самый] [посовет*|совет*|лучш*|выгодн*] [если] [торг*] [нечаст*]", "@open_close [@product_iis|@product] [но] [нигде] [не] [видел*|увидел*] [какой] [у] [меня] (тариф*|тариф* план*|комисс*|услов*|@tarifs)", "[я] [бы] [хотел*|хочет*] [узнат*| ознаком*] [какой] [у] [меня] (тариф*|тариф* план*|комисс*|услов*|@tarifs) [в|на] [данный|текущ*] [момент]", "[прошу|просьб*] [уточнит*|подсказ*] [как] [я] [могу|можн*|возможн*] [меняет*|измен*|переход*|переключ*|сменит*] (@tarifs|тариф*|тариф* план*|комисс*|услов*|ТП)", "[подскаж*] [как|какой] [называет*|назван*] [у] [вас] [самый] [выгодн*|оптимал*] [тариф* [план*]|@tarifs] [в] [{Финам [ао]}]", "[меня|мне] [интерес*|нужн*] (тариф*|тариф* план*|комисс*|услов*|@tarifs) [брокер*]", "[у] [меня] (@product_iis|@product) [какие|какой] [по] [ним|нему] (тариф*|тариф* план*|комисс*|услов*|@tarifs) [как] [они] [называют*]", "[сориентир*|уточн*] [по] (тариф*|тариф* план*|комисс*|услов*|@tarifs) [пожалуйста]", "[с] [каким|каком] (тариф*|тариф* план*|комисс*|услов*|ТП|@tarifs) [у] [меня] [откроет*|будет] (@product_iis|@product)", "[прошу|просьб*] [сообщ*|уведом*|проинформ*] [мой] (тариф*|тариф* план*|комисс*|услов*)", "[пришли*|вышл*|направ*|отправ*] [пожалуйста] [условия] [по] [моему] (тариф*|тариф* план*|комисс*|услов*)", "[подскаж*] [как|какой] [называет*|назван*] [у] [мой|свой|свои*|меня] [подключ*] [тариф* [план*]|@tarifs] [в] [{Финам [ао]} ]", "[подскаж*] [где] [я] [можно|возможн*|могу] [провер*] [посмотр*|увидет*|указан*|уточн*|ознакомит*] [в] [[мобильн*] прилож*] [что] [у] [мой|свой|свои*|меня] [подключ*] [тариф* [план*]|@tarifs]", "[а] [почему] [у] [меня] [на] [@product_iis|@product] (списывает*|удержив*|взимает*|взимают*) * [за|по] * (тариф*|тариф* план*|комисс*|услов*|ТП|@tarifs)", "[тариф*|@tarifs] [брокер*|Финам*]", "[подскаж*] [где] [я] [можно|возможн*|могу] [посмотр*|увидет*|указан*|уточн*|ознакомит*] [с|со] [мой|свой|свои*] [тариф* [план*]|@tarifs] [@commission] [за] [сделк*|операц*] *[плеч*|марж*]", "[подскажи*] [хочу|хочет*|необход*|требует*|можн*|возможн*] [уточн*|провер*|узнат*] {[моего|свой|мой] (тариф*|тариф* план*|комисс*|услов*) [на|по] [@product_iis|@product]}", "[где] [я] [могу] @get_info [в] [мобильн* приложен*|прилож*] [мой|мои|свой|свою|моего] [с] (тариф*|тариф* план*|комисс*|услов*)", "[как] @get_info [услов*] [мой|мои|свой|свою|моего] [с] (тариф*|тариф* план*|комисс*) [в|у] [Финам|вас]", "{[где] @get_info [мой|мои|свой|свою|моего] (тариф*|тариф* план*|комисс*|услов*)}", "[где|как] @get_info [мой|мои|свой|свою|моего] (тариф*|тариф* план*|комисс*|услов*|ТП) [по|для] (тариф*|тариф* план*|комисс*|услов*|ИИС)", "[где] @get_info [про] [тариф*|тариф* план*|комисс*|услов*|ТП] * [на] (валют*|фондов*|срочн*) [рынк*]", "[сколько] [стоит|удерживает*|какая комиссия при] [маржинал*|марж*] [кредитов*|торговл*]", "{[какой] (тариф*|тариф* план*|комисс*|услов*|ТП) [мог*|можн*]} @choose_TP", "{[какой] (тариф*|тариф* план*|комисс*|услов*|ТП) @choose_TP} [для] [торгов*|работ*] [с] @instruments", "[как] @choose_TP [услов*] [мой|мои|свой|свою|моего] [с] (тариф*|тариф* план*|комисс*) [в|у] [Финам|вас]", "[где] [я] [могу] @choose_TP [в] [мобильн* приложен*|прилож*] [мой|мои|свой|свою|моего] [с] (тариф*|тариф* план*|комисс*|услов*)", "{[где] @choose_TP [мой|мои|свой|свою|моего] (тариф*|тариф* план*|комисс*|услов*)}", "[где|как] @choose_TP [мой|мои|свой|свою|с моим|моего] (тариф*|тариф* план*|комисс*|услов*|ТП) * [в|на|по] [Финам|обслужив*|брокерск* обслуж*] [на] [счет*]", "[есть] [ли] [возможност*] @choose_TP [мой|мои|свой|свою|моего] (тариф*|тариф* план*|комисс*|услов*)", "[как] [долго] @choose_TP (тариф*|тариф* план*|комисс*|услов*|ТП)", "[как] [мне] (@choose_TP) (@tarifs)", "[как] [мне] @choose_TP [с одного|одних] [тариф*|тариф* план*|комисс*|услов*] [на другой] [в] [приложен*|ЛК]", "[как] [я] [могу] @choose_TP [на] (@tarifs|тариф*|тариф* план*|комисс*|услов*|ТП) [дистанционно]", "[просьба] @choose_TP [на] (@tarifs|тариф*|тариф* план*|комисс*|услов*|ТП)", "@send_me [пожалуйст*] [ссылку] [на] (тариф*|тариф* план*|комисс*|услов*|ТП|@tarifs) * [для] (@product_iis|@product) [в] [Финам]", "[вопрос*|описан*|отлич*|сравнен*] [по] (тариф*|тариф* план*|комисс*|услов*|ТП)", "[другие|разные] [тариф*|тариф* план*|комисс*|услов*|ТП]", "[какие] [есть] (тариф*|тариф* план*|комисс*|услов*|ТП) [у|в] [Финам|вас] [для] [торговли] @instruments", "{[какие] [есть] (тариф*|тариф* план*|комисс*|услов*|ТП) [у|в] [Финам|вас]}", "[есть] [где-нибудь] [свод|таблиц*] (тариф*|тариф* план*|комисс*|услов*|ТП)", "[в] [чем] [разниц|отлич*] (тариф*|тариф* план*|комисс*|услов*|ТП)", "[нуж*] [помощь] [в|при] [выбор*] (тариф*|тариф* план*|комисс*|услов*|ТП)", "[консерват*] (тариф*|тариф* план*|комисс*|услов*|ТП)", "[мне] [надо|нуж*] [на] @tarifs", "[как] [сменит*|изменит*] (тариф*|тариф* план*|комисс*|услов*|ТП) @tarifs [на] @tarifs", "[как] [мне] [подключ*|включит*|активироват*|перейт*] [с одного|одних] [тариф*|тариф* план*|комисс*|услов*] [на другой] [в] [приложен*|ЛК]", "[как] [мне] [подключ*|включит*|активироват*|перейт*] @tarifs", "[как] [долго] [меняет*|измен*|переход*|переключ*] (тариф*|тариф* план*|комисс*|услов*|ТП)", "[выбор*|смен*] [мой|мои|свой|свою|моего] (тариф*|тариф* план*|комисс*|услов*|ТП)", "@tarifs", "[мой] [текущ*] (тариф*|тариф* план*) [предусматрив*] [абонентск* плат*]", "[какой|текущ*] [у] [меня] (тариф*|услов*) [по] [счет*]", "@commission [за] [торгов* оборот*]", "[какая|какие] @commission [за|на] [@tarifs] [при] [торговлю|покупк*|работ*] [с] @instruments", "какой [сейчас|установлен*] @rateInformationType", "[какие] (условия|информация) по [моему] (тариф*|@tarifs)", "как я могу @rateInformationType", "можно @rateInformationType по счету", "@rateInformationType", "как узнать какой @rateInformationType", "где мне (найти|посмотреть|узнать) @rateInformationType", "помогите (найти|выбрать|подобрать|поставить|установить) @rateInformationType", "[какие] (условия|информация) [по] [моему] тариф* [план*] @tarifs", "[какие|какой] (тариф*|тарифн* [план*]|@tarifs) [актуальны] [для] (@product_iis|product)", "[интерес*|нужн*] (тариф*|тариф* план*|комисс*|услов*) @tarifs", "[где] [я] [могу|возмож*] (@rateInformationType|@tarifs)", "@rateInformationType @tarifs", "[по] [повод*] (тариф*|@tarifs)" ],
     "slots" : [ {
       "name" : "company",
       "entity" : "company",
@@ -996,7 +1007,7 @@
     "priority" : 0
   }, {
     "path" : "/022 ИИС",
-    "enabled" : true,
+    "enabled" : false,
     "shared" : false,
     "phrases" : [ {
       "text" : "Статус вычета по ИИС"
@@ -1738,7 +1749,7 @@
     "classificationRules" : {
       "refs" : [ ]
     },
-    "patterns" : [ "* прода* * валют* *", "* торг* * валют* *", "[как] [возмож*](купить|покуп*|продат*|продав*|приобрест*|приобретен*) (@currency|@money|том|тод|tod|tom)[на [брокерск*] счет*]", "[как]{[мне](купить|покуп*|продат*|продав*|приобрест*) (@currency|@money)}[по] [бирже*] [курс*]", "[как] [я] [могу](купить|покуп*|продат*|продав*|приобрест*|конверт*|обмен*) (@currency|@money)[в](прилож*|личном кабин*)", "[как](купить|покуп*|продат*|продав*|приобрест*|конверт*|обмен*|поменя*) (@currency|@money)", "[как] [мне](провести) (купить|покуп*|продат*|продав*|приобрест*) (@currency|@money)", "[как] [мне](купить|покуп*|продат*|продав*|приобрест*|*конвертир*|торгов*) (@currency|@money)[в|с](личном кабинет*|прилож*|[брокерс*] счет*)", "[как] [я] [могу](купить|покуп*|продат*|продав*|приобрест*|конверт*|обмен*) (@currency|@money)", "[какая] [минимальн*] [сумма](купить|покуп*|продат*|продав*|приобрест*|конверт*) (@currency|@money)", "(купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*) (@currency|@money)", "[мне] [нуж*](@currency|@money) (купить|покуп*|продат*|продав*|приобрест*|поменя*)", "[можно] [ли] [через вас] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money)", "[смог*] [ли] [я] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money) [на бирж*]", "[у] [вас] (@currency|@money)[можно] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*)", "[у] [вас] [есть|можн*] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money)", "[хочу] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money) [со счет*] (ИИС|КЛФ)", "[как] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money) [с|со] [@product_iis|@product]", "[я] [хочу] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money)", "(купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*|покупк*) (@currency|@money)", "[мне] [нужен|нужно|необход*|требует*|хочет*] [купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*|покупк*](@currency|@money)", "[мне] [нужно|необход*|требует*] (купить|покуп*|продат*|продав*|приобрест*|конверт*|обмен*) (@currency|@money) [на] (@currency|@money)", "(купить|покуп*|продат*|продав*|приобрест*|конверт*|обмен*|налич*) [налич*] (@currency|@money)", "(купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|перевест*|торгов*|покупк*) (@currency|@money) [в] (@currency|@money)", "(конвертац*|обмен*|поменят*) *", "вопрос* [по] валют* (операц*|сделк*)", "{[я] (хоч*|хочет*) (@currency|@money) (конвертац*|обмен*|поменят*)}", "[как] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money) (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money)" ],
+    "patterns" : [ "* прода* * валют* *", "* торг* * валют* *", "[как] [возмож*](купить|покуп*|продат*|продав*|приобрест*|приобретен*) (@currency|@money|том|тод|tod|tom)[на [брокерск*] счет*]", "[как]{[мне](купить|покуп*|продат*|продав*|приобрест*) (@currency|@money)}[по] [бирже*] [курс*]", "[как] [я] [могу](купить|покуп*|продат*|продав*|приобрест*|конверт*|обмен*) (@currency|@money)[в](прилож*|личном кабин*)", "[как](купить|покуп*|продат*|продав*|приобрест*|конверт*|обмен*|поменя*) (@currency|@money)", "[как] [мне](провести) (купить|покуп*|продат*|продав*|приобрест*) (@currency|@money)", "[как] [мне](купить|покуп*|продат*|продав*|приобрест*|*конвертир*|торгов*) (@currency|@money)[в|с](личном кабинет*|прилож*|[брокерс*] счет*)", "[как] [я] [могу](купить|покуп*|продат*|продав*|приобрест*|конверт*|обмен*) (@currency|@money)", "[какая] [минимальн*] [сумма](купить|покуп*|продат*|продав*|приобрест*|конверт*) (@currency|@money)", "(купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*) (@currency|@money)", "[мне] [нуж*](@currency|@money) (купить|покуп*|продат*|продав*|приобрест*|поменя*)", "[можно] [ли] [через вас] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money)", "[смог*] [ли] [я] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money) [на бирж*]", "[у] [вас] (@currency|@money)[можно] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*)", "[у] [вас] [есть|можн*] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money)", "[хочу] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money) [со счет*] (ИИС|КЛФ)", "[как] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money) [с|со] [@product_iis|@product]", "[я] [хочу] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money)", "(купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*|покупк*) (@currency|@money)", "[мне] [нужен|нужно|необход*|требует*|хочет*] [купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*|покупк*](@currency|@money)", "[мне] [нужно|необход*|требует*] (купить|покуп*|продат*|продав*|приобрест*|конверт*|обмен*) (@currency|@money) [на] (@currency|@money)", "(купить|покуп*|продат*|продав*|приобрест*|конверт*|обмен*|налич*) [налич*] (@currency|@money) [у] [вас] [можно|возможно]", "(купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|перевест*|торгов*|покупк*) (@currency|@money) [в] (@currency|@money)", "(конвертац*|обмен*|поменят*) *", "вопрос* [по] валют* (операц*|сделк*)", "{[я] (хоч*|хочет*) (@currency|@money) (конвертац*|обмен*|поменят*)}", "[как] (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money) (купить|покуп*|продат*|продав*|приобрест*|конверт*|перевод*|торгов*) (@currency|@money)" ],
     "slots" : [ {
       "name" : "company",
       "entity" : "company",
@@ -3241,6 +3252,17 @@
       "refs" : [ ]
     },
     "patterns" : [ "[как|где] [мне] [найти] [раздел*|кнопк*|меню] (торговл*|услуг*|сервис*) [в] [моем] (@LK_r|@LK)", "[как|где] [найти] [в] [стару*|стары*] * (@LK_r|@LK) [находит*] [раздел*|кнопк*|меню] (торговл*|услуг*|сервис*)", "[хочу|хочет*|необход*|требует*] [войти|вход*|попаст*] [в] (@LK_r|@LK)", "[где] (находит*|найти|найд*) [стару*|стары*|стара*] * (@LK_r|@LK)", "[не могу|не виж*|не нахож*] [найт*|увидет*] [раздел*|кнопк*] (торговл*|услуг*|сервис*) [в] (@LK_r|@LK)", "[как] [найт*|найд*|увидет*] [раздел*|кнопк*] (торговл*|услуг*|сервис*) [в] (@LK_r|@LK)", "[где] (@LK_r|@LK) [найти|увидет*] [раздел*|кнопк*] (торговл*|услуг*|сервис*)", "[подскажи*] [где] [в] (@LK_r|@LK) (найти|увидет*) [раздел*|кнопк*|вкладк*|меню] (торговл*|услуг* [операц* с ценным* бумаг*]|сервис*)", "[нет] [тако*] [раздел*|кнопк*|вкладк*|меню] (торговл*|услуг*|сервис*)", "(не могу|не получ*) (найти|увидет*) [где] [раздел*|кнопк*|вкладк*|меню] (торговл*|услуг*|сервис*) [в] (@LK_r|@LK)", "[как] (найти|увидет*|попасть|зайти) [в] [раздел*|кнопк*] (торговл*|услуг*|сервис*)", "[где] [можно] (найти|увидет*|находит*) [раздел*|кнопк*] (торговл*|услуг*|сервис*)", "[теперь] (не *мог*) (найти|увидет*) [раздел*|кнопк*|вкладк*|меню] (торговл*|услуг*|сервис*)", "[где] [в] (@LK_r|@LK) (найти|увидет*|находит*) [раздел*|кнопк*] (торговл*|услуг*|сервис*)", "[что] [значит] (@LK_r|@LK)", "[как] (включи*|открыт*|войт*|перейт*|попаст*) [в] (@LK_r|@LK)", "[как] [мне] (включи*|открыт*|войт*|перейт*|попаст*) [в] (@LK_r|@LK)", "(забыл*|потерял*) (данны*|логин*|парол*|логин* и парол*) [от] (@LK_r|@LK)", "[как] (включи*|открыт*|войт*|перейт*|попаст*) [в] (@LK_r|@LK)", "* [подскажите] [где] (найти|увидет*|находит*) [раздел*|кнопк*|вкладк*|меню] (торговл*|услуг*|сервис*) [операц*] [с] [[ценн*] бумаг*|ЦБ]" ],
+    "slots" : [ {
+      "name" : "LK",
+      "entity" : "LK",
+      "required" : false,
+      "prompts" : [ ]
+    }, {
+      "name" : "LK_r",
+      "entity" : "LK_r",
+      "required" : false,
+      "prompts" : [ ]
+    } ],
     "priority" : 0
   }, {
     "path" : "/007 Комиссии",
@@ -3349,14 +3371,26 @@
       "text" : "почему из портфеля исчезли Гонконгские акции? При этом и деньги на эту сумму также уменьшились"
     }, {
       "text" : "почему из портфеля исчезли Гонконгские акции"
+    }, {
+      "text" : "неверно некорректное отражение значит по счету денежных средств"
     } ],
     "classificationRules" : {
       "refs" : [ ]
     },
-    "patterns" : [ "*[новость] [про] [то] [что] [США|Америк*] @sanctions_spb [можно] [ли] [узнать] [подробности] *", "* [есть] [ли] [риск*] @sanctions_spb", "@sanctions_spb", "* [почему] [не] (выставляют*) [заявк*] [на] (СПб [бирж*]|СПБ|Санкт-Петербургск* [бирж*]|Питерск*|spb|spbe) *", "* [подскажи*] [какие|какой] (риск*) [из-за|из за] (СПб [бирж*]|СПБ|Санкт-Петербургск* [бирж*]|Питерск*|spb|spbe)", "* [если] [я] (покупал*|приобрет*) [@instruments|актив*] [напрям*] [на] (nyse|Найс|Nasdaq|Наздак|[Найс] [и] [Наздак]) [то] (СПб [бирж*]|СПБ|Санкт-Петербургск* [бирж*]|Питерск*|spb|spbe) [ведь] [не] [участвов*] [в] [цепочк*]", "* @sanctions_spb [нужн*|необходим*] [продав*] [@instruments] [и] [@money|@currency]", "* @sanctions_spb [как] [то] [затронул*] [ваш] [функционал] [по] [рынк* ММА]", "* [подскаж*] @sanctions_spb [не] [влияют] [же] [на] [зарубеж*] [активы] *", "* [в] [связи] [c] [попадан*] @sanctions_spb [какие] [есть] [риск*]", "[а] (где|что) (баланс*|деньг*|со|мой) [кошел*|портфел*|счет*|актив*]", "(актуальн*) (стоимост*|баланс*) [счет*|портфел*] [где] [провер*]", "(баланс*|портфел*|данные) [счет*] в (онлайн*|реальн* [времен*])", "(баланс*|портфел*|данные) [счет*] в (finam trade|финам* трейд*|фт|[мобильн*] приложен* [финам*] [трейд*]) (отлич*|другой|не сходит*) [от] (баланс*|портфел*|данные) [в|на] ([личн*] кабин*|ЛК)", "[в|на] ([личн*] кабин*|ЛК) [на] [сайт*] (есть|отражает*|имеет*|корректн*)", "[в|на] ([личн*] кабин*|ЛК) [на] [сайт*] (есть|отражает*|имеет*|корректн*) в (терминал*|finam trade|финам* трейд*|фт|[мобильн*] приложен* [финам*] [трейд*]) (меньш*|друг*|отлич*|не сходит*)", "[в|на] ([личн*] кабин*|ЛК) @instrument (есть|отражает*|имеет*|корректн*)", "[в] (терминал*|finam trade|финам* трейд*|фт|[мобильн*] приложен* [финам*] [трейд*]) и [в|на] ([личн*] кабин*|ЛК|сайт*) [нет] (доступ*|недоступ*) [к] счет*", "[в] (баланс*|портфел*|данные|позиц*) [учитывает*] (неправильн*|некорректн*) курс", "[в|на] (баланс*|портфел*) (не отображ*|не отраж*|некорректн*|не правильн*|не видн*|нет|пропал*|стал*) [меньш*] (баланс*|портфел*|данные|позиц*|бумаг*)", "[в|на] (баланс*|портфел*) (отражает*|отображ*|видн) (бред*|ерунд*|неправильн*) [по] [оценк*]", "[в|на] (баланс*|портфел*) (не отображ*|не отраж*|некорректн*|не правильн*|не видн*|не виж*|нет|пропал*|стал*) [меньш*] (баланс*|портфел*|данные|позиц*|бумаг*)", "в (терминал*|finam trade|финам* трейд*|фт|[мобильн*] приложен* [финам*] [трейд*]) (не виж*|не отображ*|не отраж*|некорректн*|не правильн*|не видн*|нет|пропал*|стал*) [свои|свой] (баланс*|портфел*|данные|позиц*|бумаг*|актив*) [и] [счет*]", "где (баланс*|портфел*|данные|позиц*|бумаг*|актив*|деньг*)", "где [мои] (баланс*|портфел*|данные|позиц*|бумаг*|актив*|деньг*) [почем*] [их] (стал*|оказал*) меньш*" ],
+    "patterns" : [ "*[новость] [про] [то] [что] [США|Америк*] @sanctions_spb [можно] [ли] [узнать] [подробности] *", "* [есть] [ли] [риск*] @sanctions_spb", "@sanctions_spb", "* [почему] [не] (выставляют*) [заявк*] [на] (СПб [бирж*]|СПБ|Санкт-Петербургск* [бирж*]|Питерск*|spb|spbe) *", "* [подскажи*] [какие|какой] (риск*) [из-за|из за] (СПб [бирж*]|СПБ|Санкт-Петербургск* [бирж*]|Питерск*|spb|spbe)", "* [если] [я] (покупал*|приобрет*) [@instruments|актив*] [напрям*] [на] (nyse|Найс|Nasdaq|Наздак|[Найс] [и] [Наздак]) [то] (СПб [бирж*]|СПБ|Санкт-Петербургск* [бирж*]|Питерск*|spb|spbe) [ведь] [не] [участвов*] [в] [цепочк*]", "* @sanctions_spb [нужн*|необходим*] [продав*] [@instruments] [и] [@money|@currency]", "* @sanctions_spb [как] [то] [затронул*] [ваш] [функционал] [по] [рынк* ММА]", "* [подскаж*] @sanctions_spb [не] [влияют] [же] [на] [зарубеж*] [активы] *", "* [в] [связи] [c] [попадан*] @sanctions_spb [какие] [есть] [риск*]", "[а] (где|что) (баланс*|деньг*|со|мой) [кошел*|портфел*|счет*|актив*]", "(актуальн*) (стоимост*|баланс*) [счет*|портфел*] [где] [провер*]", "(баланс*|портфел*|данные) [счет*] в (онлайн*|реальн* [времен*])", "(баланс*|портфел*|данные) [счет*] в (finam trade|финам* трейд*|фт|[мобильн*] приложен* [финам*] [трейд*]) (отлич*|другой|не сходит*) [от] (баланс*|портфел*|данные) [в|на] ([личн*] кабин*|ЛК)", "[в|на] ([личн*] кабин*|ЛК) [на] [сайт*] (есть|отражает*|имеет*|корректн*)", "[в|на] ([личн*] кабин*|ЛК) [на] [сайт*] (есть|отражает*|имеет*|корректн*) в (терминал*|finam trade|финам* трейд*|фт|[мобильн*] приложен* [финам*] [трейд*]) (меньш*|друг*|отлич*|не сходит*)", "[в|на] ([личн*] кабин*|ЛК) @instrument (есть|отражает*|имеет*|корректн*)", "[в] (терминал*|finam trade|финам* трейд*|фт|[мобильн*] приложен* [финам*] [трейд*]) и [в|на] ([личн*] кабин*|ЛК|сайт*) [нет] (доступ*|недоступ*) [к] счет*", "[в] (баланс*|портфел*|данные|позиц*) [учитывает*] (неправильн*|некорректн*) курс", "[в|на] (баланс*|портфел*) (не отображ*|не отраж*|некорректн*|не правильн*|не видн*|нет|пропал*|стал*) [меньш*] (баланс*|портфел*|данные|позиц*|бумаг*)", "[в|на] (баланс*|портфел*) (отражает*|отображ*|видн) (бред*|ерунд*|неправильн*) [по] [оценк*]", "[в|на] (баланс*|портфел*) (не отображ*|не отраж*|некорректн*|не правильн*|не видн*|не виж*|нет|пропал*|стал*) [меньш*] (баланс*|портфел*|данные|позиц*|бумаг*)", "в (терминал*|finam trade|финам* трейд*|фт|[мобильн*] приложен* [финам*] [трейд*]) (не виж*|не отображ*|не отраж*|некорректн*|не правильн*|не видн*|нет|пропал*|стал*) [свои|свой] (баланс*|портфел*|данные|позиц*|бумаг*|актив*) [и] [счет*]", "где (баланс*|портфел*|данные|позиц*|бумаг*|актив*|деньг*)", "где [мои] (баланс*|портфел*|данные|позиц*|бумаг*|актив*|деньг*) [почем*] [их] [стал*|оказал*] меньш*", "{(вопрос*|почем*|повод*) [по]} @sanctions_spb", "вопрос по ({[на|по] (СПБ|спб|Санкт-Петербургск*|Питерск*) [бирж*|площадк*|рынок|рынк*|[ценны*] бумаг*|акци*|опцион*|ИТФ|ЕТФ|ETF|фьючерс*]}|[бирж*|площадк*|рынок|рынк*|[ценны*] бумаг*|акци*|опцион*|ИТФ|ЕТФ|ETF|фьючерс*] (СПБ|спб|Санкт-Петербургск*|Питерск*))", "(пропал*|исчезл*|почем*) ([ценны*] бумаг*|акци*|актив*|ИТФ|ЕТФ|ETF|@money|@currency) [на] {[СПБ|спб|Санкт-Петербургск*|Питерск*] [бирж*]}", "(куда|нет*|где) [делис*|исчезл*|не отображ*|пропал*] [мои] (@money|@currency) [на|со] [@product]", "(что) [с|со] [моим] @product", "почем* [изменил*] [с|со|на] [моим|мой|моем] @product", "(что|почем*) [@money|@currency] [ушл*] [в] (блок*)", "где [моя|мои] (@money|@currency)", "{(вопрос*|почем*|повод*) [по]} @sanctions_spb", "(почем*|по повод*) [изменил*|заблокир*] (актив*|@money|@currency) [на] [моим|мой|моем] [@product]", "(исчезл*|не отображ*|пропал*) [мои] (@money|@currency) [на|со] [@product]", "(пропал*|исчезл*|почем*) [у] [меня] ([ценны*] бумаг*|акци*|актив*|ИТФ|ЕТФ|ETF|@money|@currency) [на] {[[СПБ|спб|Санкт-Петербургск*|Питерск*] [бирж*]|неторгов* [раздел*]]}", "заблокиров* ([ценны*] бумаг*|ЦБ|акци*|актив*|ИТФ|ЕТФ|ETF|@money|@currency)" ],
     "slots" : [ {
       "name" : "sanctions_spb",
       "entity" : "sanctions_spb",
+      "required" : false,
+      "prompts" : [ ]
+    }, {
+      "name" : "currency",
+      "entity" : "currency",
+      "required" : false,
+      "prompts" : [ ]
+    }, {
+      "name" : "money",
+      "entity" : "money",
       "required" : false,
       "prompts" : [ ]
     } ],
@@ -3384,7 +3418,7 @@
     "priority" : 0
   }, {
     "path" : "/пока",
-    "enabled" : true,
+    "enabled" : false,
     "shared" : false,
     "phrases" : [ {
       "text" : "пока"
@@ -3392,10 +3426,11 @@
     "classificationRules" : {
       "refs" : [ ]
     },
+    "patterns" : [ ],
     "priority" : 0
   }, {
     "path" : "/привет",
-    "enabled" : true,
+    "enabled" : false,
     "shared" : false,
     "phrases" : [ {
       "text" : "привет"
@@ -3403,6 +3438,7 @@
     "classificationRules" : {
       "refs" : [ ]
     },
+    "patterns" : [ ],
     "priority" : 0
   }, {
     "path" : "/006 Аналитика",
@@ -3589,6 +3625,11 @@
       "entity" : "company",
       "required" : false,
       "prompts" : [ ]
+    }, {
+      "name" : "ITS_demo",
+      "entity" : "ITS_demo",
+      "required" : false,
+      "prompts" : [ ]
     } ],
     "priority" : 0
   }, {
@@ -3641,7 +3682,7 @@
     "classificationRules" : {
       "refs" : [ ]
     },
-    "patterns" : [ "* информация по @ITS_demo *", "@product_demo (терминал*|програм*|платформ*)", "[у] [меня] (стоит*|установл*|есть) демо версия quik *", "@ITS_demo", "[помоч*|помогит*] (установ*|подключ*) @product_demo" ],
+    "patterns" : [ "* информация по @ITS_demo *", "@product_demo @ITS_demo", "[у] [меня] (стоит*|установл*|есть) @ITS_demo", "@ITS_demo", "[помоч*|помогит*] (установ*|подключ*) @ITS_demo", "[где] (взять|получить) (логин*|пароль*|данные) [для] [авторизац*|вход*|регистрац*] [в] [для] @ITS_demo" ],
     "slots" : [ {
       "name" : "ITS_demo",
       "entity" : "ITS_demo",
@@ -3689,10 +3730,15 @@
     "classificationRules" : {
       "refs" : [ ]
     },
-    "patterns" : [ "[а] (подскаж*|уточнит*) @IIS_OpeningDate" ],
+    "patterns" : [ "[а] (подскаж*|уточнит*) @IIS_OpeningDate", "@IIS_OpeningDate", "(подскаж*|уточни*) [где|в] [каком] [раздел*] @IIS_OpeningDate", "@IIS_OpeningDate", "@IIS_OpeningDate [также] [был] [перенес*] [или] [начал*] [занов*]", "@IIS_OpeningDate [чтобы] [уложит*|успет*|успей*] [в] [три] [год*]", "[а] (подскаж*|уточнит*) @IIS_OpeningDate", "[как] (узнат*|провер*) @IIS_OpeningDate", "[как|где] [понять|увидет*] @IIS_OpeningDate [или] [нет]", "[корректно|правильн*] [ли] [я] @IIS_OpeningDate", "[мне] [нужно|необходим*] @IIS_OpeningDate [или] [он] [уже] [открыт]", "[можно] @IIS_OpeningDate [пополнить] [его] [мне] [систем*] [не] [дает]", "[не] [могу] [найти] @IIS_OpeningDate" ],
     "slots" : [ {
       "name" : "IIS_OpeningDate",
       "entity" : "IIS_OpeningDate",
+      "required" : false,
+      "prompts" : [ ]
+    }, {
+      "name" : "product_iis",
+      "entity" : "product_iis",
       "required" : false,
       "prompts" : [ ]
     } ],
@@ -3705,7 +3751,18 @@
     "classificationRules" : {
       "refs" : [ ]
     },
-    "patterns" : [ ],
+    "patterns" : [ "@IIS_Status", "* [я] [оформил*|подал*] @IIS_Status *", "[брокер*|[брокер*] Финам* [АО]] [оформил*|подал*] @IIS_Status [за] [год*]", "* [я] [оформил*|подал*] @IIS_Status *", "какой @IIS_Status" ],
+    "slots" : [ {
+      "name" : "IIS_Status",
+      "entity" : "IIS_Status",
+      "required" : false,
+      "prompts" : [ ]
+    }, {
+      "name" : "product_iis",
+      "entity" : "product_iis",
+      "required" : false,
+      "prompts" : [ ]
+    } ],
     "priority" : 0
   }, {
     "path" : "/022 ИИС2/ИИС_Открытие_закрытие",
@@ -3713,21 +3770,44 @@
     "shared" : false,
     "phrases" : [ ],
     "classificationRules" : {
-      "refs" : [ ]
+      "refs" : [ {
+        "entityName" : "product_iis",
+        "predicate" : "CONTAINS"
+      } ]
     },
-    "patterns" : [ ],
+    "patterns" : [ "[я] [бы] [хотел*|хочу|планир*] (@IIS_Open|I@IS_Close)", "(@IIS_Open|@IIS_Close)", "(@IIS_Open|@IIS_Close) (дистанц*|удален*)", "(@IIS_Open|@IIS_Close) [в|у] [[брокер*] Финам [АО]|вас]", "(в|у) ([брокер*] Финам [АО]|вас) @product_iis [мне] [не] [будет*]", "[в|у] [[брокер*] Финам [АО]|вас] можн* (@IIS_Open|@IIS_Close)", "[в|у] [[брокер*] Финам [АО]|вас|ваш*] [компан*] [можн*|могу] (@IIS_Open|@IIS_Close)", "[вы|{[брокер*] Финам [АО]}] (@IIS_Open|@IIS_Close)", "[вы|{[брокер*] Финам [АО]}|у Вас] (@IIS_Open|@IIS_Close)", "[где] [в] [ЛК|[личн*] кабинет*] [я] [могу|можно|возможн*] (@IIS_Open|@IIS_Close)", "[где|как] [в] [ЛК|[личн*] кабинет*] [я] [могу|можно|возможн*] (@IIS_Open|@IIS_Close)", "[где|как] [я] [могу|можно|возможн*] (@IIS_Open|@IIS_Close) [в] [ЛК|[личн*] кабинет*|дистанц*|удален*]", "[если] (@IIS_Open|@IIS_Close) [что] [будет] [c] [моими] [бумаг*]", "[как] (@IIS_Open|@IIS_Close)", "[как] (@IIS_Open|@IIS_Close) [в] [ЛК|[личн*] кабинет*]", "[как] (@IIS_Open|@IIS_Close) [в] [ЛК|[личн*] кабинет*] [и] вывест* (@money|@currency)", "[как] (@IIS_Open|@IIS_Close) [в|без] [посещен*] [ЛК|[личн*] кабинет*|офис*]", "[как] (@IIS_Open|@IIS_Close) [в|без|с] [посещен*|мобил*] [ЛК|[личн*] кабинет*|офис*|телефон*]", "[как] (@IIS_Open|@IIS_Close) [и] (@IIS_Open|@IIS_Close) [счет*]", "[как] (@IIS_Open|@IIS_Close) [переведенн*] [с|из] [Альф*]", "[как] (дистанц*|удален*) (@IIS_Open|@IIS_Close)", "[как] [долго] [исполн*] [заявк*] [на] (@IIS_Open|@IIS_Close)", "[как] [мне|можно] (@IIS_Open|@IIS_Close)", "[как] [правильн*] (@IIS_Open|@IIS_Close) [у|в] ({[брокер*] Финам [АО]}|Вас)", "[как] [происход*] (@IIS_Open|@IIS_Close) [у|в] [{[брокер*] Финам [АО]}|Вас]", "[мне] [надо|нужно] (@IIS_Open|@IIS_Close)", "[мне] [надо|нужно] (@IIS_Open|@IIS_Close) [у|в] [вы|{[брокер*] Финам [АО]}|Вас] [где] сдела*", "[могу|может|можно] [ли] [я] [отменит*] [заявк*|поручен] (@IIS_Open|@IIS_Close) [в|через|на] (дистанц*|удален*|прилож*|онлайн*|сайт*)", "[планир*] (@IIS_Open|@IIS_Close) [с] [тариф*] [@tarifs]", "[планир*|подскаж*] [пожалуйст*] [как] (@IIS_Open|@IIS_Close) [с] [тариф*] [@tarifs]", "[планир*|подскаж*] [пожалуйст*|порядок] [как|действ*] [для] (@IIS_Open|@IIS_Close) [в|через|на] (дистанц*|удален*|прилож*|онлайн*|сайт*)", "[почем*] [я|заявк*] [на|не|мне] [отказ*|могу] [в] (@IIS_Open|@IIS_Close) [отмен*]", "[пытаюс*] (@IIS_Open|@IIS_Close) [в|у] [вашей|вас|{[брокер*] Финам* [АО]}] [компан*]", "[скажит*] [скольк*] [по] [времен*] [идет*|занимае*] (@IIS_Open|@IIS_Close)", "[скажит*] [я] [могу|можно] (@IIS_Open|@IIS_Close)", "[у] [вас] [можно|могу] (@IIS_Open|@IIS_Close)", "[хотел|хочу] [бы] (@IIS_Open|@IIS_Close) [и] [получ*] [вычет*] [за] [весь] [срок*]", "[хотел|хочу] [бы] (@IIS_Open|@IIS_Close) [но] [там] у меня [перевед*] [с] [ВТБ|Альф*] [фонд*]", "[хотел|хочу] [бы] [возобнов*] [процедур*] (@IIS_Open|@IIS_Close)", "[хотел|хочу] [бы] [возобнов*] [процедур*] (@IIS_Open|@IIS_Close) [в|у] [[брокер*] Финам [АО]|вас|ваш*] [компан*]", "[хотел|хочу] [бы] [возобнов*] [процедур*] (@IIS_Open|@IIS_Close) [и] [вывест*] [@money|@currency] [в] [сторон*] [банк*|организ*]", "[хотел|хочу] [бы] [возобнов*] [процедур*] (@IIS_Open|@IIS_Close) [как] [это] [сделат*]", "[хотел|хочу] [бы] [возобнов*] [процедур*] (@IIS_Open|@IIS_Close) [как|на] [это|ребенк*] [сделат*]", "[хотел|хочу] [бы] [возобнов*|сделат*|снов*] [процедур*] (@IIS_Open|@IIS_Close)", "[что|чтобы] [я|бы|нужно] [мне] (@IIS_Open|@IIS_Close) [что] [нужно] [сделат*|делат*]", "[я] [бы] [хотел*|хочу|планир*] (@IIS_Open|@IIS_Close)", "[я] [бы] [хотел*|хочу|планир*] (@IIS_Open|@IIS_Close) [и] (@IIS_Open|@IIS_Close) [новый] у вас [же]", "{[могу|может|можно] [ли] [я] (@IIS_Open|@IIS_Close) [в|через|на] (дистанц*|удален*|прилож*|онлай*|сайт*)}", "{[могу|может|можно] [ли] [я] (@IIS_Open|@IIS_Close) [в|через|на] (дистанц*|удален*|прилож*|онлайн*|сайт*)}", "{[могу|может|можно|нужно] [ли] [я] (@IIS_Open|@IIS_Close) [в|через|на|сейчас] (дистанц*|удален*|прилож*|онлай*|сайт*|самостоят*)}", "{[планир*|подскаж*|помогит*] [пожалуйст*] [как] (@IIS_Open|@IIS_Close)}", "{[планир*|подскаж*|помогит*] [пожалуйст*] [как|с] (@IIS_Open|@IIS_Close)}", "{[хотел|хочу] [бы] (@IIS_Open|@IIS_Close) [что] [нужно] [сделат*|делат*]} *", "{[что|чтобы] [бы|нужно] [мне] (@IIS_Open|@IIS_Close) [что] [нужно] [сделат*|делат*]} *", "в течен* какого времен* (@IIS_Open|@IIS_Close)", "инструкц* по (@IIS_Open|@IIS_Close)" ],
+    "slots" : [ {
+      "name" : "IIS_Open",
+      "entity" : "IIS_Open",
+      "required" : false,
+      "prompts" : [ ]
+    }, {
+      "name" : "IIS_Close",
+      "entity" : "IIS_Close",
+      "required" : false,
+      "prompts" : [ ]
+    }, {
+      "name" : "product_iis",
+      "entity" : "product_iis",
+      "required" : false,
+      "prompts" : [ ]
+    } ],
     "priority" : 0
   }, {
     "path" : "/022 ИИС2",
     "enabled" : true,
     "shared" : false,
-    "phrases" : [ {
-      "text" : "счет иис"
-    } ],
+    "phrases" : [ ],
     "classificationRules" : {
       "refs" : [ ]
     },
-    "patterns" : [ ],
+    "patterns" : [ "* [в|у] [брокер*|[брокер*]финам*|меня|я] (открыл*|открыт) @product_iis", "@product_iis", "[интерес*|по повод*] [мой|моего] @product_iis", "* [в|у] [брокер*|[брокер*]финам*|меня|я] (открыл*|хотел*) [бы] [использ*] @product_iis [и] [там] [нет|для] [возможн*|инвестиц*]", "[в|у] [[брокер*] Финам [АО]|вас] @product_iis [доступ*]" ],
+    "slots" : [ {
+      "name" : "product_iis",
+      "entity" : "product_iis",
+      "required" : false,
+      "prompts" : [ ]
+    } ],
     "priority" : 0
   }, {
     "path" : "/022 ИИС2/ИИС_Пополнение",
@@ -3737,10 +3817,15 @@
     "classificationRules" : {
       "refs" : [ ]
     },
-    "patterns" : [ "[а] [как] @IIS_Replenishment [@IIS_Replenishment]" ],
+    "patterns" : [ "@IIS_Replenishment", "@IIS_Replenishment [без] [комис*]", "@IIS_Replenishment [можно] [только] переводом с [обычного] @product", "@IIS_Replenishment [я] [могу|смогу] [со] [стандарт*] [счет*]", "[а] [как] @IIS_Replenishment [надо]", "[в] приложен* пишет что @IIS_Replenishment с банковской карты невозможно а как его пополн*", "[возмож*] [ли] @IIS_Replenishment [наличн*]", "[для] @IIS_Replenishment наличк* в касс* [финам] какие документ* нужны [с] [собой]", "[как] [сдел*] @IIS_Replenishment", "[какая] (комис*) [за] @IIS_Replenishment", "[какая] (комис*) [за] @IIS_Replenishment [с] [банковск*] [карт*]", "[какие] [у] [есть|вас] [вариант*] @IIS_Replenishment", "[какие] [у] [есть|вас] [вариант*|способ*] @IIS_Replenishment", "[какой] [валют*] [можно] @IIS_Replenishment", "[могу|можно] [ли] [я] @IIS_Replenishment", "[могу|можно] [ли] [я] @IIS_Replenishment [@currency|@money|актив*|наличн*]", "[могу|можно] [ли] [я] @IIS_Replenishment [с|из] [другого|мобильн*] [счет*|приложен*]", "[почему] [мне] нельзя @IIS_Replenishment", "[почему] [нет] [вариант*|способ*|возмож*] @IIS_Replenishment [через] прилож*", "[почему] [я] [не] [могу] @IIS_Replenishment", "[хочу] @IIS_Replenishment", "[что] [нужн*] [для] @IIS_Replenishment [через] [касс*] [наличн*]", "{[как] [мне] [можно]} @IIS_Replenishment", "{[как] [мне] [можно]} @IIS_Replenishment [c] [обычн*] [счет*]", "{[как] [мне] [можно]} @IIS_Replenishment [не|со] [приезж*|удаленн*|своего] [в] [офис|счет*]", "{[как] [мне] [можно|нужн*]} перевест* [@currency|@money|актив*|наличн*] [из] [стороннег*] [банк*] [на] ([счет*] ИИС*|Индивидуальн* инвестиционн* счет*|Инвестиционн* счет*|IS|ис)", "{[как] [мне] [правильн*]} @IIS_Replenishment", "{[скажит*] [как] [мне] [правильн*]} @IIS_Replenishment *", "а почему @product_iis не отображается в списке на пополнение через сбп", "вопрос по иис за год можно @IIS_Replenishment до миллиона рублей правильно", "не могу [уже] [втор*] [день] @IIS_Replenishment", "помог* @IIS_Replenishment" ],
     "slots" : [ {
       "name" : "IIS_Replenishment",
       "entity" : "IIS_Replenishment",
+      "required" : false,
+      "prompts" : [ ]
+    }, {
+      "name" : "product_iis",
+      "entity" : "product_iis",
       "required" : false,
       "prompts" : [ ]
     } ],
@@ -3753,7 +3838,18 @@
     "classificationRules" : {
       "refs" : [ ]
     },
-    "patterns" : [ "альф* [банк*] начал* @IIS_Transfer" ],
+    "patterns" : [ "альф* [банк*] начал* @IIS_Transfer", "@IIS_Transfer", "@IIS_Transfer [иностран*] [[ценн*] бумаг*|ЦБ] с моег* @product_iis", "[возмож*|можно|реальн*|вопрос*] [ли|о] @IIS_Transfer [из|с|от] (альф* [банк*|инвестиц*]|альф*-банк*|альфабанк*|ВТБ|инвестиц* палат*|Открытие [брокер*]|Сбер*|друго* брокер*) [к|в] [вам|Финам [ао|брокер*]]", "[вы] [сможет*|возможн*|может*] @IIS_Transfer [из|с|от] (альф* [банк*|инвестиц*]|альф*-банк*|альфабанк*|ВТБ|инвестиц* палат*|Открытие [брокер*]|Сбер*|друго* брокер*)", "@product_iis [из|с|от] (альф* [банк*|инвестиц*]|альф*-банк*|альфабанк*|ВТБ|инвестиц* палат*|Открытие [брокер*]|Сбер*|друго* брокер*)", "[к] [вам] [сможет*|возможн*|может*|можно] @IIS_Transfer [из|с|от] (альф* [банк*|инвестиц*]|альф*-банк*|альфабанк*|ВТБ|инвестиц* палат*|Открытие [брокер*]|Сбер*|друго* брокер*)", "[как] @IIS_Transfer", "[как] @IIS_Transfer [из|с|от] (альф* [банк*|инвестиц*]|альф*-банк*|альфабанк*|ВТБ|инвестиц* палат*|Открытие [брокер*]|Сбер*|друго* брокер*)", "[подскаж*] [вы] @IIS_Transfer", "[процедур] @IIS_Transfer [из|с|от] (альф* [банк*|инвестиц*]|альф*-банк*|альфабанк*|ВТБ|инвестиц* палат*|Открытие [брокер*]|Сбер*|друго* брокер*) [к|в] [вам|Финам [ао|брокер*]]", "[я] [хочу|могу] @IIS_Transfer", "[я] [хочу|могу] @IIS_Transfer [из|с|от] (альф* [банк*|инвестиц*]|альф*-банк*|альфабанк*|ВТБ|инвестиц* палат*|Открытие [брокер*]|Сбер*|друго* брокер*)", "[что] [необход*|нужно] [для] @IIS_Transfer", "[есть] [ли] [возможн*] @IIS_Transfer [на] [другого] [брокер*]" ],
+    "slots" : [ {
+      "name" : "IIS_Transfer",
+      "entity" : "IIS_Transfer",
+      "required" : false,
+      "prompts" : [ ]
+    }, {
+      "name" : "product_iis",
+      "entity" : "product_iis",
+      "required" : false,
+      "prompts" : [ ]
+    } ],
     "priority" : 0
   } ],
   "entities" : [ {
@@ -4122,6 +4218,10 @@
       "type" : "pattern",
       "rule" : [ "(финам ру|finam.ru|финам точка ру|финам.ру)" ],
       "value" : "{\n  \"name\": \"FinamRU\"\n}"
+    }, {
+      "type" : "pattern",
+      "rule" : [ "Интернет-банк" ],
+      "value" : "{\n  \"name\": \"InternetBank\"\n}"
     } ]
   }, {
     "entity" : {
@@ -4260,6 +4360,10 @@
       "type" : "pattern",
       "rule" : [ "({[с|по] брокер* [счет*|договор*|комис*]}|клф*|инвест* счет*|бс|едп|[счет*] един* денежн* позици*|един* счет*|[пакет*] моносчет*|мон*|[договор*] [c] отдельным* брокерским* счет*|торгов* счет*|{счет* [на|для] бирж*})" ],
       "value" : "{\n  \"name\": \"Брокер\",\n  \"name4company\": \"Брокер\",\n  \"phoneNumber\": \"2222\",\n  \"name2companyAOFF\": \"Брокер\",\n  \"name2companyAOB\": \"Брокер\",\n  \"name3companyAOFFUC\": \"Брокер\"\n}"
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "сорок" ],
+      "value" : "{\n  \"name\": \"Форекс\",\n  \"name4company\": \"Форекс\",\n  \"phoneNumber\": \"3887\",\n  \"name2companyAOFF\": \"Форекс\",\n  \"name2companyAOB\": \"undefined\",\n  \"name3companyAOFFUC\": \"Форекс\"\n}"
     } ]
   }, {
     "entity" : {
@@ -4367,7 +4471,7 @@
       "value" : "{\n  \"name\": \"IISDeduction\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "(@IISType [по|на|с|связан*] (иис*|[индивидуальн*] инвестицион* счет*)|@IISType|ИИС)" ],
+      "rule" : [ "(@IISType [по|на|с|связан*] (иис*|[индивидуальн*] инвестицион* счет*|@IISType|ИИС))" ],
       "value" : "{\n  \"name\": \"IISDeduction\"\n}"
     }, {
       "type" : "pattern",
@@ -4673,49 +4777,6 @@
     } ]
   }, {
     "entity" : {
-      "name" : "IISInformationType",
-      "enabled" : true,
-      "shared" : false,
-      "type" : "annotation",
-      "priority" : 1,
-      "noSpelling" : false,
-      "noMorph" : false,
-      "phoneticSearch" : false,
-      "fuzzySearch" : false,
-      "client" : false,
-      "hidden" : false
-    },
-    "records" : [ {
-      "type" : "pattern",
-      "rule" : [ "(перев*|перекид*|перевод*|переве*|перемещ*|перемест*|перелож*|зачисл*|отправ*|пересыл*|перешл*|перечисл*|упад*|упас*) [на|в] [[счет*] ИИС*|Индивидуальн* инвестиционн* счет*|инвестиционн* счет*|IS|ис]" ],
-      "value" : "{\n  \"name\": \"IISReplenishment\"\n}"
-    }, {
-      "type" : "pattern",
-      "rule" : [ "((дат*|срок*) [открыт*] @product_iis|(когда|какой|как давно) [я|у меня] (дат*|срок*|исполнит*|исполняет*) [был*|могу] [открыт*|открыл*|закрыт*|погаш*|три года] [моем*|мой|свой] @product_iis|((какой|какая|когда ) [у] [меня] [срок*|дат*] (погашен*|исполн*|*регистрир*) [три год*] @product_iis))" ],
-      "value" : "{\n  \"name\": \"IISOpeningDate\"\n}"
-    }, {
-      "type" : "pattern",
-      "rule" : [ "((начал*|осуществ*|стартов*) (перенос*|перевест*|перевод*) @product_iis [к|в] [вам|Финам [ао|брокер*]]|(вывел*|вывод*|перевод*|перевест*|перенос*|перенес*) [к|в|на] [вам|Финам [ао|брокер*]] [@instruments] [с] [моего|мой] @product_iis|(вывел*|вывод*|перевод*|перевест*|перенос*|перенес*|принят*) [мой] @product_iis [к|в] [вам|Финам [ао|брокер*]]|[для] [окончан*|заверш*] (вывел*|вывод*|перевод*|перенос*|перевест*|перенес*|принят*) [все] [@instruments|актив*] [на|с] @product_iis|@product_iis от)" ],
-      "value" : "{\n  \"name\": \"IISTransfer\"\n}"
-    }, {
-      "type" : "pattern",
-      "rule" : [ "(статус* [возврат*] [налогов*] (вычет*|льгот*) [по] @product_iis|упрощен* тип* (вычет*|льгот*) [по] [@product_iis]|(документ*|заявлен*) [в налогов*] [на|по] упрощен* вычет* [по] [@product_iis])" ],
-      "value" : "{\n  \"name\": \"IISStatus\"\n}"
-    }, {
-      "type" : "pattern",
-      "rule" : [ "([проверит*] (открыт|есть) [ли] [у] [меня|мне] @product_iis|{@product_iis (найти|посмотр*|провер*)}|(открыт|оформл*|созда*|сформир*|получ*|зарегистриров*|регистр*|добав*|деактив*|отключ*|удал*|закрыт*|закройт*|ликвидац*|ликвидир*|расторж*|расторгн*|расторг*|приостанов*|останов*|аннулиров*) [у] [меня] @product_iis (у|в) [вас|вашей] [компан*|организац*]|(отображ*|видн*) [своего|свой] @product_iis [в] [приложен*|терминал*]|@product_iis [я] [понятия] [не имею] (откуда))" ],
-      "value" : "{\n  \"name\": \"IISOpeningDate\"\n}"
-    }, {
-      "type" : "pattern",
-      "rule" : [ "{(открыт*|открыв*|открыл*|оформл*|оформит*|созда*|сформир*|получ*|зарегистриров*|регистр*|добав*|включ*|подключ*|добав*) ([счет*] ИИС*|Индивидуальн* инвестиционн* счет*|Инвестиционн* счет*|IS|ис)}" ],
-      "value" : "{\n  \"name\": \"IISOpen\"\n}"
-    }, {
-      "type" : "pattern",
-      "rule" : [ "({([счет*] ИИС*|Индивидуальн* инвестиционн* счет*|Инвестиционн* счет*|IS|ис) (отключ*|отвяз*|отвяж*|деактив*|отсоедин*|отрез*|отреж|удал*|закрыт*|закройт*|ликвидац*|ликвидир*|расторж*|расторгн*|расторг*|приостанов*|останов*|аннулиров*)}|закрыт* [иис|счет*])" ],
-      "value" : "{\n  \"name\": \"IISClose\"\n}"
-    } ]
-  }, {
-    "entity" : {
       "name" : "IISType",
       "enabled" : true,
       "shared" : false,
@@ -4846,6 +4907,10 @@
       "type" : "pattern",
       "rule" : [ "(метатрейдер* (четыр*четверт*)|mt4|мт4|{метак* (четыр*|четверт*)}|metatrader (четыр*четверт*)|(четыр*четверт*) метатрейдер*|мета трейдер (четыр*четверт*)|метотрейдер (четыр*четверт*)|мето трейдер (четыр*четверт*)|МТ (четыр*четверт*)|метатрейдер (четыр*четверт*)|мета трейдер (четыр*четверт*))" ],
       "value" : "{\n  \"name\": \"MT4\"\n}"
+    }, {
+      "type" : "pattern",
+      "rule" : [ "([доступ*] [в] (интернет*|[личн*] кабинет*|ЛК|мобильн*) банк*|интернет-банк*|банк* клиент*)" ],
+      "value" : "{\n  \"name\": \"Интернет_банк\"\n}"
     } ]
   }, {
     "entity" : {
@@ -5515,7 +5580,7 @@
     },
     "records" : [ {
       "type" : "pattern",
-      "rule" : [ "(1668|16 68|1 6 6 8|{Уф*  Пушкин*}|одна тысяча шестьсот шестьдесят восемь|шестнадцать шестьдесят восемь|один шесть шесть восемь)" ],
+      "rule" : [ "(1668|16 68|1 6 6 8|{[Уф*] Пушкин*}|одна тысяча шестьсот шестьдесят восемь|шестнадцать шестьдесят восемь|один шесть шесть восемь)" ],
       "value" : "{\n  \"phoneNumber\": \"1668\"\n}"
     }, {
       "type" : "pattern",
@@ -5531,7 +5596,7 @@
       "value" : "{\n  \"phoneNumber\": \"3081\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "(3082|30 82|3 0 8 2|{Челябинск* [на|в|во] [сорок лет] [Побед*]}|{[доп|дополнительн*] офис* [на|в|во] Челябинск* [сорок лет] [Побед*]}|[доп|дополнительн*] офис* {[на|в|во] Челябинск* [на|в|во] [сорок лет] [Побед*]}|[доп|дополнительн*] офис* [на|в|во] город* Челябинск* [на|в|во] [сорок лет] [Побед*]|[на|в|во] [доп|дополнительн*] офис* [на|в|во] Челябинск* [на|в|во] [сорок лет] [Побед*]|[мне] [хочу|нужен*|нужн*|необходим*] [говорит*|переговор*|проконсультир*|консультир*|обсудит*|поговорит*] [со] [своим] [доп|дополнительн*] [офис*|@operator] [на|в|во] Челябинск* [на|в|во] [сорок лет] [Побед*]|три тысячи восемьдесят два|тридцать восемьдесят два|три восемь два восемь)" ],
+      "rule" : [ "(3082|30 82|3 0 8 2|{[Челябинск*] [на|в|во] [сорок лет] Побед*}|три тысячи восемьдесят два|тридцать восемьдесят два|три восемь два восемь)" ],
       "value" : "{\n  \"phoneNumber\": \"3082\"\n}"
     }, {
       "type" : "pattern",
@@ -5595,11 +5660,11 @@
       "value" : "{\n  \"phoneNumber\": \"5100\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "(5110|51 10|5 1 1 0|{[Казан*] Декабристов*}|пять тысяч сто десять|пятьдесят один десять|пять один один ноль)" ],
+      "rule" : [ "(5110|51 10|5 1 1 0|{[Казан*] Декабрист*}|пять тысяч сто десять|пятьдесят один десять|пять (один|раз|едени*) (один|раз|едени*) ноль)" ],
       "value" : "{\n  \"phoneNumber\": \"5110\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "(5139|51 39|5 1 3 9|{Казан* [Пушкин*]}|пять тысяч сто тридцать девять|пятьдесят один тридцать девять|пять один три девять)" ],
+      "rule" : [ "(5139|51 39|5 1 3 9|{Казан* Пушкин*}|пять тысяч сто тридцать девять|пятьдесят один тридцать девять|пять (один|раз|едени*) три девять)" ],
       "value" : "{\n  \"phoneNumber\": \"5139\"\n}"
     }, {
       "type" : "pattern",
@@ -5623,7 +5688,7 @@
       "value" : "{\n  \"phoneNumber\": \"5273\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "(5326|53 26|5 3 2 6|{[Екатеринбург*] [Белинск*]}|пять тысяч триста двадцать шесть|пятьдесят три двадцать шесть|пять три два шесть)" ],
+      "rule" : [ "(5326|53 26|5 3 2 6|{[Екатеринбург*] [Белинского*]}|{[доп|дополнительн*] офис* [на|в|во] Екатеринбург* [Белинского*]}|[доп|дополнительн*] офис* {[на|в|во] Екатеринбург* [на|в|во] [Белинского*]}|[доп|дополнительн*] офис* [на|в|во] город* Екатеринбург* [на|в|во] [Белинского*]|[на|в|во] [доп|дополнительн*] офис* [на|в|во] Екатеринбург* [на|в|во] [Белинского*]|[мне] [хочу|нужен*|нужн*|необходим*] [говорит*|переговор*|проконсультир*|консультир*|обсудит*|поговорит*] [со] [своим] [доп|дополнительн*] [офис*|@operator] [на|в|во] Екатеринбург* [на|в|во] [Белинского*]|пять тысяч триста двадцать шесть|пятьдесят три двадцать шесть|пять три два шесть)" ],
       "value" : "{\n  \"phoneNumber\": \"5326\"\n}"
     }, {
       "type" : "pattern",
@@ -5655,7 +5720,7 @@
       "value" : "{\n  \"phoneNumber\": \"5540\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "(5555|55 55|5 5 5 5|{[Уф*] Цюрупы}|пять тысяч пятьсот пятьдесят пять|пятьдесят  пять  пятьдесят  пять|пять пять пять пять|четыре пятерки)" ],
+      "rule" : [ "(5555|55 55|5 5 5 5|{[Уф*] Цюруп*}|пять тысяч пятьсот пятьдесят пять|пятьдесят пять пятьдесят пять |пять пять пять пять|пять пятьдесят пять пять|четыр* пятерк*|пятерк*)" ],
       "value" : "{\n  \"phoneNumber\": \"5555\"\n}"
     }, {
       "type" : "pattern",
@@ -5671,7 +5736,7 @@
       "value" : "{\n  \"phoneNumber\": \"5735\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "(5760|57 60|5 7 6 0|{(Челябинск*|Челяб*) [на ул.]  [Красн*]}|пять тысяч семьсот шестьдесят|пятьдесят семьдесят шестьдесят|пять семь шесть ноль)" ],
+      "rule" : [ "(5760|57 60|5 7 6 0|{[Челябинск*] [на|в|во] Красн*}|пять тысяч семьсот шестьдесят|пятьдесят семь шестьдесят|пять семь шесть ноль)" ],
       "value" : "{\n  \"phoneNumber\": \"5760\"\n}"
     }, {
       "type" : "pattern",
@@ -5791,7 +5856,7 @@
       "value" : "{\n  \"phoneNumber\": \"6900\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "(6910|69 10|6 9 1 0|Владивосток*|шесть тысяч девятьсот десять|шестьдесят девять десять|шесть девять один ноль)" ],
+      "rule" : [ "(6910|69 10|6 9 1 0|{Владивосток* [Остряков*]}|{[доп|дополнительн*] офис* [на|в|во] Владивосток* [Остряков*]}|[доп|дополнительн*] офис* {[на|в|во] Владивосток* [на|в|во] [Остряков*]}|[доп|дополнительн*] офис* [на|в|во] город* Владивосток* [на|в|во] [Остряков*]|[на|в|во] [доп|дополнительн*] офис* [на|в|во] Владивосток* [на|в|во] [Остряков*]|[мне] [хочу|нужен*|нужн*|необходим*] [говорит*|переговор*|проконсультир*|консультир*|обсудит*|поговорит*] [со] [своим] [доп|дополнительн*] [офис*|@operator] [на|в|во] Владивосток* [на|в|во] [Остряков*]|шесть тысяч девятьсот десять|шестьдесят девять десять|шесть девять (один|раз|едени*) ноль)" ],
       "value" : "{\n  \"phoneNumber\": \"6910\"\n}"
     }, {
       "type" : "pattern",
@@ -5823,7 +5888,7 @@
       "value" : "{\n  \"phoneNumber\": \"3077\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "({[Моск*] Настасьинс*}|[на] Настасьинск*|ЦО|(центральн*|главны*|головн*) офис*|[на] {[переул*] Настасьинск*}|[доп*] [офис*] [на|в|во] [Москв*] [на|в] {[переул*] Настасьинск*}|[на|в|во] [доп|дополнительн*] офис* [на|в|во] [Москв*] [на|в|во] (Настасьинск*|{[переул*] Настасьинск*})|[мне] [хочу|нужен*|нужн*|необходим*] [говорит*|переговор*|проконсультир*|консультир*|обсудит*|поговорит*] [со] [своим] [доп|дополнительн*] [офис*|@operator] [на|в|во] [Москв*] [на|в|во] ({Настасьинск* [переул*]}))" ],
+      "rule" : [ "({[Моск*] Настасьинс*}|[на] Настасьинск*|ЦО|(центральн*|главны*|головн*) [доп|дополнител*] [офис*]|[на] {[переул*] Настасьинск*}|[доп*] [офис*] [на|в|во] [Москв*] [на|в] {[переул*] Настасьинск*}|[на|в|во] [доп|дополнительн*] офис* [на|в|во] [Москв*] [на|в|во] (Настасьинск*|{[переул*] Настасьинск*})|[мне] [хочу|нужен*|нужн*|необходим*] [говорит*|переговор*|проконсультир*|консультир*|обсудит*|поговорит*] [со] [своим] [доп|дополнительн*] [офис*|@operator] [на|в|во] [Москв*] [на|в|во] ({Настасьинск* [переул*]}))" ],
       "value" : "{\n  \"phoneNumber\": \"1000\"\n}"
     } ]
   }, {
@@ -6886,6 +6951,10 @@
       "type" : "pattern",
       "rule" : [ "[попал*|ввел*|ввид*] [под|после|последн*] (санкц*|огранич*|блокировк*|событ*)" ],
       "value" : ""
+    }, {
+      "type" : "pattern",
+      "rule" : [ "((заблокир*) [@assetType] [на] ({(СПБ|спб|Санкт-Петербургск*|Питерск*) [бирж*|площадк*|рынок|рынк*|[ценны*] бумаг*|акци*|опцион*|ИТФ|ЕТФ|ETF|фьючерс*]}|[бирж*|площадк*|рынок|рынк*|[ценны*] бумаг*|акци*|актив*|средств*|опцион*|ИТФ|ЕТФ|ETF|фьючерс*] (СПБ|спб|Санкт-Петербургск*|Питерск*))|заблокир* средств*)" ],
+      "value" : ""
     } ]
   }, {
     "entity" : {
@@ -7372,7 +7441,7 @@
       "value" : "{\n  \"name\": \"ЦБ\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "(деньг*|денежн*|средств*|инвестиров* средств* |валют*|денеж*|копейк*|мелоч*|остат* валют*|денеж*|денег|деньг*|денежн* средств*|дс|иностран* валют*|наличн*|остат*|средств*|бабки|@currency)" ],
+      "rule" : [ "(деньг*|денежн*|средств*|инвестиров* средств* |валют*|денеж*|копейк*|мелоч*|остат* валют*|денеж*|денег|деньг*|денежн* средств*|дс|иностран* валют*|наличн*|остат*|средств*|бабки|@currency|актив*)" ],
       "value" : "{\n  \"name\": \"ДС\"\n}"
     } ]
   }, {
@@ -7546,7 +7615,7 @@
       "value" : "{\n  \"name\": \"Гонконгская биржа\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "{(Мосбирж*|Московск*|Москв*|ММВБ|Мос*) [бирж*|площадк*|рынок|рынк*|[ценны*] бумаг*|акци*|опцион*|ИТФ|ЕТФ|ETF|фьючерс*]}" ],
+      "rule" : [ "({(Мосбирж*|Московск*|ММВБ|Мос*) (бирж*|площадк*|рынок|рынк*|[ценны*] бумаг*|акци*|опцион*|ИТФ|ЕТФ|ETF|фьючерс*)}|(Мосбирж*|ММВБ))" ],
       "value" : "{\n  \"name\": \"Московская биржа\"\n}"
     } ]
   }, {
@@ -7585,7 +7654,7 @@
       "value" : ""
     }, {
       "type" : "pattern",
-      "rule" : [ "{(Мосбирж*|Московск*|Москв*|ММВБ|Мос*) [бирж*|площадк*|рынок|рынк*|[ценны*] бумаг*|акци*|опцион*|ИТФ|ЕТФ|ETF|фьючерс*]}" ],
+      "rule" : [ "({(Мосбирж*|Московск*|ММВБ|Мос*) (бирж*|площадк*|рынок|рынк*|[ценны*] бумаг*|акци*|опцион*|ИТФ|ЕТФ|ETF|фьючерс*)}|(Мосбирж*|ММВБ))" ],
       "value" : ""
     }, {
       "type" : "pattern",
@@ -7660,7 +7729,7 @@
     } ]
   }, {
     "entity" : {
-      "name" : "officePhone_q",
+      "name" : "officePhone_question",
       "enabled" : true,
       "shared" : false,
       "type" : "annotation",
@@ -7674,19 +7743,19 @@
     },
     "records" : [ {
       "type" : "pattern",
-      "rule" : [ "(москв*|московск*)" ],
+      "rule" : [ "[доп|дополнит*] [офис] [в|на] (москв*|московск*)" ],
       "value" : "{\n  \"name\": \"Москва\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "челябинск*" ],
+      "rule" : [ "[доп|дополнит*] [офис] [в|на] челябинск*" ],
       "value" : "{\n  \"name\": \"Челябинск\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "(уфа|уфе|уфой|уфинск*)" ],
+      "rule" : [ "[доп|дополнит*] [офис] [в|на] (уфа|уфе|уфой|уфинск*)" ],
       "value" : "{\n  \"name\": \"Уфа\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "казан*" ],
+      "rule" : [ "[доп|дополнит*] [офис] [в|на] казан*" ],
       "value" : "{\n  \"name\": \"Казань\"\n}"
     } ]
   }, {
@@ -7793,11 +7862,11 @@
     },
     "records" : [ {
       "type" : "pattern",
-      "rule" : [ "пушкина" ],
+      "rule" : [ "(5139|51 39|5 1 3 9|{[Казан*] Пушкин*}|{[доп|дополнительн*] офис* [на|в|во] [Казан*] Пушкин*}|[доп|дополнительн*] офис* {[на|в|во] [Казан*] [на|в|во] Пушкин*}|[доп|дополнительн*] офис* [на|в|во] город* [Казан*] [на|в|во] Пушкин*|[на|в|во] [доп|дополнительн*] офис* [на|в|во] [Казан*] [на|в|во] Пушкин*|[мне] [хочу|нужен*|нужн*|необходим*] [говорит*|переговор*|проконсультир*|консультир*|обсудит*|поговорит*] [со] [своим] [доп|дополнительн*] [офис*|@operator] [на|в|во] [Казан*] [на|в|во] Пушкин*|пять тысяч сто тридцать девять|пятьдесят один тридцать девять|пять (один|раз|едени*) три девять)" ],
       "value" : "{\n  \"phoneNumber\": \"5139\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "декабристов" ],
+      "rule" : [ "(5110|51 10|5 1 1 0|{[Казан*] Декабрист*}|{[доп|дополнительн*] офис* [на|в|во] [Казан*] Декабрист*}|[доп|дополнительн*] офис* {[на|в|во] [Казан*] [на|в|во] Декабрист*}|[доп|дополнительн*] офис* [на|в|во] город* [Казан*] [на|в|во] Декабрист*|[на|в|во] [доп|дополнительн*] офис* [на|в|во] [Казан*] [на|в|во] Декабрист*|[мне] [хочу|нужен*|нужн*|необходим*] [говорит*|переговор*|проконсультир*|консультир*|обсудит*|поговорит*] [со] [своим] [доп|дополнительн*] [офис*|@operator] [на|в|во] [Казан*] [на|в|во] Декабрист*|пять тысяч сто десять|пятьдесят один десять|пять (один|раз|едени*) (один|раз|едени*) ноль)" ],
       "value" : "{\n  \"phoneNumber\": \"5110\"\n}"
     } ]
   }, {
@@ -7816,11 +7885,11 @@
     },
     "records" : [ {
       "type" : "pattern",
-      "rule" : [ "пушкина" ],
+      "rule" : [ "(1668|16 68|1 6 6 8|{[Уф*] Пушкин*}|{[доп|дополнительн*] офис* [на|в|во] [Уф*] Пушкин*}|[доп|дополнительн*] офис* {[на|в|во] [Уф*] [на|в|во] Пушкин*}|[доп|дополнительн*] офис* [на|в|во] [город* Уф*] [на|в|во] Пушкин*|[на|в|во] [доп|дополнительн*] офис* [на|в|во] [Уф*] [на|в|во] Пушкин*|[мне] [хочу|нужен*|нужн*|необходим*] [говорит*|переговор*|проконсультир*|консультир*|обсудит*|поговорит*] [со] [своим] [доп|дополнительн*] [офис*|@operator] [на|в|во] [Уф*] [на|в|во] Пушкин*|одна тысяча шестьсот шестьдесят восемь|шестнадцать шестьдесят восемь|один шесть шесть восемь)" ],
       "value" : "{\n  \"phoneNumber\": \"1668\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "цюрупы" ],
+      "rule" : [ "(5555|55 55|5 5 5 5|{[Уф*] Цюруп*}|{[доп|дополнительн*] офис* [на|в|во] [Уф*] Цюруп*}|[доп|дополнительн*] офис* {[на|в|во] [Уф*] [на|в|во] Цюруп*}|[доп|дополнительн*] офис* [на|в|во] [город* Уф*] [на|в|во] Цюруп*|[на|в|во] [доп|дополнительн*] офис* [на|в|во] [Уф*] [на|в|во] Цюруп*|[мне] [хочу|нужен*|нужн*|необходим*] [говорит*|переговор*|проконсультир*|консультир*|обсудит*|поговорит*] [со] [своим] [доп|дополнительн*] [офис*|@operator] [на|в|во] [Уф*] [на|в|во] Цюруп*|пять тысяч пятьсот пятьдесят пять|пятьдесят пять пятьдесят пять |пять пять пять пять|пять пятьдесят пять пять|четыр* пятерк*|пятерк*)" ],
       "value" : "{\n  \"phoneNumber\": \"5555\"\n}"
     } ]
   }, {
@@ -7839,12 +7908,28 @@
     },
     "records" : [ {
       "type" : "pattern",
-      "rule" : [ "(демо|трениров*|трениров*|учебн*|тестов*) (finam trade|финам* трейд*|фт|[мобильн*] приложен* [финам*] [трейд*]|quik|квик*|крик*|клик*|transaq|транзак*|метатрейдер* (четыр*четверт*)|mt4|мт4|{метак* (четыр*|четверт*)}|metatrader (четыр*четверт*)|(четыр*четверт*) метатрейдер*|мета трейдер (четыр*четверт*)|метотрейдер (четыр*четверт*)|мето трейдер (четыр*четверт*)|МТ (четыр*четверт*)|метатрейдер (четыр*четверт*)|мета трейдер (четыр*четверт*)|терминал*|програм*|платформ*)" ],
-      "value" : ""
+      "rule" : [ "{[терминал*|програм*|платформ*] (демо|трениров*|учебн*|тестов*) [верси*] (finam trade|финам* трейд*|фт|[мобильн*] приложен* [финам*] [трейд*])}" ],
+      "value" : "{\n  \"name\": \"FT\"\n}"
     }, {
       "type" : "pattern",
-      "rule" : [ "{(quik|квик*|крик*|клик*) джуниор*}" ],
-      "value" : ""
+      "rule" : [ "{[терминал*|програм*|платформ*] (демо|трениров*|учебн*|тестов*) [верси*] (метатрейдер* (четыр*|четверт*)|mt4|мт4|{метак* (четыр*|четверт*)}|metatrader (четыр*|четверт*)|(четыр*|четверт*) метатрейдер*|мета трейдер (четыр*|четверт*)|метотрейдер (четыр*|четверт*)|мето трейдер (четыр*|четверт*)|МТ (четыр*|четверт*)|метатрейдер (четыр*|четверт*)|мета трейдер (четыр*|четверт*))}" ],
+      "value" : "{\n  \"name\": \"MT4\"\n}"
+    }, {
+      "type" : "pattern",
+      "rule" : [ "{([терминал*|програм*|платформ*] ({(демо|трениров*|учебн*|тестов*) [верси*] quik}|{(демо|трениров*|учебн*|тестов*) [верси*] квик*}|{(демо|трениров*|учебн*|тестов*) [верси*] крик*}|{(демо|трениров*|учебн*|тестов*) [верси*] клик*}|{[демо|трениров*|учебн*|тестов*] [верси*] [quik|квик*|крик*|клик*] джуниор}))}" ],
+      "value" : "{\n  \"name\": \"Quik\"\n}"
+    }, {
+      "type" : "pattern",
+      "rule" : [ "{[терминал*|програм*|платформ*] (демо|трениров*|учебн*|тестов*) [верси*] (transaq (конектор*|connector)|транзак* (конектор*|connector))}" ],
+      "value" : "{\n  \"name\": \"TransaqConnector\"\n}"
+    }, {
+      "type" : "pattern",
+      "rule" : [ "{[терминал*|програм*|платформ*] (демо|трениров*|учебн*|тестов*) [верси*] (transaq|транзак*)}" ],
+      "value" : "{\n  \"name\": \"Transaq\"\n}"
+    }, {
+      "type" : "pattern",
+      "rule" : [ "{[терминал*|програм*|платформ*] (демо|трениров*|учебн*|тестов*) [верси*] (метатрейдер* (пятый|пять|пят*)|mt5|мт5|{метак* (пятый|пять|пят*)}|metatrader (пятый|пять|пят*)|(пятый|пять|пят*) метатрейдер*|мета трейдер (пятый|пять|пят*)|метотрейдер (пятый|пять|пят*)|мето трейдер (пятый|пять|пят*)|МТ (пятый|пять|пят*)|метатрейдер (пятый|пять|пят*)|мета трейдер (пятый|пять|пят*))}" ],
+      "value" : "{\n  \"name\": \"MT5\"\n}"
     } ]
   }, {
     "entity" : {
@@ -7862,7 +7947,15 @@
     },
     "records" : [ {
       "type" : "pattern",
+      "rule" : [ "((дат*|срок*) [открыт*] [@product_iis]|(когда|какой|как давно) [я|у меня] (дат*|срок*|исполнит*|исполняет*|был) [был*|могу] [открыт*|открыл*|закрыт*|погаш*|три года] [моем*|мой|свой] [@product_iis]|((какой|какая|когда ) [у] [меня] [срок*|дат*] (погашен*|исполн*|*регистрир*) [три год*] [@product_iis]))" ],
+      "value" : ""
+    }, {
+      "type" : "pattern",
       "rule" : [ "({дат* открыт* иис [мою]})" ],
+      "value" : ""
+    }, {
+      "type" : "pattern",
+      "rule" : [ "([проверит*] (открыт|открыл*|открывать|есть) [ли] [у] [меня|мне] @product_iis|{@product_iis (найти|посмотр*|провер*)}|(открыт|оформл*|созда*|сформир*|получ*|зарегистриров*|регистр*|добав*|деактив*|отключ*|удал*|закрыт*|закройт*|ликвидац*|ликвидир*|расторж*|расторгн*|расторг*|приостанов*|останов*|аннулиров*) [у] [меня] @product_iis (у|в) [вас|вашей] [компан*|организац*]|(отображ*|видн*) [своего|свой] @product_iis [в] [приложен*|терминал*]|@product_iis [я] [понятия] [не имею] (откуда))" ],
       "value" : ""
     } ]
   }, {
@@ -7881,7 +7974,7 @@
     },
     "records" : [ {
       "type" : "pattern",
-      "rule" : [ "({[надо] (пополн*|завест*) ([счет*] ИИС*|Индивидуальн* инвестиционн* счет*|Инвестиционн* счет*|IS|ис)}|{со счет* на счет* [нельзя] перевод*})" ],
+      "rule" : [ "({(пополн*|полнит*|завест*|ввест*|внест*|ввод|закинут*|зачислит*|положит*|перевест*|перевод|отправит*) [@currency|@money|актив*|наличн*] [со счет*|счет*] [из] [сторонн* банк*] [на] [свой|мой] [[счет*] ИИС*|Индивидуальн* инвестиционн* счет*|Инвестиционн* счет*|IS|ис]}|{со счет* на счет* [нельзя] перевод*})" ],
       "value" : ""
     } ]
   }, {
@@ -7900,7 +7993,11 @@
     },
     "records" : [ {
       "type" : "pattern",
-      "rule" : [ "перенос иис к вам" ],
+      "rule" : [ "[альф* [банк*]|альфа-банк*] [начал*] (перенос*|перенест*|перевод*|вывел*|принят*|приним*) [на] [мой] [[брокерск*|стар*|новы*] [счет*|договор*] ИИС*|Индивидуальн* инвестиционн* счет*|Инвестиционн* счет*|IS|ис] [к|в] [вам|ваш*|Финам*] [компан*]" ],
+      "value" : ""
+    }, {
+      "type" : "pattern",
+      "rule" : [ "([начал*|осуществ*|стартов*] (перенос*|перевест*|перевод*) [@product_iis] [к|в|от] [вам|Финам [ао|брокер*]] [к] [другому] [брокер*]|(вывел*|вывод*|перевод*|перевест*|перенос*|перенес*) [к|в|на] [вам|Финам [ао|брокер*]] [@instruments] [с] [моего|мой] [@product_iis]|(вывел*|вывод*|перевод*|перевест*|перенос*|перенес*|принят*) [мой] [@product_iis] [к|в] [вам|Финам [ао|брокер*]]|[для] [окончан*|заверш*] (вывел*|вывод*|перевод*|перенос*|перевест*|перенес*|принят*) [все] [@instruments|актив*] [на|с] [@product_iis]|@product_iis от)" ],
       "value" : ""
     } ]
   }, {
@@ -7917,7 +8014,11 @@
       "client" : false,
       "hidden" : false
     },
-    "records" : [ ]
+    "records" : [ {
+      "type" : "pattern",
+      "rule" : [ "{(открыт*|открыв*|оформл*|оформит*|созда*|сформир*|получ*|зарегистриров*|регистр*|добав*|включ*|подключ*|добав*|нужен|завест*|требует*) [только|у] [мой|свой|вас] [могу|можно] [[брокерск*|стар*|новы*] [счет*|договор*] ИИС*|Индивидуальн* инвестиционн* счет*|Инвестиционн* счет*|IS|ис]}" ],
+      "value" : ""
+    } ]
   }, {
     "entity" : {
       "name" : "IIS_Status",
@@ -7932,7 +8033,11 @@
       "client" : false,
       "hidden" : false
     },
-    "records" : [ ]
+    "records" : [ {
+      "type" : "pattern",
+      "rule" : [ "([статус*] [возврат*] [налогов*] (вычет*|льгот*) [по] [@product_iis]|упрощен* тип* (вычет*|льгот*) [по] [@product_iis]|(документ*|заявлен*) [в налогов*] [на|по] упрощен* вычет* [по] [@product_iis])" ],
+      "value" : ""
+    } ]
   }, {
     "entity" : {
       "name" : "IIS_Close",
@@ -7947,7 +8052,11 @@
       "client" : false,
       "hidden" : false
     },
-    "records" : [ ]
+    "records" : [ {
+      "type" : "pattern",
+      "rule" : [ "{(отключ*|деактив*|отсоедин*|удал*|закрыт*|закройт*|ликвидац*|ликвидир*|расторж*|расторгн*|расторг*|приостанов*|останов*|аннулиров*|закрою) [только|у] [мой|свой|вас] [могу|можно] [[брокерск*|стар*|новы*] [счет*|договор*] ИИС*|индивидуальн* инвестиц* счет*|инвестиц* счет*|IS|ис]}" ],
+      "value" : ""
+    } ]
   } ],
   "enabledSystemEntities" : [ "mystem.geo", "pymorphy.name", "duckling.number", "duckling.time", "duckling.date", "duckling.time-of-day", "duckling.duration", "duckling.phone-number", "duckling.email", "duckling.url" ],
   "spellerDictionary" : [ {
@@ -8020,6 +8129,9 @@
     "word" : "тинькоф",
     "frequency" : 1
   }, {
+    "word" : "джуниор",
+    "frequency" : -1
+  }, {
     "word" : "КПУРом",
     "frequency" : -1
   }, {
@@ -8055,6 +8167,9 @@
   }, {
     "word" : "тиньков",
     "frequency" : 1
+  }, {
+    "word" : "неторговом",
+    "frequency" : -1
   }, {
     "word" : "ФОРТС",
     "frequency" : -1
@@ -8113,6 +8228,9 @@
     "word" : "номинированный",
     "frequency" : -1
   }, {
+    "word" : "иисов",
+    "frequency" : -1
+  }, {
     "word" : "Зарубеж",
     "frequency" : -1
   }, {
@@ -8154,6 +8272,9 @@
   }, {
     "word" : "крика",
     "frequency" : 1
+  }, {
+    "word" : "метак",
+    "frequency" : -1
   }, {
     "word" : "насдак",
     "frequency" : -1
@@ -8209,10 +8330,19 @@
     "word" : "СММА",
     "frequency" : -1
   }, {
+    "word" : "сегрегированного",
+    "frequency" : -1
+  }, {
+    "word" : "алфа",
+    "frequency" : -1
+  }, {
     "word" : "расчитывается",
     "frequency" : -1
   }, {
     "word" : "сбер",
+    "frequency" : -1
+  }, {
+    "word" : "форекс",
     "frequency" : -1
   }, {
     "word" : "маржинальную",
