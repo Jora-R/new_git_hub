@@ -2927,7 +2927,7 @@ theme: /
         q: * @ndfl_tax_calculation * ||toState = "/Предварительный расчет"
         q: * @ndfl__tax_calculation_method * ||toState = "/Методика расчета ндфл"
         q: * @ndfl_tax_refund * ||toState = "/Возврат ндфл"
-        q: * @ndfl_resident * ||toState = "/Налоговое резиденство"
+        q: * @ndfl_resident * ||toState = "/Налоговое резидентство"
         q: * @choice_1 * ||toState = "/Документы для налоговой"
         q: * @choice_2 * ||toState = "/Налоговые ставки"
         q: * @choice_3 * ||toState = "/Предварительный расчет"
