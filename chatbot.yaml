@@ -7,16 +7,18 @@ language: ru
 
 tests:
   include:
-    - margin_trading.xml
-    - obuchenie.xml
+    - test.xml
+
+injector:
+    api_key: "eyJraWQiOiI0MWRjYTE5Mi0wNTc4LTRiZTEtYTM2Zi04NjNhZTlmNDU0YmUiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhcmVhIjoiZGV2Iiwic2NvbnRleHQiOiJDZ3NJQnhJSGRXNXJibTkzYmdvb0NBTVNKRGRsTURNME1EWmxMVE5rWVRVdE5HRTRZUzFoT1ROa0xXSmlZV1ppWW1Nd05qbGhaZ29FQ0FVU0FBb0tDQUFTQmxORlVsWkZVZ29mQ0FJU0cxTkZVbFpKUTBVdFkyaGhkQzFpYjNRdE1qQXlNeTB3TXkwd053b0ZDQWdTQVRFS0JBZ0pFZ0FLQkFnS0VnQUtLQWdFRWlRME1XUmpZVEU1TWkwd05UYzRMVFJpWlRFdFlUTTJaaTA0TmpOaFpUbG1ORFUwWW1VU0JBZ0tFZ0FhREFqdStadWdCaERBdzY3MUFpSU1DTzZweExRSEVNRERydlVDIiwiemlwcGVkIjp0cnVlLCJjcmVhdGVkIjoiMTY3ODE3OTU2NiIsInJlbmV3RXhwIjoiMTk4OTMwNTk2NiIsInNlc3MiOiJINHNJQUFBQUFBQUEvMU1xNFZJeE16SkxzVWhKTTlRMVRERkswalZKU3JiVVRVbzFNZGMxVFUweE0wcXlURTR5TkRVVjRyc3c0Y0x1QzFzdjdMcllDQ1IzU25GZG1IeXgrY0xHQ3pzdTdGVVNUaTlOeXN4elNNNHZLdEJMeTh4THpOVXJLbldTRG5ZTkN2TjBkdFZOemtnczBVM0tMOUUxTWpBeTFqVUFJdk1PUmlZQU9qeU5QWGtBQUFBIiwiaXNzIjoidHhzZXJ2ZXIiLCJrZXlJZCI6IjQxZGNhMTkyLTA1NzgtNGJlMS1hMzZmLTg2M2FlOWY0NTRiZSIsImZpcmViYXNlIjoiIiwic2VjcmV0cyI6Im9rNWppK2htb1lRUlN0WjQ3MEFtWUE9PSIsInByb3ZpZGVyIjoiSU5URVJOQUwiLCJzY29wZSI6IkNBRVFBUSIsInRzdGVwIjoiZmFsc2UiLCJleHAiOjE5ODkyMTk1NjYsImp0aSI6IjdlMDM0MDZlLTNkYTUtNGE4YS1hOTNkLWJiYWZiYmMwNjlhZiJ9.HatwaQC9cqCx58IbJ1LAEnOFWFyAFvvl_T7V1h3G5iqOnZ3wLHiq48weEB2Y4llU-PRtmxq4KQELnMZWLctE0Q"
 
 nlp:
   intentNoMatchThresholds:
-    phrases: 0.3
-    patterns: 0.5
-
-injector:
-  slotfilling:
-    maxSlotRetries: 3
-    stopOnAnyIntent: false
-    stopOnAnyIntentThreshold: 0.2
+    phrases: 0.2
+    patterns: 0.2
+  modifyRequestInPreMatch: true
+  lengthLimit:
+    enabled: true
+    symbols: 150
+    words: -1
+    
