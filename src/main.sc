@@ -1,4935 +1,6410 @@
 require: slotfilling/slotFilling.sc
   module = sys.zb-common
-require: dateTime/moment.min.js
-    module = sys.zb-common
-require: tikerCheck.js
-require: ./scripts/textCut.js
+require: dateTime/dateTime.sc
+  module = sys.zb-common
+require: name/name.sc
+  module = sys.zb-common 
+# Определение времени работы отдела
+require: ./scripts/getPhoneByDateTime.js
+# Определение ответа по движению ДС и ЦБ
+require: ./scripts/moneyTransfer.js 
+# Установка периода ожидания ответа клиента
+require: ./scripts/setTimeout.js
+# Вывод ошибки при отсутствии сценария
+require: ./scripts/DialogError.js
+# Вывод ошибки в скрипте
+require: ./scripts/ScriptError.js
+# Определение времени работы офисов в регионах
+require: ./scripts/additionalNumbers.js
+# Пребор добавочных региона + функция проверки и перевода
+require: ./scripts/regionalOfficeCall.js
+# Функция перевода на оператора (тут указан канал)
+require: ./scripts/callProcessing.js
+# Функция активации праздничного текста для некоторых интентов. Для отключения - закомментировать.
+# require: ./scripts/HolidayActivation.js
+
 theme: /
+    
+    # state: Перс данные
+    #     q!: перс данные
+    #     a: перс данные
+    #     go!: /Перс данные/Получение GlobalID
+        
+    #     state: Получение GlobalID
+    #         HttpRequest:
+    #             url = https://test-global-data-api.finam.ru/v1/globaldata/find
+    #             method = POST
+    #             body = { "language": "RU","type": "N","contacts": [{"typeCode": "CELLPHONE","value": "+7(916) 363-44-16"}]}
+    #             timeout = 1000
+    #             headers = [{"name":"Authorization","value": "eyJraWQiOiI5MzQ1NzNiYy01MGNhLTQzZmQtOWM5Zi02Yjk5ZWNhODY2NWYiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhcmVhIjoiZGV2Iiwic2NvbnRleHQiOiJDZ3NJQnhJSGRXNXJibTkzYmdvb0NBTVNKRGN5Wm1ZeFlUTmxMV0ppT0RJdE5HTXpaUzA0TVdJMExUWTFNMkpoWTJRNVltVXpNZ29FQ0FVU0FBb0xDQUFTQjNWdWEyNXZkMjRLS0FnQ0VpUXdNakZoT1RNNE9DMWhOV1F5TFRRMVlUa3RZamRpT0MwMU1EaGlZekZoWXprMlltWUtCUWdJRWdFeENnUUlDUklBQ2dRSUNoSUFDaWdJQkJJa09UTTBOVGN6WW1NdE5UQmpZUzAwTTJaa0xUbGpPV1l0Tm1JNU9XVmpZVGcyTmpWbUVnVUkwUThTQUJvTUNLS2V6YTRHRU1EYTdaZ0NJZ3dJb3M3MXdnY1F3TnJ0bUFJb0FnIiwiemlwcGVkIjp0cnVlLCJjcmVhdGVkIjoiMTcwODM0NzE3MCIsInJlbmV3RXhwIjoiMjAxOTQ3MzU3MCIsInNlc3MiOiJINHNJQUFBQUFBQUEvMU9LNFZKSk5EUzBNRFV3TXRWTk1URTAxRFV4TmpIU3RVZzFOZEkxTnpReE4wcExNekJMU3pNUll2TktMQzV4OUpUaURISU4xRFd6TURNelVoSlB6TTNNcTB6TXpNbDNTTTR2S3RCTHk4eEx6TlVyS25YaXlNdlh6Y2xQejh6cllHUUNBRGdENlBaaEFBQUEiLCJpc3MiOiJ0eHNlcnZlciIsImtleUlkIjoiOTM0NTczYmMtNTBjYS00M2ZkLTljOWYtNmI5OWVjYTg2NjVmIiwiZmlyZWJhc2UiOiIiLCJzZWNyZXRzIjoiQlJuenl1NTdVS1FEZkpLSEF6c3RKZz09IiwicHJvdmlkZXIiOiJJTlRFUk5BTCIsInNjb3BlIjoiQ0FFUUFRIiwidHN0ZXAiOiJmYWxzZSIsImV4cCI6MjAxOTM4NzE3MCwianRpIjoiNzJmZjFhM2UtYmI4Mi00YzNlLTgxYjQtNjUzYmFjZDliZTMyIn0.S3DSBqY_nSN0Uef3lsRhTdAZMu8WR3cEWhxnZlo3qCVXzm9ZjeeN3S3pZ50mFsLfQVjYN6zyYZ2ai1xtjkmjbQ"},{"name":"Content-Type","value":"application/json"},{"name":"Accept","value":"application/json"}]
+    #             vars = [ { "name": "ResultGlobalID", "value": "$httpResponse" } ]
+    #             okState = /Перс данные/Получен GlobalID
+    #             errorState = /Перс данные/Ошибка получения GlobalID
+                
+    #     state: Ошибка получения GlobalID
+    #         a: Ошибка
+        
+    #     state: Получен GlobalID
+    #         a: Успех
+    #         script:
+    #             $reactions.answer(JSON.stringify($session.ResultGlobalID.data[0].actualGlobalId));
+    #             $session.GlobalID = $session.ResultGlobalID.data[0].actualGlobalId;
+    #             $session.codeWord = "кролик";
+    #             $reactions.answer($session.GlobalID);
+    #             $reactions.answer($session.codeWord);
+                
+    #         go!: /Перс данные/Проверка кодового слова
+                
+    #     state: Проверка кодового слова
+    #         HttpRequest:
+    #             url = http://risk3.finam.ru:7380/v3/CheckCodeWord
+    #             method = POST
+    #             body = {"personeGlobalId": "{{$session.GlobalID}}","codeWord": "{{$session.codeWord}}"}
+    #             timeout = 1000
+    #             headers = [{"name":"Content-Type","value":"application/json"},{"name":"Accept","value":"application/json"}]
+    #             vars = [ { "name": "ResultCheckCodeWord", "value": "$httpResponse" } ]
+    #             okState = /Перс данные/Клиент идентифицирован
+    #             errorState = /Перс данные/Кодовое слово не найдено
+            
+    #     state: Кодовое слово не найдено
+    #         a: Ошибка
+        
+    #     state: Клиент идентифицирован
+    #         a: Успех
+    #         script:
+    #             $reactions.answer(JSON.stringify($session.ResultCheckCodeWord));
+    
+    state: Start
+            
+        q!: $regex</start>
+        a: Вас приветствует голосовой помощник фина'м!
+        # Праздники
+        # a: В новогодние праздники с 1 по 8 января, менеджеры поддержки работают в дежурном режиме; время ожидания ответа оператора может быть увеличено.
+        # a: Наблюдаются сложности с выставлением заявок в терминале Фина'м Трейд; Для выставления заявок воспользуйтесь альтернативным терминалом Квик. Мы работаем над устранением проблемы.
+        # a: Наблюдаются сложности с выставлением заявок; при необходимости выставить заявку можно воспользоваться системой квик или транза'к или обратиться в отдел голосового трейдинга. Мы работаем над устранением проблемы.
+        # a: ШАБЛОНЫ ИТС Торговая система фина'м трейд транза'к квик Meta Trader 5
+        # a: Какой у вас вопрос?
+        a: Уточните, пожалуйста, вы обращаетесь как физическое или юридическое лицо?
+        q: * @FL * ||toState = "/FL"
+        q: * @YL * ||toState = "/YL"
+        q: * @choice_1 * ||toState = "/FL"
+        q: * @choice_2 * ||toState = "/YL"
+        q: * @choice_last * ||toState = "/YL"
+        q: @repeat_please * ||toState = "."
+        
+    state: YL
+        script:
+            $session.operatorPhoneNumber =  '1000';
+            $reactions.transition("/Оператор/Оператор по номеру");
+            # final scenario
+        
+    state: FL
+        a: Пожалуйста, опишите коротко суть вопроса.
+        
+    state: Hello
+        q!: @hello
+        a: Здравствуйте! Уточните, пожалуйста, ваш вопрос.
+        
+    state: Другой_вопрос
+        q!: * @another_question
+        random:
+            a: Пожалуйста, опишите коротко суть вопроса.
+            a: Позвольте мне вам помочь. Какой у вас вопрос?
+        
+    state: Я робот
+        q!: * @robot *    
+        a: Я голосовой помощник компании Фина'м. Какой у вас вопрос?
+        
+    state: Открытие_закрытие_счета
+        intent!: /016 Открытие_закрытие_счета
+        script:
+            $analytics.setMessageLabel("016 Открытие_закрытие_счета", "Интенты");
+                        
+            if ( typeof $parseTree._open_close != "undefined" ){
+                $session.open_close = $parseTree._open_close;
+            }
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }            
+            if ( typeof $session.open_close == "undefined" ){
+                $reactions.transition("/Открытие_закрытие_счета/Уточнение открыть_закрыть");
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Открытие_закрытие_счета/Уточнение компании");
+            } else {
+
+                var phoneNumber = $session.company.phoneNumber; //Фиксация данных во временных переменных, т.к. далее зачищаем значения всех переменных сессии
+                var open_closeName = $session.open_close.name; //Используем данный алгоритм, так как даже при последовательной записи действие/зачистка данных сама зачистка происходит раньше
+                var companyName = $session.company.name;
+                $session = {}; //Зачистка данных сессии
+                $session.operatorPhoneNumber = phoneNumber; //Записываем обратно добавочный из временной переменной в сессию, т.к. в функции перевода на оператора стандартизированое название переменной
+                $reactions.transition("/Открытие_закрытие_счета/" + open_closeName + "_" + companyName);
+            }
+            
+        state: Уточнение открыть_закрыть
+            a: Уточните, пожалуйста, вы хотели бы открыть или закрыть счет?
+            
+            state: Ожидание ответа
+                q: * @open_close *
+                script:
+                    $session.open_close = $parseTree._open_close;
+                    $reactions.transition("/Открытие_закрытие_счета")
+                
+        state: Уточнение компании
+            a: Операции с каким счетом вас интересуют; С БРОКЕРСКИМ счетом; Со счетом в банке, в управляющей компании, или форекс.
+            q: @repeat_please * ||toState = "."
+                 
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Открытие_закрытие_счета")
+        
+        state: open_Банк
+            a: Открыть банковский счет, депозит, или карту в банке фина'м, можно в офисе компании. Или дистанционно, если ранее, вы открывали, брокерский счет, лично, в офисе компании.
+            a: Дистанционно подать заявку на открытие счета, можно в личном кабинете на сайте фина'м точка ру, кнопка открыть новый счет, находится под списком ваших открытых счетов.
+            a: Далее выберите раздел, банковские продукты, далее выберите, карты, или тип счета.
+            a: Обращаем ваше внимание, если вы не открывали ранее брокерский счет, или открывали его дистанционно, то открыть банковский счет, или карту, можно только при личном визите в офис компании фина'м.
+            a: Получить банковскую карту можно в офисе компании, или курьерской доставкой, в зависимости от города получения. Доступный способ получения отображается при заказе банковской карты при выборе города.
+            a: Хотите получить консультацию у оператора по открытию банковского счёта?
+            # script: 
+            #     $context.session = {};
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+            # final answer
+
+        state: open_Брокер
+            a: Открыть брокерский счет в компании фина'м, можно дистанционно, или в офисе компании. Дистанционно подать заявку на открытие счета, можно на сайте, фина'м точка ру.
+            a: Желтая кнопка, открыть счет, находится в верхнем правом углу страницы. Для заполнения анкеты понадобится мобильный телефон, и гражданский паспорт. Открыть дополнительный счет можно дистанционно в личном кабинете.
+            a: Количество действующих стандартных брокерских счетов неограниченно, НО счет ИИС у физического лица может быть только один.
+            a: Брокерские счета полностью независимы, по ним могут быть разные тарифы и торговые системы. Новый счет будет доступен для торговли через несколько часов, после подписания документов об открытии.
+            a: Обращаем ваше внимание: открыть дистанционно, первичный счет, могут только совершеннолетние физические лица, граждане эРэФ и дружественных государств.
+            a: Лицам до 18 лет, открытие счёта доступно только при личном посещении офиса, с родителем или опекуном.
+            a: Хотите получить консультацию у оператора по открытию брокерского счёта?
+            # script: 
+            #     $context.session = {};
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+            # final answer
+            
+        state: open_УК
+            a: Открыть счет доверительного управления в управляющей компании Фина'м, можно дистанционно в личном кабинете брокера, на сайте фина'м точка ру.
+            a: Кнопка открыть новый счёт, находится слева под списком ваших открытых счетов. Далее выберите раздел Доверительное управление, и следуйте инструкциям сайта.
+            a: Хотите получить консультацию у оператора по выбору стратегии управления активами и открытию счёта?
+            # script: 
+            #     $context.session = {};
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+            # final answer
+
+        state: open_Форекс
+            a: Открытие счёта фина'м Форекс доступно совершеннолетним гражданам Российской федерации.
+            a: Открыть форекс счет в компании фина'м, можно дистанционно, или в офисе компании, адрес ближайшего офиса можно посмотреть на сайте Фина'м точка ру, в разделе контактная информация, внизу страницы.
+            a: Дистанционно подать заявку на открытие счета, можно на сайте форекс точка фина'м точка ру.
+            a: Если у вас есть брокерский счет в компании Фина'м, вы можете дистанционно открыть счет форекс в личном кабинете брокера, на сайте едо'кс точка Фина''м точка ру.
+            a: Для этого выберите, открыть новый счет, выберите тип компании форекс-диллер, далее следуйте инструкциям. Дополнительные счета «фина'м Форекс» можно открыть в личном кабинете Форекс на сайте форекс кабинет точка фина'м точка ру.
+            a: Хотите получить консультацию у оператора?
+            # script: 
+            #     $context.session = {};
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+            # final answer
+    
+        state: close_Банк
+            a: Закрыть банковский счет или карту можно в личном кабинете банка фина'м, на сайте айбанк точка фина'м точка ру.
+            a: Для этого выберите нужный счет, в поле справа выберите, закрыть счет. Обращаем ваше внимание, что закрытие счетов, открытых до две тысячи двадцать третьего года, может быть доступно только в офисе компании.
+            a: Хотите получить консультацию у оператора?
+            # script: 
+            #     $context.session = {};
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+            # final answer
+        
+        state: close_Брокер
+            a: Закрыть брокерский счет можно дистанционно в личном кабинете едо'кс точка фина'м точка ру, для этого, в разделе, Услуги, выберите меню, Прочие операции.
+            a: Договор расторгается на 5-й рабочий день с момента подписания заявления.
+            a: Обращаем ваше внимание, что в рамках брокерского договора может быть несколько счетов. При расторжении все они будут закрыты.
+            a: Закрытие счетов доступно при отсутствии на них активов, открытых позиций и задолженностей.
+            a: Способ закрытия счёта ИИС зависит от желаемого типа налогового вычета. Хотите получить консультацию у оператора?
+            # script: 
+            #     $context.session = {};
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+            # final answer
+ 
+        state: close_УК
+            a: Закрыть счет доверительного управления в Управляющей компании можно дистанционно в личном кабинете едо'кс точка фина'м точка ру.
+            a: Для этого, в разделе, Услуги, выберите меню, Операции по договорам доверительного управления, расторжение договора.
+            a: Договор расторгается на 3-й рабочий день с момента подписания заявления, продажа активов с последующими расчетами, осуществляется в течение 10 дней с даты расторжения договора.
+            a: В случае, если у вас в договоре заранее была указана дата расторжения, не забудьте предоставить реквизиты для перечисления средств в личном кабинете на сайте едо'кс точка фина'м точка ру, в разделе, Информация.
+            a: Хотите получить консультацию у оператора?
+            # script: 
+            #     $context.session = {};
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+            # final answer
+        
+        state: close_Форекс
+            a: Закрыть дополнительный счет форекс, можно дистанционно в личном кабинете на сайте форекс точка фина'м точка ру. 
+            a: Чтобы закрыть единственный счет форекс, обратитесь к менеджеру фина'м.
+            a: Хотите получить консультацию у оператора?
+            # script: 
+            #     $context.session = {};
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+            # final answer
+        
+    
+    state: Заказ_документов
+        intent!: /017 Заказ_документов
+        
+        script:
+            $analytics.setMessageLabel("017 Заказ_документов", "Интенты");
+            
+            if ( typeof $parseTree._document != "undefined" ){
+                $session.document = $parseTree._document;
+            }            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.document == "undefined" ){
+                $reactions.transition("/Заказ_документов/Уточнение типа документа");
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Заказ_документов/Уточнение компании");
+            }
+             else {
+                $reactions.transition("/Заказ_документов/Заказ_" + $session.document.name + "_" + $session.company.name);
+            }
+
+        state: Уточнение типа документа
+            a: Какой документ вас интересует?
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @document *
+                script:
+                    $session.document = $parseTree._document;
+                    $reactions.transition("/Заказ_документов");
+    
+        state: Уточнение компании
+            a: Документы для какого счёта вас интересуют? Брокерского счёта; Банковского, счёта в Управляющей компании, или Форекс.
+            q: @repeat_please * ||toState = "."    
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Заказ_документов");
+            
+        state: Заказ_справка_Брокер
+            a: Заказать справку по брокерскому счету, можно в личном кабинете на сайте, фина'м точка ру, для этого выберите меню отчёты, далее выберите раздел, налоги и справки.
+            a: Максимальный интервал получения справки по счету, 92 дня. При необходимости получить годовой отчет, справку можно сформировать 4 раза.
+            a: В разделе, брокерский отчет, автоматически выгружаются отчеты брокера на подпись.
+            a: Также, историю операций по счету, можно посмотреть в личном кабинете, для этого выберите нужный счет, далее выберите вкладку, история.
+            a: Для заказа брокерского отчета на бумажном носителе обратитесь к менеджеру поддержки.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Заказ_счет_фактура_Брокер
+            script: 
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_выписка_депо_Брокер
+            a: Заказать выписки из депозитария, можно в личном кабинете на сайте, фина'м точка ру, для этого выберите меню отчёты, далее выберите раздел, налоги и справки, далее выберите раздел, депозитарий.
+            a: Заказ документов оплачивается по тарифам депозитария, Выписка по счету ДЕПО, или Выписка об операциях по счету ДЕПО, 200 рублей.
+            a: Изготовление, в течение трех рабочих дней. Заказ выписки из национального расчетного депозитария, 500 рублей, изготовление, в течение месяца.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Заказ_налог_справка_Брокер
+            a: Заказать справку о доходах 2НДФЛ, и справку об убытках, можно за отчетный период, то есть один календарный год, в личном кабинете на сайте, фина'м точка ру.
+            a: Для этого выберите меню, отчёты, далее выберите раздел, налоги и справки, далее выберите раздел, налоги. Справка 2 НДФЛ за 2023 год будет доступна к заказу после 10 марта 2024 года.
+            a: Электронный формат справки будет доступен в личном кабинете в течение трех рабочих дней. Изготовление справки на бумажном носителе в течение одной рабочей недели.
+            a: Вы хотите узнать подробнее о содержимом справки 2НДФЛ?
+            script: 
+                $context.session = {};
+            q: @agree ||toState = "/Заказ_документов/Заказ_налог_справка_Брокер/Подробнее_2НДФЛ"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+            # final answer
+                
+            state: Подробнее_2НДФЛ
+                a: В справке 2НДФЛ, в разделе доход, содержится общая стоимость сделок продажи за отчетный период. В разделе Вычет, общая стоимость сделок покупки за отчетный период, а также комиссии, соответствующие коду дохода. 
+                a: В разделе НалогООблага'емая база, указана итоговая прибыль, которая рассчитывается как разница дохода и вычета.
+                a: Если в данной графе указано ноль, то за текущий отчетный период отсутствуют доходы и необходимо проверить справку об убытках.
+                a: Чем я могу еще помочь?
+                script: 
+                    $context.session = {};
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                q: @repeat_please * ||toState = "."
+                # final answer
+    
+        state: Заказ_справка_актив_Брокер
+            a: Заказать справку об активах можно в личном кабинете на сайте, фина'м точка ру, для этого выберите меню, отчёты, далее выберите раздел, налоги и справки, далее выберите, 
+            a: Запрос на предоставление справки об активах. Изготовление справки занимает до двух рабочих дней.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Заказ_документы_откр_Брокер
+            a: Заказать документы об открытии брокерского счета, можно в личном кабинете на сайте, едо'кс точка фина'м точка ру, для этого выберите меню отчетность, далее выберите раздел, основные документы. 
+            a: Основными документами являются, Заявление о выборе условий обслуживания, Уведомление о заключении договора присоединения, Заявление о присоединении к регламенту, Уведомление для ИФНС.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Заказ_справка_госслуж_Брокер
+            a: Заказать справку для гос служащего по форме 57 98 уу, можно в личном кабинете на сайте, фина'м точка ру, для этого выберите меню, отчёты, далее выберите раздел, налоги и справки, справка для гос служащих.
+            a: Изготовление справки до пяти рабочих дней.
+            a: Вы хотите узнать подробнее о содержимом справки для госслужащих?
+            script: 
+                $context.session = {};
+            q: @agree ||toState = "/Заказ_документов/Заказ_справка_госслуж_Брокер/Подробнее_госслуж"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+            # final answer
+                
+            state: Подробнее_госслуж
+                a: В первом разделе справки для гос служащего указаны сведения по банковским счетам, соответственно при получении данной справки от брокера, раздел не заполняется. 
+                a: Для получения сведений об остатках средств на брокерских счетах, можно заказать справку по счету в личном кабинете на сайте, фина'м точка ру, для этого выберите меню отчёты, далее выберите раздел, налоги и справки. 
+                a: Во втором разделе указана информация о поставленных ценных бумагах, а также, сведения о доходах, налогах, дивидендах и купонах. Важно. Производные финансовые инструменты, фьючерсы и опционы, не являются ценными бумагами. 
+                a: В третьем разделе указана информация об иных доходах, процентах на остаток, доходах от продажи валюты без учета расходов, доходах по драгоценным металлам и прочее. 
+                a: В четвертом разделе указана информация о займах, сделках РЕПО' и иных обязательствах клиента и брокера перед клиентом, если они превышали сумму 1000000 рублей.
+                a: Чем я могу еще помочь?
+                script: 
+                    $context.session = {};
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                q: @repeat_please * ||toState = "."
+                # final answer
+        
+        state: Заказ_1042s_Брокер
+            a: Справку формы 10 42 ЭС, формируют национальный расчетный депозитарий и СПБ-биржа, и направляют брокеру. 
+            a: Готовые формы загружаются автоматически в личный кабинет на сайте, фина'м точка ру. Справка формируется за отчетный период, то есть за один календарный год. 
+            a: Чтобы заказать справку в личном кабинете, выберите меню, отчёты, далее выберите раздел, налоги и справки, далее выберите раздел, налоги. 
+            a: Электронный формат справки доступен на следующий рабочий день. Изготовление справки на бумажном носителе в течение одной рабочей недели.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Заказ_w8_Брокер
+            a: Подписать форму дабл ю 8 бэн, можно в личном кабинете на сайте, фина'м точка ру, для этого выберите меню, отчёты, далее выберите раздел, налоги и справки, Форма дабл ю 8 бэн. 
+            a: Далее выберите биржу, сформируйте заявление, распечатайте, поставьте подпись, отсканируйте документ и вложите скан в сформированный вами документ в личном кабинете. 
+            a: Сформировать документ, распечатать, подписать и прикрепить заявление необходимо в течение одного дня. Форма рассматривается 30 календарных дней.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Заказ_выписка_квал_Брокер
+            a: Если вы являетесь квалифицированным инвестором в Фина'м, вы можете заказать выписку из реестра квалифицированных лиц,
+            a: в личном кабинете на сайте, едо'кс точка Фина'м точка ру. для этого выберите меню, Услуги, далее выберите раздел, Налоги, выписки, справки, в поле меню другОе, выберите, Выписка из реестра квалифицированных лиц.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Заказ_регламент_Брокер
+            a: Регламент брокерского обслуживания представлен на сайте фина'м точка ру. Чтобы открыть регламент, в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, документы и регламенты.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        # заказ документов по Банку    
+        state: Заказ_справка_Банк
+            a: Заказать выписку по договору банковского счёта, срочного вклада или по банковской карте, можно в личном кабинете банка Фина'м, на сайте айбанк точка фина'м точка ру.
+            a: Для этого выберите нужный счет, в поле справа выберите, выписка по счету. Если у вас есть также брокерский счет, то заказать выписку можно и в личном кабинете брокера на сайте, едо'кс точка Фина'м точка ру.
+            a: Для этого выберите меню, Услуги, далее выберите раздел, Налоги выписки справки, в поле меню, Запрос в Банк на предоставление документов выберите нужное.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+
+        state: Заказ_счет_фактура_Банк
+            script: 
+                $session.operatorPhoneNumber =  '3820';
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+                
+        state: Заказ_выписка_депо_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: Заказ_налог_справка_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+    
+        state: Заказ_справка_актив_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_документы_откр_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_справка_госслуж_Банк
+            a: Заказать справку для гос служащего, можно в личном кабинете брокера на сайте, фина'м точка ру. Авторизуйтесь в личный кабинет, и выберите меню, отчёты, далее выберите раздел, налоги и справки, справка для гос служащих.
+            a: Выберите компанию идентификации, Банк фина'м. Изготовление справки до пяти рабочих дней.
+            a: Чем могу еще помочь?
+            script:
+                $context.session = {};
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+            # final answer
+        
+        state: Заказ_1042s_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_w8_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_выписка_квал_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_регламент_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_справка_Форекс
+            a: Заказать справку по счету можно в личном кабинете форекс точка фина'м точка ру, для этого в левом вертикальном меню выберите вкладку, отчёты. Изготовление справки занимает до двух рабочих дней.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Заказ_налог_справка_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_документы_откр_Форекс
+            a: Заказать документы об открытии форекс счёта, можно в личном кабинете брокера фина'м на сайте, едо'кс точка фина'м точка ру, для этого выберите меню отчетность, далее выберите раздел, основные документы.
+            a: Основными документами об открытии форекс счёта являются, Заявление о присоединении к регламенту, Уведомление о заключении Рамочного договора, Уведомление о рисках к Рамочному договору.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Заказ_справка_госслуж_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: Заказ_1042s_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_выписка_квал_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_регламент_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        # заказ документов по УК   
+        state: Заказ_справка_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_выписка_депо_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: Заказ_налог_справка_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+    
+        state: Заказ_справка_актив_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_документы_откр_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_справка_госслуж_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: Заказ_1042s_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_w8_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_выписка_квал_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Заказ_регламент_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+
+            
+            
+    state: MoneyTransfer || modal = true
+        # Движение ДС (сущность компании обязательна и определяется при первичном обращении только для ФФ и УК)
+        intent!: /005 Движение_ДС 
+        #|| toState = "/MoneyTransfer", onlyThisState = true
+        script:
+            $analytics.setMessageLabel("005 Движение_ДС", "Интенты");
+            
+            $session.moneyTransfer = {
+                company : "undefined",
+                assetType : "undefined",
+                type : "undefined", //ввод, вывод, перевод
+                method : "undefined", //для ввода, вывода актуально: СБП, наличные, реквизиты, карта
+                transferCBbetweenАccounts : "undefined", //между своими, между разными клиентами, между разделами
+                companyPhoneNumber : "undefined", //для банка и фф автоперевод на добавочный компании
+                isCommission : false,
+                isPeriod : false
+            };
+            
+            moneyTransferRun(true);
+        
+        state: MoneyTransferGetCompany
+            a: Операции с каким счетом вас интересуют; С БРОКЕРСКИМ счетом; Со счетом в банке, в управляющей компании, или форекс.
+
+            state: Уточнение_MoneyTransferGetCompany
+                # q: * {[@commission] * [@assetType] * [@period] * [@moneyTransferType] * [@moneyTransferMethod]} 
+                q: * @company *
+                script: 
+                    # $reactions.answer("3");
+                    moneyTransferRun(false);
+                    
+            state: LocalCatchAll
+                event: noMatch
+                a: Это не похоже на компанию. Попробуйте еще раз.
+           
+        state: MoneyTransferGetAssetType
+            a: Уточните, вас интересуют операции с денежными средствами, или с ценными бумагами?
+
+            state: Уточнение_MoneyTransferGetAssetType
+                q: * {[@commission] * [@period] * [@moneyTransferType] * [@moneyTransferMethod] * @assetType} *
+                script: 
+                    moneyTransferRun(false);
+                    
+            state: LocalCatchAll
+                event: noMatch
+                a: Это не похоже на компанию. Попробуйте еще раз.
+
+        state: MoneyTransferGetType
+            if: $session.moneyTransfer.assetType === 'ДС'
+                a: Уточните, какой тип операции Вас интересует, пополнение счёта, вывод средств или перевод между своими счетами?
+            
+            if: $session.moneyTransfer.assetType === 'ЦБ'
+                a: Уточните, вы хотите перевести бумаги от другого брокера в фина'м, вывести бумаги к другому брокеру, или перевести бумаги между счетами внутри фина'м?
+
+            state: Уточнение_MoneyTransferGetType
+                q: * {[@commission] * [@period] * [@moneyTransferMethod] * [@transferCBbetweenАccounts] * @moneyTransferType} *
+                script: 
+                    moneyTransferRun(false);
+                    
+            
+            state: LocalCatchAll
+                event: noMatch
+                a: Это не похоже на тип операции. Попробуйте еще раз.
+
+        state: MoneyTransferGetBetweenAccounts
+            a: Какой тип перевода Вас интересует, перевод между своими счетами, перевод между разными клиентами фина'м, или перевод между разделами.
+
+            state: Уточнение_MoneyTransferGetBetweenAccounts
+                q: * {[@commission] * [@period] * @transferCBbetweenАccounts} *
+                script: 
+                    moneyTransferRun(false);
+                    
+            state: LocalCatchAll
+                event: noMatch
+                a: Это не похоже на тип операции. Попробуйте еще раз.
+
+        state: MoneyTransferGetMethod
+            if: $session.moneyTransfer.type === 'Ввод'
+                # a: В преддверии новогодних праздников, рекомендуем пополнять брокерский счет, и счет ИИС, заблаговременно, учитывая срок зачисления средств. Последний день зачисления средств в 2023 году - 29 декабря.
+                # a: Обращаем ваше внимание, что пополнение по реквизитам, занимает до 3х рабочих дней. Если у вас осталось менее трех дней для пополнения счета, то рекомендуем выбрать другие способы; например, системой быстрых платежей, или наличными, в офисе фина'м.
+                a: Какой способ пополнения вас интересует? Системой быстрых платежей, СБП? Банковской картой, По реквизитам счёта, или Наличными в кассе.
+            
+            if: $session.moneyTransfer.type === 'Вывод'
+                # a: 29 декабря, выводы денежных средств в рублях эрэф доступны до 15:00 по московскому времени; и срочные выводы по реквизитам доступны до 12:00 часов, и только в размере свободного остатка на момент исполнения поручения.
+                # a: Выводы, поданные позднее, будут исполнены уже 3 января. В январе выводы средств доступны с третьего по пятое, и с 8ого января в штатном режиме. Выводы валюты будут исполняться с 9 января.
+                a: Какой способ вывода средств Вас интересует? Системой быстрых платежей, СБП? Банковской картой, По реквизитам счёта, или Наличными в кассе.
+            
+            # if: $session.moneyTransfer.type === 'Перевод'
+            #     a: Уточните, какой способ перевода Вас интересует?
+
+            state: Уточнение_MoneyTransferGetMethod
+                q: * {[@commission] * [@period] * [@moneyTransferType] * @moneyTransferMethod} *
+                # a: {{ $parseTree._moneyTransferMethod.name }}
+                script: 
+                    moneyTransferRun(false);
+                    
+            state: LocalCatchAll
+                event: noMatch
+                a: Это не похоже на способ {{ $session.moneyTransfer.type }}a. Попробуйте еще раз.
+
+        state: MoneyTransferText
+            script:
+                $response.replies = $response.replies || [];
+                $session.moneyTransfer.text = getTestForMoneyTransfer($session.moneyTransfer, $response.replies);
+            a: {{ $session.moneyTransfer.text['a'] ? $session.moneyTransfer.text['a'] : $session.moneyTransfer.text }}
+            a: Чем я могу еще помочь?
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # script:
+            #     unset($session.moneyTransfer);
+            # final answer
+    
+
+        state: MoneyTransferOperator
+            a: Информацию по данному вопросу, вам предоставит специалист профильного отдела.
+            script:
+                $session.operatorPhoneNumber = $session.moneyTransfer.companyPhoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+            
+    
+    
+    state: Аналитика
+        intent!: /006 Аналитика
+        # a: Инфа по аналитике.
+        script:
+            $analytics.setMessageLabel("006 Аналитика", "Интенты");
+            $session.operatorPhoneNumber = '1000';
+            $reactions.transition("/Оператор/Оператор по номеру");
+            # final scenario
+            
+            
+    state: Отзыв
+        intent!: /039 Отзыв о работе
+        # a: Клиент хочет оставить отзыв.
+        script:
+            $analytics.setMessageLabel("039 Отзыв о работе", "Интенты");
+            $session.operatorPhoneNumber = '1000';
+            $reactions.transition("/Оператор/Оператор по номеру");
+            # final scenario
+            
+
+
+    state: Установка_ИТС
+        intent!: /011 Установка_ИТС
+
+        script:
+            $analytics.setMessageLabel("011 Установка_ИТС", "Интенты");
+            
+            if ( typeof $parseTree._ITS != "undefined" ){
+                $session.ITS = $parseTree._ITS;
+            }
+            if ( typeof $session.ITS == "undefined" ){
+                $reactions.transition("/Установка_ИТС/Уточнение ИТС");
+            } else {
+                $reactions.transition("/Установка_ИТС/Установка_ИТС_" + $session.ITS.name);
+            }
+        
+        state: Уточнение ИТС
+            a: Какую торговую систему вы хотели бы установить?
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @ITS *
+                script:
+                    $session.ITS = $parseTree._ITS;
+                    $reactions.transition("/Установка_ИТС");
+        
+        state: Установка_ИТС_Quik
+            a: Торговая система КВИК предназначена для установки на устройства с системой Windows. Терминал предоставляется бесплатно. 
+            a: Скачать торговую систему КВИК можно на сайте фина'м точка ру. Для этого, в верхней части страницы выберите раздел Инвестиции, далее выберите Торговые платформы, КВИК. 
+            a: Здесь вы можете скачать дистрибутив КВИК, генератор ключей Кей Ген, и инструкцию по его установке.
+            a: Чтобы продолжить настройки, убедитесь в доступности терминала по вашему брокерскому счету.
+            a: Если при открытии брокерского счета, вы не подключали терминал квик к счету, то вы можете подключить КВИК в личном кабинете, на сайте едо'кс точка фина'м точка ру, в разделе, 
+            a: Торговля, выберите пункт меню, информационно торговые системы, И Т эС, и подключите терминал к желаемому счету.
+            a: Для получения подробной иллюстрированной инструкции или обучающего видео, по установке и настройке КВИК, напишите нам в чате поддержки на сайте фина'м точка ру или в терминале фина'м трейд.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Установка_ИТС_Transaq
+            a: Торговые системы ТРАНЗАК или ТРАНЗА'К Ю ЭС, предназначены для установки на устройства с системой Windows.
+            a: Терминал предоставляется бесплатно. Скачать дистрибутив ТРАНЗАК или ТРАНЗА'К Ю ЭС, можно на сайте фина'м точка ру.
+            a: Для этого, в верхней части страницы выберите раздел Инвестиции, далее выберите Торговые платформы, система ТРАНЗА'К, и скачайте нужную версию.
+            a: Чтобы продолжить настройки, убедитесь в доступности терминала по вашему брокерскому счёту. При открытии нового брокерского счёта вы можете сразу выбрать терминал ТРАНЗАК.
+            a: А также, вы можете открыть доступ к системе ТРАНЗАК, для уже имеющегося счета, зайдите в личный кабинет на сайте едо'кс точка фина'м точка ру.
+            a: В разделе, торговля, выберите пункт меню, информационно торговые системы, И Т эС, и подключите терминал к желаемому счету. 
+            a: В работе с терминалом ТРАНЗА'К Ю ЭС, обращаем ваше внимание, что торговый сервер ТРАНЗА'К Ю ЭС запускается в 11 часов 30 минут по московскому времени, подключение до этого времени недоступно.
+            a: Обучающее видео по работе с терминалом ТРАНЗАК, вы можете запросить в чате поддержки на сайте фина'м точка ру или в терминале фина'м трейд.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Установка_ИТС_FT
+            a: Торговая система фина'м трейд не требует установки. Чтобы воспользоваться вэб версией терминала, зайдите в личный кабинет на сайте фина'м точка ру, далее перейдите в раздел, трейдинГ. 
+            a: Мобильное приложение, можно скачать на Android или АйОс в магазине на вашем устройстве, либо на сайте фина'м точка ру. Для этого, в верхней части страницы выберите раздел Инвестиции; далее выберите Торговые платформы; Мобильное приложение фина'м трейд.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Установка_ИТС_TrConnector
+            a: Установка терминала не требуется. Для подключения к серверу через сторонние системы достаточно подключенного счета. 
+            a: Зайдите в личный кабинет на сайте едо'кс точка фина'м точка ру. в разделе, торговля, выберите пункт меню, информационно торговые системы, И Т эС, и подключите желаемый счет. 
+            a: Доступ к системе бесплатный. После того, как вы подпишете заявление на подключение терминала, вам придет СМС с паролем от системы. 
+            a: Логин находится в личном кабинете на сайте едо'кс точка фина'м точка ру, выберите нужный счет, далее разверните раздел, торговые программы.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Установка_ИТС_MT5
+            a: Торговая система Meta Trader 5 предназначена для установки на устройства с системой Windows. Терминал предоставляется бесплатно. 
+            a: Скачать дистрибутив Meta Trader 5 можно на сайте фина'м точка ру. Для этого, в верхней части страницы выберите раздел Инвестиции; далее выберите Торговые платформы; MetaTrader 5. 
+            a: Также, подключить брокерский счет к терминалу Мета Трейдер 5, можно в личном кабинете на сайте едо'кс точка фина'м точка ру.
+            a: В разделе, Торговля, выберите пункт меню, информационно торговые системы, И Т эС, и подключите терминал к желаемому счету. 
+            a: К одному идентификатору, или ло'гину, можно подключить только один брокерский счет. Обращаем ваше внимание, что Договора с раздельными брокерскими счетами недоступны для подключения к Meta Trader 5.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Установка_ИТС_Интернет_банк
+            a: Скачать мобильное приложение Фина'м Банк можно в магазинах Google плэй и App Store. По умолчанию, логином от личного кабинета является номер телефона в международном формате.
+            a: Для России, номер начинается с цифры, 7. Пароль вы задавали самостоятельно, при открытии счёта или при изменении пароля в личном кабинете. А также, зайти в интернетбанк можно на сайте фина'м точка ру, в разделе банк, интернетбанк.
+            a: Чем я могу еще помочь? 
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        
+    
+    state: ИТС
+        intent!: /013 ИТС
+        script:
+            $analytics.setMessageLabel("013 ИТС", "Интенты");
+            
+        a: Фина'м предоставляет бесплатный доступ к нескольким торговым системам. Торговая система фина'м трейд представлена в виде веб-версии и мобильного приложения.
+        a: Программы для установки на персональный компьютер пользователя: ТРАНЗАК или ТРАНЗА'К ю эсс, квик, Meta Trader 5.
+        a: А также платное мобильное приложение КВИК ИКС или вэб КВИК за 420 рублей в месяц. Мобильное приложение для Meta Trader 5 не предоставляется.
+        a: Подключить стороннее программное обеспечение можно через ТРАНЗА'К Connector, Комо'н Trade API и квик.
+        a: Если вам интересно узнать подробнее, назовите тему, установка торговых систем или обучающие видео курсы по работе в торговых терминалах.
+ 
+        q: * @installation_its_u * ||toState = "/Установка_ИТС"
+        q: * @learning_ITS_u * ||toState = "/Обучение_ИТС"
+        q: * @choice_1 * ||toState = "/Установка_ИТС"
+        q: * @choice_2 * ||toState = "/Обучение_ИТС"
+        q: * @choice_last * ||toState = "/Обучение_ИТС"
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
+        
+    state: NLK
+        intent!: /012 NLK
+        
+        script:
+            $analytics.setMessageLabel("012 NLK", "Интенты");
+            
+            if ( typeof $parseTree._personalData != "undefined"){
+                $session.personalData = $parseTree._personalData;
+            }
+            if ( typeof $session.personalData == "undefined" ){
+                $reactions.transition("/NLK/Уточнение данных для замены");
+            } else {
+                $reactions.transition("/NLK/ЗаменаДанных_" + $session.personalData.name)
+            } 
+            
+        state: Уточнение данных для замены
+            a: Какие данные нужно заменить? Паспортные данные. Адрес регистрации. Номер телефона. Или электронную почту.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @personalData *
+                script:
+                    $session.personalData = $parseTree._personalData;
+                    $reactions.transition("/NLK");    
+    
+        state: ЗаменаДанных_passport
+            a: Подать поручение на смену паспортных данных, можно в офисе компании, или в личном кабинете на сайте фина'м точка ру.
+            a: Для этого авторизуйтесь в личном кабинете, далее в верхнем правом углу нажмите на иконку профиля, далее выберите, персональные данные, внизу страницы выберите, редактировать данные.
+            a: В зависимости от внесенных изменений, вам перезвонит менеджер поддержки фина'м, чтобы задать три контрольных вопроса, для подтверждения вашей личности.
+            a: Обращаем ваше внимание, для замены паспортных данных, нужно вкладывать копии полных страниц документа, подтверждающих смену данных. Копии должны хорошо читаться, не иметь бликов, посторонних надписей, или рисунков.
+            a: Чем я могу еще помочь?
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: ЗаменаДанных_registration
+            a: Подать поручение на смену адреса регистрации можно в офисе компании, или в личном кабинете на сайте фина'м точка ру.
+            a: Для этого авторизуйтесь в личном кабинете, далее в верхнем правом углу нажмите на иконку профиля, далее выберите, персональные данные, внизу страницы выберите, редактировать данные.
+            a: В зависимости от внесенных изменений, вам перезвонит менеджер поддержки фина'м, чтобы задать три контрольных вопроса, для подтверждения вашей личности.
+            a: Обращаем ваше внимание, для замены паспортных данных, нужно вкладывать копии полных страниц документа, подтверждающих смену данных. Копии должны хорошо читаться, не иметь бликов, посторонних надписей, или рисунков.
+            a: Чем я могу еще помочь?
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: ЗаменаДанных_phoneNumber
+            a: Подать поручение на смену или добавление номера телефона, можно в личном кабинете на сайте фина'м точка ру.
+            a: Для этого авторизуйтесь в личном кабинете, далее в верхнем правом углу нажмите на иконку профиля, далее выберите, персональные данные, внизу страницы выберите, редактировать данные.
+            a: У каждого пользователя должен быть уникальный номер телефона, одновременное использование одного номера для двух аккаунтов невозможно.
+            a: В зависимости от внесенных изменений, вам перезвонит менеджер поддержки фина'м, чтобы задать три контрольных вопроса, для подтверждения вашей личности.
+            a: Обращаем ваше внимание, что смс подпись, будет приходить только на один номер телефона. Выбрать номер для получения смс подписи можно в личном кабинете.
+            a: Для этого авторизуйтесь в личном кабинете на сайте фина'м точка ру, в верхнем правом углу нажмите на квадратный значок меню, и перейдите в личный кабинет. Далее в разделе Сервис, выберите раздел, СМС подпись.
+            a: Чем я могу еще помочь?
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: ЗаменаДанных_email
+            a: Подать поручение на смену или добавление адреса электронной почты, можно в личном кабинете на сайте фина'м точка ру.
+            a: Для этого авторизуйтесь в личном кабинете, далее в верхнем правом углу нажмите на иконку профиля, далее выберите, персональные данные, внизу страницы выберите, редактировать данные.
+            a: В зависимости от внесенных изменений, вам перезвонит менеджер поддержки фина'м, чтобы задать три контрольных вопроса, для подтверждения вашей личности.
+            a: Обращаем ваше внимание, что у каждого клиента должен быть свой уникальный адрес электронной почты, одновременное использование одного адреса для двух и более аккаунтов невозможно.
+            a: После подписания заявления, появится уведомление с просьбой подтвердить указанный адрес электронной почты.
+            a: Чем я могу еще помочь?
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: ЗаменаДанных_fullName
+            a: Подать поручение на смену фамилии, имени, отчества, и других паспортных данных, можно в офисе компании, или в личном кабинете на сайте фина'м точка ру.
+            a: Для этого авторизуйтесь в личном кабинете, далее в верхнем правом углу нажмите на иконку профиля, далее выберите, персональные данные, внизу страницы выберите, редактировать данные.
+            a: В зависимости от внесенных изменений, вам перезвонит менеджер поддержки фина'м, чтобы задать три контрольных вопроса, для подтверждения вашей личности.
+            a: Обращаем ваше внимание, для замены паспортных данных, нужно вкладывать копии полных страниц документа, подтверждающих смену данных.
+            a: Копии должны хорошо читаться, не иметь бликов, посторонних надписей, или рисунков. Если ваш вопрос касается отображения вашего ФИ'Оо в справке w 8 бэн, то нужно написать в поддержку, указав свое полное имя как в загран паспорте.
+            a: Чем я могу еще помочь?
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+    state: NLK_Номер счета
+        intent!: /012 NLK/NLK_Номер счета
+        
+        go!: /NLK_Номер счета/Ответ
+        
+        state: Ответ
+            a: Ваш текущий тарифный план, а так же номер счета, номер договора и торговый код  отображаются в личном кабинете, в разделе, Детали по счету.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            q: @repeat_please * ||toState = "."
+            # final answer
+        
+    
+    state: Авторизация
+        intent!: /015 Авторизация
+        
+        script:
+            if (typeof $parseTree._application != "undefined " ){
+                $session.application = $parseTree._application;
+            }
+            if ( typeof $parseTree._LK != "undefined" ){
+                $session.LK = $parseTree._LK;
+            }
+        
+        a: Ваш вопрос связан с логином и паролем, или с получением СМС кода?
+        
+        q: * @LoginPassword * ||toState = "/Авторизация_Логин и пароль"
+        q: * @SMS_delivery * ||toState = "/Авторизация_Не приходит СМС"
+        q: * @choice_1 * ||toState = "/Авторизация_Логин и пароль"
+        q: * @choice_2 * ||toState = "/Авторизация_Не приходит СМС"
+        q: * @choice_last * ||toState = "/Авторизация_Не приходит СМС"
+        q: @repeat_please * ||toState = "."
+        
+                
+    state: Авторизация_Логин и пароль
+        intent!: /015 Авторизация/Авторизация_Логин и пароль
+            
+        script:
+            
+            if ( typeof $parseTree._application != "undefined" ){
+                $session.application = $parseTree._application;
+            } if ( typeof $session.application == "undefined" ){
+                $reactions.transition("/Авторизация_Логин и пароль/Уточнение системы");
+            } else {
+                $reactions.transition("/Авторизация_Логин и пароль/" + $session.application.name);
+            }
+                    
+        state: Уточнение системы
+            a: В какой системе или на каком сайте вы хотите авторизоваться?
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @application *
+                script:
+                    $session.application = $parseTree._application;
+                    $reactions.transition("/Авторизация_Логин и пароль");
+                
+            state: LocalCatchAll
+                event: noMatch
+                a: Я не поняла вас. Уточните наименование системы или сайта где нужна авторизация?
+             
+                    
+        state: Quik
+            a: Чтобы зайти в торговую систему КВИК, после запуска системы, в появившемся диалоговом окне Идентификация пользователя, используйте логин и пароль, которые вы задали на этапе регистрации ключей для Квик в программе генераторе ключей, кей ген.
+            a: Для восстановления данных для входа, нужно сгенерировать новую пару ключей, в программе генераторе ключей, кей ген.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: QuikX
+            a: Подключить торговую систему веб квик к брокерскому счету, можно в личном кабинете старого дизайна на сайте едо'кс точка фина'м точка ру.
+            a: Для этого в разделе Торговля, выберите, информационно торговые системы, далее выберите, Подключение платных сервисов. Торговая система платная, 420 рублей в месяц.
+            a: Пароль к терминалу вы получите в СМС при подключении. Чтобы посмотреть Логин в личном кабинете. Нажмите на счет, по которому необходимо уточнить логин. Вы увидите список подключенных ко счету платформ.
+            a: Найдите в открывшемся списке идентификатор терминала квик. В квик икс используются те же логин и пароль, что и в веб квик. После того, как вы подклю'чите счет к терминалу, свяжитесь с менеджером Фина'м. Он поможет активировать квик икс.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Transaq
+            a: Чтобы зайти в торговую систему транзак, после запуска системы, в появившемся диалоговом окне Идентификация пользователя, используйте пароль, который приходил вам в смс при получении торговой системы.
+            a: Если сообщение было утеряно, восстановить пароль можно в личном кабинете, в разделе Торговля – Информационно торговые системы – Смена пароля на терминал. После первого входа нужно поменять пароль в настройках транзак.
+            a: Посмотреть логин можно в личном кабинете старого дизайна на сайте, едо'кс точка фина'м точка ру. Нажмите на счет, к которому нужен логин от транзак. Вы увидите список подключенных ко счету платформ. Найдите в нем идентификатор транзак.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: TransaqConnector
+            a: Подключить счет к транзак коннектор можно в личном кабинете старого дизайна, на сайте едо'кс точка фина'м точка ру, в разделе Торговля – Информационно торговые системы – Подключение счёта на терминал.
+            a: После того, как вы подпишите заявление на подключение терминала, вам придет СМС с паролем от системы.
+            a: Если сообщение утеряно, вы можете восстановить пароль в личном кабинете, в разделе Торговля – Информационно торговые системы – Смена пароля на терминал.
+            a: Логин находится в этом же личном кабинете. Нажмите на счет, к которому нужен логин от транзак коннектор. Вы увидите список подключенных ко счету платформ. Найдите в нем идентификатор транзак коннектор.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: FT
+            a: Чтобы зайти в терминал Фина'м трейд, авторизуйтесь в личный кабинет на сайте фина'м точка ру. далее выберите раздел, торговля. По умолчанию, логином является номер телефона в международном формате. Для России, номер начинается с цифры, 7.
+            a: Пароль вы задавали самостоятельно, при открытии счёта или при изменении пароля в личном кабинете. Если вы не помните учетные данные, то для восстановления доступа, под формой для ввода логина и пароля, нажмите кнопку, Забыли логин или пароль.
+            a: После выполнения инструкций сайта, на вашу электронную почту придет письмо с логином, и ссылкой на создание нового пароля.
+            a: Если у вас нет доступа к электронной почте и паспортным данным, обратитесь в ближайший офис компании. Если у вас нет доступа только к номеру телефона, обратитесь к менеджеру компании.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: MT4
+            script:
+                $session.operatorPhoneNumber = '3887';
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+                
+        state: MT5
+            a: Чтобы зайти в торговую систему мета трейдер 5, после запуска системы, используйте для входа пароль, который приходил в виде СМС после на получение торговой системы.
+            a: Если сообщение утеряно, вы можете восстановить пароль в личном кабинете, в разделе Торговля – Информационно торговые системы – Смена пароля на терминал.
+            a: Логин отображается в личном кабинете старого дизайна на сайте, едо'кс точка фин''ам точка ру.
+            a: Нажмите на счет, по которому необходимо уточнить логин. Вы увидите список подключенных к счету платформ. Найдите в открывшемся списке идентификатор терминала мета трейдер.
+            a: Идентификатор терминала является логином. К одному идентификатору может быть подключен только один брокерский счет.
+            a: Обращаем ваше внимание, что договор с раздельными брокерскими счетами, то есть моносчета'ми, недоступен для подключения к мета трейдер 5.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Comon
+            a: Чтобы зайти в личный кабинет сервиса Автоследования, зайдите на сайт комо'н точка ру. далее в верхнем правом углу нажмите, Вход. Для авторизации используйте логин и пароль от личного кабинета брокера Фина'м.
+            a: По умолчанию, логином от личного кабинета является номер телефона в международном формате. Для России, номер начинается с цифры, 7. Пароль вы задавали самостоятельно, при открытии счёта или при изменении пароля в личном кабинете.
+            a: Если вы не помните учетные данные, то для восстановления доступа, под формой для ввода логина и пароля, нажмите кнопку, Забыли логин или пароль.
+            a: После выполнения инструкций сайта, на вашу электронную почту придет письмо с логином, и ссылкой на создание нового пароля.
+            a: Если у вас нет доступа к электронной почте и паспортным данным, обратитесь в ближайший офис компании. Если у вас нет доступа только к номеру телефона, обратитесь к менеджеру компании.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: ComonTradeAPI
+            script:
+                $session.operatorPhoneNumber = '2222';
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: DMA
+            script:
+                $session.operatorPhoneNumber = '3024';
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: FinamRU
+            a: Чтобы авторизоваться на сайте фина'м точка ру, в верхнем правом углу выберите, вход. После регистрации на сайте фина'м точка ру, вам придет письмо с логином и паролем.
+            a: Для авторизации на сайте, также можно использовать номер телефона в международном формате, электронную почту, или данные от личного кабинета брокера фина'м. Восстановить пароль можно по номеру телефона или по электронной почте.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: FinamBonus
+            a: Чтобы зайти в личный кабинет Фина'м бонус, зайдите на сайт фина'м точка ру, в верхнем правом углу выберите, вход.
+            a: Если ранее вы не регистрировались на сайте фина'м тока ру, то на вашу электронную почту одновременно с письмом о регистрации в акции Фина'м бонус приходило письмо с логином и паролем от сайта.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Dist
+            script:
+                $session.operatorPhoneNumber = '2222';
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: InternetBank
+            a: Безопасно управлять счетами и картами онлайн можно в кабинете интернет-банка и в мобильном приложении. Зайти в интернетбанк можно на сайте фина'м точка ру. Для этого, в верхней части страницы сайта выберите раздел Банк; Частное или юридическое лицо; войти в интернетбанк.
+            a: Скачать мобильное приложение Фина'м Банка можно в магазинах Google плэй и App Store. По умолчанию, логином от личного кабинета является номер телефона в международном формате.
+            a: Для России, номер начинается с цифры, 7. Пароль вы задавали самостоятельно, при открытии счёта или при изменении пароля в личном кабинете.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: LK
+            go!: /Авторизация_Личный кабинет    
+        
+    # Логин и пароль - Личный кабинет
+    state: Авторизация_Личный кабинет
+        intent!: /015 Авторизация/Авторизация_Личный кабинет
+        
+        script:
+            if ( typeof $parseTree._LK != "undefined" ){
+                $session.LK = $parseTree._LK;
+            }
+            if ( typeof $session.LK == "undefined" ){
+                $reactions.transition("/Авторизация_Личный кабинет/Уточнение типа ЛК");
+            } else {
+                $reactions.transition("/Авторизация_Личный кабинет/Ответ_" + $session.LK.name);
+            } 
+        
+
+        state: Уточнение типа ЛК
+            a: В какой личный кабинет нужно зайти? Кабинет брокера; интернет-банк, кабинет агента, или форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @LK *
+                script:
+                    $session.LK = $parseTree._LK;
+                    $reactions.transition("/Авторизация_Личный кабинет");  
+
+            
+        state: Ответ_Брокер
+            a: Зайти в личный кабинет брокера фина'м, можно на сайте фина'м точка ру. в верхнем правом углу страницы сайта нажмите на квадратный значок меню, и перейдите в личный кабинет.
+            a: По умолчанию, логином от личного кабинета является номер телефона в международном формате. Для России, номер начинается с цифры, 7.
+            a: Пароль вы задавали самостоятельно, при открытии счёта или при изменении пароля в личном кабинете.
+            a: Некоторые услуги и сервисы временно доступны в старой версии личного кабинета с доменом едо'кс. Чтобы в него перейти, в личном кабинете выберите раздел, Помощь. Далее слева нажмите кнопку перейти в старый дизайн. 
+            a: Если вы не помните учетные данные, то для восстановления доступа, под формой для ввода логина и пароля, нажмите кнопку, Забыли логин или пароль.
+            a: После выполнения инструкций сайта, на вашу электронную почту придет письмо с логином, и ссылкой на создание нового пароля. Если у вас нет доступа к электронной почте и паспортным данным, обратитесь в ближайший офис компании.
+            a: Если у вас нет доступа только к номеру телефона, обратитесь к менеджеру компании.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Ответ_Агент
+            script:
+                $session.operatorPhoneNumber = '1000';
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Ответ_Банк
+            script:
+                $session.operatorPhoneNumber = '3888';
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: Ответ_ФФ
+            script:
+                $session.operatorPhoneNumber = '3887';
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+            
+    state: Авторизация_Не приходит СМС
+        intent!: /015 Авторизация/Авторизация_Не приходит СМС
+
+        go!: /Авторизация_Не приходит СМС/Общая информация
+
+                    
+        state: Общая информация
+            a: Если вам не пришел смс код, попробуйте перезагрузить устройство, сделать очистку СМС, переставить сим карту в другое устройство, проверить услугу черный список. 
+            a: Если Вы подписываете поручение в личном кабинете, проверьте смс-код в уведомлениях приложения фина'м трейд.
+            a: Вам удалось выполнить эти рекомендации?
+            
+            q: * @agree *  ||toState = "/Авторизация_Не приходит СМС/Перевод на оператора"
+            q: * @disagree * ||toState = "/Авторизация_Не приходит СМС/Повторить?"
+            # final answer
+            
+        state: Повторить?    
+            a: Хотите услышать рекомендации еще раз?
+            
+            q: @agree ||toState = "/Авторизация_Не приходит СМС/Общая информация"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+
+            
+        state: Перевод на оператора
+            script:
+                $session.operatorPhoneNumber = '1000';
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+            
+            
+    state: Автоследование 
+        intent!: /019 Автоследование
+        
+        script:
+            $analytics.setMessageLabel("019 Автоследование", "Интенты");
+    
+        a: Просьба уточнить, какая информация Вас интересует? Создание аккаунта, комиссии, синхронизация, или подключение и отключение счетов от стратегий?
+        
+        q: * @creating_account_comon_u * ||toState = "/Автоследование_Создание аккаунта"
+        q: * @comission_comon_u * ||toState = "/Автоследование_Комиссии"
+        q: * @synchronization * ||toState = "/Автоследование_Синхронизация"
+        q: * @open_comon_u * ||toState = "/Автоследование_Подключение стратегии"
+        q: * @close_comon_u * ||toState = "/Автоследование_Отключение стратегии"
+        q: * @choice_1 * ||toState = "/Автоследование_Создание аккаунта"
+        q: * @choice_2 * ||toState = "/Автоследование_Комиссии"
+        q: * @choice_3 * ||toState = "/Автоследование_Синхронизация"
+        q: * @choice_4 * ||toState = "/Автоследование_Подключение стратегии"
+        q: * @choice_last * ||toState = "/Автоследование_Отключение стратегии"
+        q: @repeat_please * ||toState = "."
+    
+    
+    state: Автоследование_Создание аккаунта
+        intent!: /019 Автоследование/Автоследование_Создание аккаунта
+        
+        go!: /Автоследование_Создание аккаунта/Ответ
+         
+        state: Ответ
+            a: Для использования сервиса Автоследование, необходимо зарегистрироваться и создать учетную запись на сайте комо'н точка ру, с помощью данных для входа в Личный кабинет брокера фина'м.
+            a: Обращаем ваше внимание, что договор с раздельными счетами по секциям, то есть, моносчета'ми, а также счета с установленными нестандартными настройками, недоступны для подключения сервиса.
+            a: Ознакомиться с Детальной информацией и правилами сервиса фина'м Автоследование, можно на сайте коммо'н точка ру в разделе, Правила.
+            a: Чем я могу еще помочь?
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+    state: Автоследование_Комиссии
+        intent!: /019 Автоследование/Автоследование_Комиссии
+        
+        go!: /Автоследование_Комиссии/Ответ
+        
+        state: Ответ
+            a: Чтобы узнать тариф по конкретной стратегии Автоследования, на сайте коммо'н точка ру выберите из списка интересующую вас стратегию. Далее откройте вкладку показатели, и нажмите на название тарифа.
+            a: Также, со стоимостью сервиса фина'м Автоследование, по каждому тарифу можно ознакомиться в разделе Правила.
+            a: Списание комиссии происходит ежедневно, и отображается в справке по счету, как, списание по пункту 16 регламента брокерского обслуживания.
+            a: Чем я могу еще помочь?
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+    state: Автоследование_Синхронизация
+        intent!: /019 Автоследование/Автоследование_Синхронизация
+        
+        go!: /Автоследование_Синхронизация/Ответ
+            
+        state: Ответ
+            a: Для синхронизации со стратегией автора, нужно авторизоваться на сайте коммо'н точка ру.  Далее нажать на значок персоны, в верхнем правом углу, и перейти в раздел, Мои подписки.
+            a: В этом разделе отображается информация о подключенных стратегиях. Далее нажмите на значок шестеренки, отобразится меню, синхронизировать портфель.
+            a: Рекомендуется также проставить галочки, чтобы при пополнении вашего торгового счета, автоматически наращивать позиции по стратегии автоследования, без подачи дополнительных команд.
+            a: Чем я могу еще помочь?
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+    state: Автоследование_Подключение стратегии
+        intent!: /019 Автоследование/Автоследование_Подключение стратегии
+        
+        go!: /Автоследование_Подключение стратегии/Ответ
+        
+        state: Ответ    
+            a: Подключить к сервису автоследование можно единый брокерский счет, открытый в фина'м. Для подключения стратегии, нужно авторизоваться на сайте коммо'н точка ру. 
+            a: Далее выбрать нужную стратегию, перейти на страницу с ее описанием, и нажать кнопку, подключить. Далее нужно установить синхронизацию, и подписать документы кодом из смс. 
+            a: В зависимости от стратегии, дополнительно может понадобиться пройти тест на инвестиционный профиль, пройти тестирование для неквалифицированных инвесторов, иметь статус квалифицированного инвестора, или статус клиента с повышенным уровнем риска. 
+            a: Обращаем ваше внимание, что не все стратегии подходят для счетов ИИС. А также, договор с раздельными счетами по секциям, то есть, моносчета'ми, а также счета с установленными нестандартными настройками, недоступны для подключения сервиса.
+            a: Ознакомиться с Детальной информацией и правилами сервиса фина'м Автоследование, можно на сайте коммо'н точка ру в разделе, Правила.
+            a: Чем я могу еще помочь?
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+    state: Автоследование_Отключение стратегии
+        intent!: /019 Автоследование/Автоследование_Отключение стратегии
+        
+        go!: /Автоследование_Отключение стратегии/Ответ
+        
+        state: Ответ    
+            a: Для отключения стратегии Автоследования, нужно авторизоваться на сайте коммо'н точка ру. Далее нажать на значок персоны в верхнем правом углу, и перейти в раздел, Мои подписки. 
+            a: Далее нужно выбрать стратегию и нажать на значок шестеренки, и выбрать, отключить автоследование. 
+            a: Если нужно также закрыть все позиции, то проставьте соответствующие галочки в открывшемся меню. Позиции будут закрыты во время активной торговой сессии на бирже. Если биржа закрыта, то подписка перейдет в статус удаления. 
+            a: Дальнейшие действия будут доступны только после закрытия позиций. Ознакомиться с Детальной информацией и правилами сервиса фина'м Автоследование, можно на сайте коммо'н точка ру в разделе, Правила. 
+            a: Чем я могу еще помочь?
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+    
+    state: Тарифы 
+        intent!: /020 Тарифы
+        
+        script:
+            $analytics.setMessageLabel("020 Тарифы", "Интенты");
+            
+            if ( typeof $parseTree._tarifs != "undefined"){
+                $session.tarifs = $parseTree._tarifs;
+                //$session.company = 'Брокер';
+            } if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            } if ( typeof $parseTree._rateInformationType != "undefined" ){
+                $session.rateInformationType = $parseTree._rateInformationType;
+            } if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Тарифы/Уточнение компании");
+            } else if ( typeof $session.rateInformationType == "undefined" ){
+                $reactions.transition("/Тарифы/Уточнение типа информации");
+            } else {
+                $reactions.transition("/Тарифы/" + $session.company.name + '_' + $session.rateInformationType.name);
+            }    
+            
+            # $response.replies = $response.replies || [];
+            #                 $response.replies.push({
+            #                     "type": "text",
+            #                     "text": JSON.stringify($parseTree)
+            #                 });
+            
+        state: Уточнение компании
+            a: Уточните, вас интересуют тарифы брокера? Тарифы банка, Управляющей компании, или Форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Тарифы");
+                    
+        state: Уточнение типа информации
+            a: Какая информация вас интересует? Смена тарифа, сравнение тарифов, или информация по тарифу?
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @rateInformationType *
+                script:
+                    $session.rateInformationType = $parseTree._rateInformationType;
+                    $reactions.transition("/Тарифы");            
+                
+        #Информация по Брокеру    
+        state: Брокер_AllRatesList
+            a: Ознакомиться с описанием тарифных планов можно на сайте Фина'м точка ру. Для этого в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Тарифы. 
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м. Регламент представлен на сайте фина'м точка ру. 
+            a: Чтобы открыть регламент, в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, документы и регламенты.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана. Списание комиссии происходит в 23 часа 59 минут по московскому времени.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+                
+        state: Брокер_ChoosingBestRate
+            a: Сравнить тарифы и выбрать лучший, можно на сайте Фина'м точка ру. Для этого в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Тарифы, Сравнение тарифов. 
+            a: Сравнительная таблица подробно отображает комиссии пяти наиболее популярных у клиентов Фина'м тарифов. Выбирая тариф, учитывайте количество, и объем сделок которые планируете совершать, а также стоимость обслуживания счета. 
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м.
+            a: Регламент представлен на сайте фина'м точка ру. Чтобы открыть регламент, в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, документы и регламенты.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Брокер_HowToChangeRate
+            a: Изменить тариф можно в личном кабинете, на сайте Фина'м точка ру. Выберите нужный счет, далее выберите раздел, Детали. Чтобы сменить тариф, кликните на текущий тариф по счету, и выберите новый из предложенного списка. 
+            a: Действие нового тарифа начинается, со следующего рабочего дня после подписания заявления на смену тарифа. Количество заявок на смену тарифа неограниченно. Действующим устанавливается тариф из последней подписанной заявки.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Брокер_ClientPersonalRate
+            a: Ваш текущий тарифный план отображается в личном кабинете, на сайте Фина'м точка ру. Просто выберите нужный счет, далее выберите, Детали, на открывшейся странице будет указан ваш тариф в строке, тарифный план. 
+            a: Обращаем ваше внимание, что по каждому счету тариф устанавливается отдельно.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Брокер_RateInformation
+            script:
+                if ( typeof $session.tarifs == 'undefined'){
+                    $reactions.transition("/Тарифы/ОпределениеТарифа");
+                }
+            go!: /Тарифы/Тариф_{{ $session.tarifs.name }}
+            
+        state: ОпределениеТарифа
+            a: Уточните, пожалуйста, какой тариф Вы подразумеваете?
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа от клиента
+                q: * @tarifs *
+                script:
+                    $session.tarifs = $parseTree._tarifs;
+                go!: /Тарифы/Тариф_{{ $session.tarifs.name }} 
+                
+        #Информация по Банку
+        state: Банк_AllRatesList
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+                
+        state: Банк_ChoosingBestRate
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+
+        state: Банк_HowToChangeRate
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+
+        state: Банк_ClientPersonalRate
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Банк_RateInformation
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+            
+        #Информация по Управляющей Компании
+        state: УК_AllRatesList
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: УК_ChoosingBestRate
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: УК_HowToChangeRate
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: УК_ClientPersonalRate
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+
+        state: УК_RateInformation
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+
+            
+        #Информация по Форекс    
+        state: Форекс_AllRatesList
+            a: Тарифный план при торговле через компанию Фина'м Форекс един для всех клиентов. Чтобы ознакомиться с условиями тарифа, на сайте Фина'м точка ру, зайдите в раздел, Форекс, далее выберите, Торговые условия.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+                
+        state: Форекс_ChoosingBestRate
+            a: Тарифный план при торговле через компанию Фина'м Форекс един для всех клиентов. Чтобы ознакомиться с условиями тарифа, на сайте Фина'м точка ру, зайдите в раздел, Форекс, далее выберите, Торговые условия.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Форекс_HowToChangeRate
+            a: Тарифный план при торговле через компанию Фина'м Форекс един для всех клиентов. Чтобы ознакомиться с условиями тарифа, на сайте Фина'м точка ру, зайдите в раздел, Форекс, далее выберите, Торговые условия.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Форекс_ClientPersonalRate
+            a: Тарифный план при торговле через компанию Фина'м Форекс един для всех клиентов. Чтобы ознакомиться с условиями тарифа, на сайте Фина'м точка ру, зайдите в раздел, Форекс, далее выберите, Торговые условия.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Форекс_RateInformation
+            a: Тарифный план при торговле через компанию Фина'м Форекс един для всех клиентов. Чтобы ознакомиться с условиями тарифа, на сайте Фина'м точка ру, зайдите в раздел, Форекс, далее выберите, Торговые условия.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+
+        #Информация по конкретному тарифу    
+        state: Тариф_Стратег
+            a: Абонентская плата в месяц, по тарифу, Стратег, 0 рублей. Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру.
+            a: Для этого в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Тарифы.
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м. Регламент представлен на сайте фина'м точка ру.
+            a: Чтобы открыть регламент, в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, документы и регламенты.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Тариф_Дневной
+            a: Абонентская плата в месяц, по тарифу, Дневной, 177 рублей. И 400 рублей, в случае если сумма чистых активов на счете менее 2х тысяч рублей. Комиссия за обслуживание уменьшается на сумму других уплаченных в текущем месяце брокерских комиссий.
+            a: Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру. Для этого в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Тарифы.
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м. Регламент представлен на сайте фина'м точка ру.
+            a: Чтобы открыть регламент, в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, документы и регламенты.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        # state: Тариф_ЕдиныйДневной
+        #     a: Информация по Тариф_ЕдиныйДневной
+        #     a: Чем я могу еще помочь?
+        #     q: @repeat_please * ||toState = "."
+        
+        state: Тариф_ЕдиныйКонсультационный
+            a: Тарифный план, Единый Консультационный, предполагает дополнительное информационное и консультационное обслуживание.
+            a: Абонентская плата в месяц, по тарифу, Единый Консультационный, 177 рублей. И 400 рублей, в случае если сумма чистых активов на счете менее 2х тысяч рублей.
+            a: Комиссия за обслуживание уменьшается на сумму других уплаченных в текущем месяце брокерских комиссий. Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру.
+            a: Для этого в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Тарифы.
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м. Регламент представлен на сайте фина'м точка ру.
+            a: Чтобы открыть регламент, в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, документы и регламенты.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Тариф_ЕдиныйТест-Драйв
+            a: При открытии своего первого брокерского счёта в Фина'м, вы можете подключить выгодный тариф с бесплатным обслуживанием, Тест Драйв, сроком на один месяц.
+            a: Через 30 дней с момента открытия счёта с тарифом, Тест Драйв, тариф автоматически сменится на другой, также без абонентской платы, тариф Стратег.
+            a: Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру. Для этого в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Тарифы.
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м. 
+            a: Регламент представлен на сайте фина'м точка ру. Чтобы открыть регламент, в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, документы и регламенты.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Тариф_ЕдиныйФиксированный
+            a: Тарифный план, Единый Фиксированный, предполагает пониженную ставку от торгового дневного оборота, и фиксированную комиссию, 3540 рублей, при совершении одной и более сделок в течение месяца.
+            a: Абонентская плата в месяц, по тарифу, Единый Фиксированный, 177 рублей. И 400 рублей, в случае если сумма чистых активов на счете менее 2х тысяч рублей.
+            a: Комиссия за обслуживание уменьшается на сумму других уплаченных в текущем месяце брокерских комиссий.
+            a: Полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м.
+            a: Регламент представлен на сайте фина'м точка ру. Чтобы открыть регламент, в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, документы и регламенты.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Тариф_Инвестор
+            a: Абонентская плата в месяц, по тарифу, Инвестор, 200 рублей. И 400 рублей, в случае если сумма чистых активов на счете менее 2х тысяч рублей. Комиссия за обслуживание уменьшается на сумму других уплаченных в текущем месяце брокерских комиссий.
+            a: Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру. Для этого в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Тарифы.
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м.
+            a: Регламент представлен на сайте фина'м точка ру. Чтобы открыть регламент, в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, документы и регламенты.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        # state: Тариф_Консультационный
+        #     a: Информация по  Тариф_Консультационный
+        #     a: Чем я могу еще помочь?
+        #     q: @repeat_please * ||toState = "."
+            
+        state: Тариф_СтандартныйФортс
+            a: Абонентская плата в месяц, по тарифу, Стандартный Фортс, 177 рублей. И 400 рублей, в случае если сумма чистых активов на счете менее 2х тысяч рублей.
+            a: Комиссия за обслуживание уменьшается на сумму других уплаченных в текущем месяце брокерских комиссий.
+            a: Полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м. Регламент представлен на сайте фина'м точка ру.
+            a: Чтобы открыть регламент, в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, документы и регламенты.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        # Тариф удален из сущности    
+        # state: Тариф_Тест-Драйв
+        #     a: Информация по  Тариф_Тест-Драйв
+        #     q: @repeat_please * ||toState = "."
+            
+        state: Тариф_ФриТрейд
+            a: При открытии своего первого брокерского счёта в Фина'м, вы можете подключить выгодный тариф с бесплатным обслуживанием, Фри Трейд, сроком на один месяц.
+            a: Через 30 дней с момента открытия счёта с Фри Трейд, тариф автоматически сменится на другой, также без абонентской платы, тариф Стратег.
+            a: Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру. Для этого в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Тарифы.
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м. Регламент представлен на сайте фина'м точка ру.
+            a: Чтобы открыть регламент, в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, документы и регламенты.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Тариф_ЕдиныйOptions
+            a: Абонентская плата в месяц, по тарифу, Единый Дневной Опшенс, 177 рублей. И 400 рублей, в случае если сумма чистых активов на счете менее 2х тысяч рублей.
+            a: Комиссия за обслуживание уменьшается на сумму других уплаченных в текущем месяце брокерских комиссий. При подключении тарифа на cчет, Сегрегированный Глобал, стоимость обслуживания составит 4,5 доллара США.
+            a: Ознакомиться с описанием тарифного плана можно на сайте Фина'м точка ру. Для этого в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Тарифы.
+            a: Также, полные условия тарифных планов можно изучить в Приложении номер 7, к Регламенту брокерского обслуживания Фина'м.
+            a: Регламент представлен на сайте фина'м точка ру. Чтобы открыть регламент, в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, документы и регламенты.
+            a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        # Тариф удален из сущности     
+        # state: Тариф_ФриТрейд2.0
+        #     a: Информация по Тариф_ФриТрейд2.0
+        #     q: @repeat_please * ||toState = "."
+
+    
+                
+    state: Налоговые вычеты
+        intent!: /021 Налоговые вычеты
+
+        script:
+            $analytics.setMessageLabel("021 Налоговые вычеты", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }            
+            if ( typeof $parseTree._deductionType != "undefined" ){
+                $session.deductionType = $parseTree._deductionType;
+            }
+            if ( typeof $parseTree._IISType != "undefined" ){
+                $session.IISType = $parseTree._IISType;
+            }            
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Налоговые вычеты/Уточнение компании");
+            }
+            if ( typeof $session.deductionType == "undefined" ){
+                $reactions.transition("/Налоговые вычеты/Уточнение типа вычета");
+            } else {
+                $reactions.transition("/Налоговые вычеты/" + $session.company.name + "_" + $session.deductionType.name);
+            }
+        
+        state: Уточнение компании
+            a: Вас интересует информация о налоговых вычетах по счетам брокера или по счетам в Управляющей компании.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Налоговые вычеты");
+                    
+        state: Уточнение типа вычета
+            a: Информация по какому типу налогового вычета вас интересует; Инвестиционный вычет по ИИС; Трёхгодичная льгота; Льгота по бумагам инновационного сектора; Пятилетняя льгота по операциям с эмитентом чьи активы состоят из недвижимости на территории эРэФ не более чем на 50%.
+           
+            q: * @choice_1 ||toState = "/Налоговые вычеты/Брокер_IISDeduction"
+            q: * @choice_2 ||toState = "/Налоговые вычеты/Брокер_3YearsBenefit"
+            q: * @choice_3 ||toState = "/Налоговые вычеты/Брокер_InnovationSector"
+            q: * @choice_4 ||toState = "/Налоговые вычеты/Брокер_50%Benefit"
+            q: * @choice_last ||toState = "/Налоговые вычеты/Брокер_50%Benefit"
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @deductionType *
+                script:
+                    $session.deductionType = $parseTree._deductionType;
+                    $reactions.transition("/Налоговые вычеты");                    
+        
+        state: Определение типа вычета по ИИС
+            a: Информация по какому типу вычета, вас интересует? Тип, А, или Бэ?
+            q: * @type_a_u * ||toState = "/Налоговые вычеты/Брокер_IISDeduction_TypeA"
+            q: * @type_b_u * ||toState = "/Налоговые вычеты/Брокер_IISDeduction_TypeB"
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @IISType *
+                script:
+                    $session.IISType = $parseTree._IISType;
+                    $reactions.transition("/Налоговые вычеты/" + $session.company.name + "_IISDeduction");                    
+                     
+            
+        #проверка на наличие информации по типу вычета ИИС
+        state: Брокер_IISDeduction
+            script:
+                if ( typeof $session.IISType == "undefined"){
+                    $reactions.transition("/Налоговые вычеты/Определение типа вычета по ИИС");
+                } else {
+                    $reactions.transition("/Налоговые вычеты/" + $session.company.name + "_IISDeduction_" + $session.IISType.name);
+                }
+                
+                
+        state: Брокер_IISDeduction_TypeA
+            a: Максимальная сумма для вычета по типу а, за календарный год составляет 400000 ₽. В зависимости от ставки налога на ваш доход, Государство вернет вам 13% или 15% от той суммы, которую вы внесли на ИИС в отчетном году. 
+            a: Таким образом, максимальная сумма налога, подлежащая возврату, составит до 52000 или до 60000 рублей соответственно. С 2020 года вычет по типу А, можно оформлять в упрощенном порядке. 
+            a: Скачать пакет документов для самостоятельной подачи, или подать заявку на получение вычета в упрощенном порядке, можно в личном кабинете на сайте, фина'м точка ру. 
+            a: Для этого зайдите в личный кабинет, далее выберите раздел, отчёты, далее выберите пункт меню, налоги и справки, далее выберите нужное.
+            a: Обращаем ваше внимание, что для подачи заявления в упрощенном порядке за 2021й год нужно обратиться к менеджеру.
+            a: Заявления будут отправлены до 25 февраля 2024 года, после размещения налоговой службой данных для заполнения в кабинете налогоплательщика. До момента отправки будет отображаться статус, Ожидает отправки в ФэНэ эС.
+            a: Если в личном кабинете налогоплательщика пришел отказ по упрощенной процедуре, а также при оформлении вычета, по стандартной процедуре за более ранние периоды, вам потребуется собрать следующие документы и обратиться в налоговую.
+            a: Справка 2 НДФЛ с места работы. Платежное поручение об отправке денежных средств на ИИС. Пакет документов об открытии счёта и брокерский отчет.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+                
+        state: Брокер_IISDeduction_TypeB  
+            a: Максимальная сумма для вычета по типу Бэ, равна доходу, полученному от торговых операций, учтенных на договоре ИИ'С, данная инвестиционная прибыль при вычете по типу Бэ, налогом не облагается. 
+            a: Чтобы оформить вычет по типу Бэ, можно подать заявку на получение вычета в упрощенном порядке, в личном кабинете на сайте, фина'м точка ру. 
+            a: Для этого зайдите в личный кабинет, далее выберите раздел, отчёты, далее выберите пункт меню, налоги и справки, далее выберите нужное. После подачи заявления в течение двух рабочих дней, ожидайте новый статус заявления, Принято к исполнению. 
+            a: После получение данного статуса, в течение 30 дней нужно вывести средства со счёта ИИС и закрыть счет ИИС. Доход, полученный на счете ИИС, не будет облагаться налогом.    
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Брокер_InnovationSector
+            a: Инвестор освобождается от уплаты 13% НДФЛ по операциям с ценными бумагами высокотехнологичного инновационного сектора. Актуальный перечень таких бумаг представлен на сайте московской биржи.
+            a: Условиями получения такой льготы являются приобретение бумаг не ранее включения эмитента в перечень, и их продажа до исключения из этого перечня.
+            a: И непрерывное владение бумагами более одного года. Льгота предоставляется брокером по запросу в отдел поддержки.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+                
+        state: Брокер_3YearsBenefit
+            a: Инвесторы могут не платить НДФЛ с дохода от продажи ценных бумаг, которыми владели более трех лет. Если у вас в портфеле, за исключением договора ИИС, есть бумаги, приобретенные после 1 января 2014 года.
+            a: И вы владеете ими непрерывно более трех лет, то вы можете претендовать на трех годичную льготу. 
+            a: Проверить наличие бумаг, попадающих под трех годичную льготу на счетах в Фина'м, а также подать заявление на ее предоставление, можно в личном кабинете брокера на сайте, едо'кс точка Фина'м точка ру.
+            a: Для этого выберите меню, Услуги, далее выберите раздел, Налоги, выписки, справки, в поле меню налоги, выберите нужное. 
+            a: Заявление на получение льготы нужно подписать до вывода средств от продажи ценных бумаг. Оно действует в течение одного календарного года.
+            a: Обращаем ваше внимание, если бумаги были приобретены через другого брокера, или получены в дар, и по ним отсутствует возможность подачи заявления в личном кабинете, то для оформления льготы нужно обратиться в налоговую.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Брокер_50%Benefit
+            a: Инвестор освобождается от уплаты 13% НДФЛ по операциям с акциями российских и иностранных организаций, если активы эмитента состоят из недвижимости на территории РФ не более чем на 50%.
+            a: Условиями получения льготы являются непрерывное владение бумагами более 5 лет и отсутствие сделок займа или РЭ'ПО.
+            a: А также необходима справка от эмитента, что на последний день месяца предшествующего месяцу продажи ЦБ, активы эмитента состояли из недвижимости на территории эРэФ не более чем на 50%. отсутствуют.
+            a: Воспользоваться льготой можно через Фина'м, до 31 января года, следующего за годом продажи бумаг. Через ИФНС обращаться можно в течение трёх лет, следующих за отчетным периодом, в котором произошла реализация бумаг.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        #Информация по УК
+        state: УК_IISDeduction
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: УК_IISDeduction_TypeA
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: УК_IISDeduction_TypeB
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: УК_InnovationSector
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: УК_3YearsBenefit
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+
+ 
+    state: ИИС  
+        intent!: /022 ИИС
+        script:
+            $analytics.setMessageLabel("022 ИИС", "Интенты");
+        
+        a: На индивидуальных инвестиционных счетах, инвесторам доступны операции с российскими ценными бумагами на Московской и СПБ Бирже; На Московской бирже также доступны такие инструменты как облигации, паи инвестиционных фондов, фьючерсы, опционы, и валюты.
+        a: Какая информация по ИИС вас интересует? Дата открытия ИИС. Пополнение. Перевод ИИС от брокера к брокеру, или статус налогового вычета.
+            
+        q: * @IIS_OpeningDate * ||toState = "/ИИС_Дата открытия"
+        q: * @IIS_Replenishment * ||toState = "/ИИС_Пополнение"
+        q: * @IIS_Transfer * ||toState = "/ИИС_Перевод"
+        q: * @IIS_Status_u * ||toState = "/ИИС_Статус вычета"
+        q: * @IIS_Open * ||toState = "/ИИС_Открытие_закрытие/Ответ_Открытие"
+        q: * @IIS_Close * ||toState = "/ИИС_Открытие_закрытие/Ответ_Закрытие"
+        q: * @choice_1 * ||toState = "/ИИС_Дата открытия"
+        q: * @choice_2 * ||toState = "/ИИС_Пополнение"
+        q: * @choice_3 * ||toState = "/ИИС_Перевод"
+        q: * @choice_4 * ||toState = "/ИИС_Статус вычета"
+        # # choice 5 открытие закрытие?
+        q: * @choice_last * ||toState = "/ИИС_Статус вычета"
+        q: @repeat_please * ||toState = "."
+               
+        
+    state: ИИС_Дата открытия
+        intent!: /022 ИИС/ИИС_Дата открытия
+        
+        script:
+            $analytics.setMessageLabel("ИИС_Дата открытия", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/ИИС_Дата открытия/Уточнение компании");
+            } else {
+                $reactions.transition("/ИИС_Дата открытия/Ответ_" + $session.company.name);
+            } 
+        
+
+        state: Уточнение компании
+            a: Вас интересует Информация по счету ИИС, в брокерской? или в Управляющей компании.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/ИИС_Дата открытия");  
+        
+        state: Ответ_Брокер
+            a: Перечень действующих счетов доступен в личном кабинете на сайте, фина'м точка ру. Проверить дату открытия договора ИИС, и актуальный тариф, можно в личном кабинете, для этого выберите счет с названием КЛФ ИИС, далее выберите раздел, детали.
+            a: Если счет ИИС переведен от другого брокера, первичную дату открытия можно уточнить у менеджера фина'м, или в личном кабинете брокера на сайте, едо'кс точка Фина'м точка ру, кликнув на счет с названием КЛФ ИИС. 
+            a: Историю пополнения договора ИИС, вы можете посмотреть в истории операций по счету в личном кабинете на сайте, фина'м точка ру. для этого рядом с разделом портфель, выберите вкладку история.
+            a: Также посмотреть историю пополнения договора ИИС, можно в справке по счету. Заказать справку по брокерскому счету, можно в личном кабинете на сайте, фина'м точка ру, для этого выберите меню отчёты, далее выберите раздел, налоги и справки.
+            a: Максимальный интервал получения справки по счету, 92 дня. При необходимости получить годовой отчет, справку можно сформировать 4 раза. Или запросить заверенный брокерский отчет у менеджера фина'м.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+    
+    state: ИИС_Пополнение
+        intent!: /022 ИИС/ИИС_Пополнение
+        
+        script:
+            $analytics.setMessageLabel("ИИС_Пополнение", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/ИИС_Пополнение/Уточнение компании");
+            } else {
+                $reactions.transition("/ИИС_Пополнение/Ответ_" + $session.company.name);
+            } 
+        
+        # Можно вынести отдельно чтобы не дублировать в каждом интенте
+        state: Уточнение компании
+            a: Вас интересует Информация по счету ИИС, в брокерской? или в Управляющей компании.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/ИИС_Пополнение");  
+        
+        state: Ответ_Брокер
+            # a: В преддверии новогодних праздников, рекомендуем пополнять счет ИИС заблаговременно, учитывая срок зачисления средств. Последний день зачисления средств в 2023 году - 29 декабря.
+            # a: Обращаем ваше внимание, что пополнение по реквизитам, занимает до 3х рабочих дней. Если у вас осталось менее трех дней для пополнения счета, то рекомендуем выбрать другие способы; например, системой быстрых платежей, или наличными, в офисе фина'м.
+            a: Пополнять счет ИИС можно только в валюте рубль РФ, на сумму не более 1000000 рублей в год, отправителем средств на ИИС должен являться владелец этого счета.
+            a: Рекомендуем пополнять счет ИИС наличными в кассе, безналичным платежом по реквизитам или через систему быстрых платежей.
+            a: При оформлении вычета, налоговая имеет право запросить платежное поручение с подтверждением внесения средств на ИИС.
+            a: Чтобы пополнить счет ИИС по реквизитам, в личном кабинете на сайте, фина'м точка ру, выберите вкладку, пополнение, далее выберите, переводом из другого банка. Под суммой пополнения выберите способ, по реквизитам. Деньги поступят в течение дня.
+            a: Срок может быть увеличен до трех рабочих дней, в зависимости от исполнения платежа банком-отправителем. За данную операцию, фина'м не взимает комиссию. 
+            a: Однако возможна комиссия со стороны банка-отправителя. Через кассу представительства фина'м, можно пополнить ИИС наличными средствами, без комиссии. Для этого вам понадобится действующий паспорт гражданина Российской Федерации.
+            a: Адрес ближайшего офиса можно посмотреть на сайте Фина'м точка ру, в разделе контактная информация, внизу страницы.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+    
+    state: ИИС_Перевод
+        intent!: /022 ИИС/ИИС_Перевод
+        
+        script:
+            $analytics.setMessageLabel("ИИС_Перевод", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/ИИС_Перевод/Уточнение компании");
+            } else {
+                $reactions.transition("/ИИС_Перевод/Ответ_" + $session.company.name);
+            } 
+        
+        # Можно вынести отдельно чтобы не дублировать в каждом интенте
+        state: Уточнение компании
+            a: Вас интересует Информация по счету ИИС, в брокерской? или в Управляющей компании.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/ИИС_Перевод");  
+        
+        state: Ответ_Брокер
+            # a: 222
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+                
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+                
+        
+    state: ИИС_Статус вычета
+        intent!: /022 ИИС/ИИС_Статус вычета
+        
+        script:
+            $analytics.setMessageLabel("ИИС_Статус вычета", "Интенты");
+                        
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/ИИС_Статус вычета/Уточнение компании");
+            } else {
+                $reactions.transition("/ИИС_Статус вычета/Ответ_" + $session.company.name);
+            } 
+        
+        # Можно вынести отдельно чтобы не дублировать в каждом интенте
+        state: Уточнение компании
+            a: Вас интересует Информация по счету ИИС, в брокерской? или в Управляющей компании.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/ИИС_Статус вычета");  
+        
+        state: Ответ_Брокер
+            # a: 111
+            a: Статус отправки сведений в ФНС, по упрощенному порядку для получения вычета типа А, можно отслеживать в личном кабинете на сайте, фина'м точка ру.
+            a: Для этого выберите раздел, отчёты, далее выберите пункт меню, налоги и справки, далее выберите, Упрощенный порядок получения вычета.
+            a: Если заявление принято в работу, то федеральная налоговая служба сформирует для вас предсоставленное заявление, которое необходимо подписать в личном кабинете налогоплательщика. Срок камеральной проверки после подписания декларации, один месяц. 
+            a: Статус отправки сведений в ФНС, по упрощенному порядку для получения вычета типа Б, можно отслеживать в личном кабинете на сайте, фина'м точка ру, для этого выберите меню, отчёты, далее выберите раздел, документы, журнал поручений.
+            a: Если заявление было принято, и подтверждено федеральной налоговой службой, то в течение 30 дней, нужно вывести средства и закрыть счет ИИС. Доход, полученный на счете ИИС, не будет облагаться налогом.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+    
+            
+    state: ИИС_Открытие_закрытие
+        intent!: /022 ИИС/ИИС_Открытие_закрытие
+        
+        script:
+            $analytics.setMessageLabel("ИИС_Открытие_закрытие", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $parseTree._IIS_Open != "undefined" ){
+                $reactions.transition("/ИИС_Открытие_закрытие/Ответ_Открытие");
+            }            
+            if ( typeof $parseTree._IIS_Close != "undefined" ){
+                $reactions.transition("/ИИС_Открытие_закрытие/Ответ_Закрытие");
+            }
+
+        
+        state: Уточнение компании
+            a: Вас интересует Информация по счету ИИС, в брокерской? или в Управляющей компании.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/ИИС_Открытие_закрытие/Ответ_" + $session.open_close);  
+        
+        state: Ответ_Открытие
+            script:
+                if ( typeof $session.company == "undefined" ){
+                    $session.open_close = 'Открытие'; 
+                    $reactions.transition("/ИИС_Открытие_закрытие/Уточнение компании");
+                } else {
+                    var phoneNumber = $session.company.phoneNumber;
+                    var companyName = $session.company.name;
+                    $session = {};
+                    $session.operatorPhoneNumber = phoneNumber;
+                    $reactions.transition("/ИИС_Открытие_закрытие/Ответ_Открытие/" + companyName);
+                }
+                    
+            state: Брокер        
+                a: Совершеннолетние граждане РФ могут открыть счет ИИС в компании фина'м, как дистанционно, так и в офисе компании. С 1 января 2024 года доступно открытие до трех счетов нового типа ИИС.
+                a: Важно обратить внимание, что поправки о налоговом вычете для нового типа ИИС, еще не были приняты в налоговом кодексе эРэФ; поэтому для получения налогового вычета, счет ИИС у физического лица может быть только один.
+                a: Дистанционно подать заявку на открытие счета, можно на сайте, фина'м точка ру. Желтая кнопка, открыть счет, находится в верхнем правом углу страницы. А также подать заявку на открытие ИИС можно в личном кабинете. Для заполнения анкеты понадобится мобильный телефон, и гражданский паспорт.
+                a: Хотите получить консультацию у оператора по открытию брокерского счёта?
+                # script: 
+                #     $context.session = {};
+                q: @agree ||toState = "/Оператор/Оператор по номеру"    
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+                
+            state: УК
+                script:
+                    # $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                    $reactions.transition("/Оператор/Оператор по номеру");
+                    # final scenario
+
+        state: Ответ_Закрытие
+            script:
+                if ( typeof $session.company == "undefined" ){
+                    $session.open_close = 'Закрытие';
+                    $reactions.transition("/ИИС_Открытие_закрытие/Уточнение компании");
+                } else {
+                    var phoneNumber = $session.company.phoneNumber;
+                    var companyName = $session.company.name;
+                    $session = {};
+                    $session.operatorPhoneNumber = phoneNumber;
+                    $reactions.transition("/ИИС_Открытие_закрытие/Ответ_Закрытие/" + companyName);
+                }
+                    
+            state: Брокер
+                a: Способ закрытия счёта ИИС зависит от желаемого типа налогового вычета. Хотите получить консультацию у оператора?
+                # script: 
+                #     $context.session = {};
+                q: @agree ||toState = "/Оператор/Оператор по номеру"    
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+                
+            state: УК
+                script:
+                    # $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                    $reactions.transition("/Оператор/Оператор по номеру");
+                    # final scenario
+                    
+    state: ИИС 3
+        intent!: /048 ИИС 3
+        
+        a: Согласно федеральному закону от 19 декабря 2023 года номер 600 ФэЗэ, ИИС нового типа работает с 1 января 2024 года; Сопутствующие поправки в Налоговый кодекс эРэФ прошли первое чтение Госдумы, но еще не приняты законодательно.
+        a: Расскажу про отличия нового типа ИИС от старого. Инвестор сможет открывать и владеть тремя ИИС нового типа одновременно. При этом, счет ИИС, открытый до 31 декабря 2023 года по-прежнему можно иметь только один.
+        a: Если у инвестора уже есть счет ИИС старого образца, открытый до 31 декабря 2023 года, то при желании дополнительно открыть ИИС нового образца, нужно будет трансформировать старый тип ИИС в новый, обратившись в отдел поддержки.
+        a: При трансформации срок владения ИИС будет считаться с момента открытия, но не более трех лет. Открытые с 2024 года ИИС, нельзя будет закрыть раньше, чем через 5 лет, при этом каждый последующий год минимальный срок владения будет увеличиваться и к 2031 году составит 10 лет.
+        a: В то время как для счетов открытых до 31 декабря 2023 года, доступно пополнение до 1000000 рублей в год, у ИИС нового типа нет ограничений на сумму пополнения. К ИИС, открытым до 31 декабря 2023 года, можно применить один налоговый вычет на выбор;
+        a: по ИИС третьего типа можно будет получать обе льготы сразу, при этом по льготе в размере финансового результата (тип Б) максимальный лимит составит 30000000 рублей.  Вывести деньги с нового счета ИИС досрочно, можно будет чтобы оплатить дорогостоящее лечение.
+        a: Чем я могу еще помочь?
+        script: 
+            $context.session = {};
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
+        
+        
+    
+    state: Маржинальная торговля
+        intent!: /024 Маржинальная торговля
+        script:
+            $analytics.setMessageLabel("024 Маржинальная торговля", "Интенты");
+        
+        # a: Обращаем ваше внимание! В ближайшее время ставки риска по ценным бумагам на иностранных биржах, и валютам, будут повышаться в связи с требованием рыночной конъектуры.
+        a: Какая информация по маржинальной торговле Вас интересует? Открытие маржинальной позиции, отключение или подключение маржинальной торговли, где посмотреть уровень маржи' по счету, уровни риска КПУР, КСУР, или ставки риска по инструментам?
+        
+        q: * @open_margin * ||toState = "/Маржинальная торговля_открытие позиции"
+        q: * @open_close_margin * ||toState = "/Маржинальная торговля_подключение|отключение"
+        q: * @level_margin * ||toState = "/Маржинальная торговля_уровень маржи"
+        q: * @KPUR_KSUR * ||toState = "/Маржинальная торговля_КПУР|КСУР"
+        q: * @risk_rate * ||toState = "/Маржинальная торговля_ставка риска"
+        q: * @choice_1 * ||toState = "/Маржинальная торговля_открытие позиции"
+        q: * @choice_2 * ||toState = "/Маржинальная торговля_подключение|отключение"
+        q: * @choice_3 * ||toState = "/Маржинальная торговля_уровень маржи"
+        q: * @choice_4 * ||toState = "/Маржинальная торговля_КПУР|КСУР"
+        q: * @choice_5 * ||toState = "/Маржинальная торговля_ставка риска"
+        q: * @choice_last * ||toState = "/Маржинальная торговля_ставка риска"
+        q: @repeat_please * ||toState = "."
+        
+    
+    state: Маржинальная торговля_открытие позиции
+        intent!: /024 Маржинальная торговля/Маржинальная торговля_открытие позиции
+        
+        script:
+            $analytics.setMessageLabel("Маржинальная торговля_открытие позиции", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Маржинальная торговля_открытие позиции/Уточнение компании");
+            } else {
+                $reactions.transition("/Маржинальная торговля_открытие позиции/Ответ_" + $session.company.name);
+            } 
+        
+        # Можно вынести отдельно чтобы не дублировать в каждом интенте
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Фина'м Брокер или Фина'м Форекс?
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Маржинальная торговля_открытие позиции");  
+
+            
+        state: Ответ_Брокер
+            a: Для открытия маржинальной позиции нужно подключить возможность маржинальной торговли по счету. Чтобы подключить маржинальную торговлю авторизуйтесь в личном кабинете на сайте, едо'кс точка фина'м точка ру.
+            a: Далее в разделе, Торговля, выберите, тестирование для неквалифицированного инвестора по категории Необеспеченные сделки.
+            a: Для квалифицированных инвесторов доступ предоставляется автоматически. Обращаем ваше внимание, что маржинальная торговля может быть ограничена по ряду инструментов. Например, на Гонконгской бирже маржинальная торговля не доступна.
+            a: Ознакомиться со списком доступных инструментов для длинных и коротких позиций, а также ставками риска, можно на сайте фина'м точка ру. В верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, и в выпадающем меню выберите пункт Список маржинальных бумаг.
+            a: Ставки риска могут отличаться на сайте и в торговых системах в зависимости от рыночной ситуации. Самую актуальную информацию по ставкам риска можно узнать в торговой системе Транза'к в Описании инструмента, а также у менеджера Фина'м.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+    state: Маржинальная торговля_подключение|отключение
+        intent!: /024 Маржинальная торговля/Маржинальная торговля_подключение|отключение
+        
+        script:
+            $analytics.setMessageLabel("Маржинальная торговля_подключение|отключение", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Маржинальная торговля_подключение|отключение/Уточнение компании");
+            } else {
+                $reactions.transition("/Маржинальная торговля_подключение|отключение/Ответ_" + $session.company.name);
+            }
+        
+        state: Уточнение компании
+            a: Уточните, ваш вопрос по счетам брокера, Или по счетам форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Маржинальная торговля_подключение|отключение");     
+        
+        state: Ответ_Брокер
+            a: Маржинальная торговля или необеспеченные сделки, это операции с использованием заемных средств брокера, которые одновременно повышают потенциальный риск и потенциальную доходность операции.
+            a: Чтобы подключить маржинальную торговлю, нужно пройти тестирование для неквалифицированного инвестора по категории Необеспеченные сделки. Это можно сделать в личном кабинете на сайте фина'м точка ру.
+            a: Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус.
+            a: Далее выберите, пройти тестирование. Для квалифицированных инвесторов доступ предоставляется автоматически. Чтобы отключить маржинальную торговлю обратитесь к менеджеру фина'м.
+            a: После отключения будет заблокирована возможность использования заемных средств брокера по счету, а также доступ к коротким позициям. Узнать, подключена ли у вас маржинальная торговля можно у менеджера.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        
+    state: Маржинальная торговля_уровень маржи
+        intent!: /024 Маржинальная торговля/Маржинальная торговля_уровень маржи
+        
+        script:
+            $analytics.setMessageLabel("Маржинальная торговля_уровень маржи", "Интенты");
+             
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Маржинальная торговля_уровень маржи/Уточнение компании");
+            } else {
+                $reactions.transition("/Маржинальная торговля_уровень маржи/Ответ_" + $session.company.name);
+            }
+        
+        state: Уточнение компании
+            a: Уточните, ваш вопрос по счетам брокера, Или по счетам форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Маржинальная торговля_уровень маржи");    
+
+        state: Ответ_Брокер
+            a: Информацию о состоянии портфеля, значениях маржи и запасе портфеля до принудительного закрытия можно посмотреть в личном кабинете на сайте фина'м точка ру.
+            a: Для этого выберите нужный счет, в разделе, детали по счету, раскройте строку, показатели риска.
+            a: В терминале фина'м трейд, начальные требования, суммарную оценку денежных средств, ценных бумаг и обязательств, можно посмотреть в разделе, Аналитика по счету. в мобильном приложении фина'м трейд, в разделе, Детали по счету.
+            a: В терминале КВИК, следить за маржинальными требованиями можно с помощью таблицы, Клиентский портфель. Для этого выберите на панели инструментов, Создать окно, Все типы окон, Клиентский портфель.
+            a: В терминале Meta Trader 5, в строке Баланс, показатели Активы Маржа' Уровень маржи' и другие, будут отображаться только при открытых позициях на фондовой и валютной секциях.
+            a: В случае, если торговля ведется только по фьючерсным контрактам, то за показателями риска можно следить через личный кабинет.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        
+    state: Маржинальная торговля_КПУР|КСУР
+        intent!: /024 Маржинальная торговля/Маржинальная торговля_КПУР|КСУР
+        
+        script:
+            $analytics.setMessageLabel("Маржинальная торговля_КПУР|КСУР", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Маржинальная торговля_КПУР|КСУР/Уточнение компании");
+            } else {
+                $reactions.transition("/Маржинальная торговля_КПУР|КСУР/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: Уточните, ваш вопрос по счетам брокера, Или по счетам форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Маржинальная торговля_КПУР|КСУР");    
+        
+
+        state: Ответ_Брокер
+            a: При открытии брокерского счёта, инвестору по умолчанию присваивается стандартный уровень риска, или КСУР. Уровни риска влияют на величину кредитного плеча, которое будет доступно при подключении маржинальной торговли.
+            a: Инвестор может получить категорию повышенного уровня риска, или КПУР, если сумма его активов на его брокерских счетах не менее трех миллионов рублей.
+            a: Либо, сумма активов более 600000 рублей, и он является клиентом брокера в течение последних 180 дней и заключал сделки с ценными бумагами или производными финансовыми инструментами на протяжении пяти и более дней.
+            a: Для КПУР применяются ставки маржинального обеспечения ниже, чем для КСУР. Таким образом, статус клиента с повышенным уровнем риска дает больше возможностей для наращивания маржинальных позиций, или размера плеча, но и повышает финансовые риски.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        
+    state: Маржинальная торговля_ставка риска
+        intent!: /024 Маржинальная торговля/Маржинальная торговля_ставка риска
+        
+        script:
+            $analytics.setMessageLabel("Маржинальная торговля_ставка риска", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Маржинальная торговля_ставка риска/Уточнение компании");
+            } else {
+                $reactions.transition("/Маржинальная торговля_ставка риска/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: Уточните, ваш вопрос по счетам брокера, Или по счетам форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Маржинальная торговля_ставка риска");
+        
+
+        state: Ответ_Брокер
+            a: Ознакомиться со списком доступных инструментов для длинных и коротких позиций, а также ставками риска, можно на сайте фина'м точка ру.
+            a: В верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, и в выпадающем меню выберите пункт Список маржинальных бумаг.
+            a: Ставки риска могут отличаться на сайте и в торговых системах в зависимости от рыночной ситуации. Самую актуальную информацию по ставкам можно узнать в торговой системе Транза'к в Описании инструмента, а также у менеджера Фина'м.
+            # a: Обращаем ваше внимание! В ближайшее время ставки риска по ценным бумагам на иностранных биржах, и валютам, будут повышаться в связи с требованием рыночной конъектуры.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+    
+    
+    
+    state: Срочный рынок  
+        intent!: /026 Срочный рынок
+        script:
+            $analytics.setMessageLabel("026 Срочный рынок", "Интенты");
+        
+        a: Какая информация о торговле на срочном рынке Вас интересует? Как узнать гарантийное обеспечение? как уменьшить гарантийное обеспечение? Как посмотреть свой финансовый результат? Узнать подробнее о торговле фьючерсами.
+        
+        q: * @which_GO * ||toState = "/Срочный рынок_гарантийное обеспечение по счету"
+        q: * @what_profit_loss * ||toState = "/Срочный рынок_прибыль|убыток по счету"
+        q: * @lower_GO * ||toState = "/Срочный рынок_уменьшение гарантийного обеспечения"
+        q: * @futures_trading * ||toState = "/Срочный рынок_покупка|продажа фьючерса"
+        q: * @choice_1 * ||toState = "/Срочный рынок_гарантийное обеспечение по счету"
+        q: * @choice_2 * ||toState = "/Срочный рынок_уменьшение гарантийного обеспечения"
+        q: * @choice_3 * ||toState = "/Срочный рынок_прибыль|убыток по счету"
+        q: * @choice_4 * ||toState = "/Срочный рынок_покупка|продажа фьючерса"
+        q: * @choice_last * ||toState = "/Срочный рынок_покупка|продажа фьючерса"
+        q: @repeat_please * ||toState = "."
+        
+        
+    state: Срочный рынок_гарантийное обеспечение по счету
+        intent!: /026 Срочный рынок/Срочный рынок_гарантийное обеспечение по счету
+        script:
+            $analytics.setMessageLabel("Срочный рынок_гарантийное обеспечение по счету", "Интенты");
+        
+        go!: /Срочный рынок_гарантийное обеспечение по счету/Ответ_Брокер
+        
+        state: Ответ_Брокер
+            a: При открытии позиции по фьючерсу, на счете блокируется гарантийное обеспечение, или ГэО'. При закрытии позиции, заблокированные средства освобождаются.
+            a: Проверить актуальное ГэО' по счету можно в системе Транза'к в информации по инструменту, либо уточнить у менеджера. Величина ГэО' устанавливается биржей и публикуется на сайте мо'екс точка ком.
+            a: По единым брокерским счетам, Размер гарантийного обеспечения формируется на основании ставок риска по инструментам, и категории риска клиента, КСУР или КПУР.
+            a: По умолчанию для счетов со статусом КСУР, ГэО' почти в два раза больше биржевого, в связи с действующими требованиями к риск-менеджменту.
+            a: При выставлении рыночной заявки гарантийное обеспечение увеличивается в 1,5 раза. Рекомендуется использовать лимитные заявки.
+            a: Хотите узнать способы, как уменьшить гарантийное обеспечение?
+            script:
+                $context.session = {};
+            q: @agree ||toState = "/Срочный рынок_уменьшение гарантийного обеспечения"
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            q: @repeat_please * ||toState = "."
+            # final answer
+        
+    
+    state: Срочный рынок_прибыль|убыток по счету
+        intent!: /026 Срочный рынок/Срочный рынок_прибыль|убыток по счету
+        script:
+            $analytics.setMessageLabel("Срочный рынок_прибыль|убыток по счету", "Интенты");
+        
+        go!: /Срочный рынок_прибыль|убыток по счету/Ответ_Брокер
+        
+        state: Ответ_Брокер
+            a: Прибыль или убыток по фьючерсам и опционам, зачисляется или списывается в виде вариационной маржи'. Позиционная вариационная маржа' начисляется на контракты, которые есть в портфеле на утро.
+            a: Посделочная вариационная маржа' начисляется в день открытия позиции по фьючерсу или опциону. На следующий день, и до момента закрытия позиции начисляется позиционная вариационная маржа'.
+            a: Если позиция открыта и закрыта внутри торговой сессии, то будет зачислена посделочная маржа'.
+            a: Фактическое зачисление вариационной маржи' на счет происходит в основной клиринг в 19 ноль пять по московскому времени. Движение маржи' отображается в справке по счету, а также в истории операций по счету.
+            a: Параметры инструментов для расчета вариационной маржи' доступны на сайте Московской биржи.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+    
+    state: Срочный рынок_уменьшение гарантийного обеспечения
+        intent!: /026 Срочный рынок/Срочный рынок_уменьшение гарантийного обеспечения
+        
+        script:
+            $analytics.setMessageLabel("Срочный рынок_уменьшение гарантийного обеспечения", "Интенты");
+            
+            if ( typeof $parseTree._GOreductionType != "undefined" ){
+                $session.GOreductionType = $parseTree._GOreductionType;
+            }
+            if ( typeof $session.GOreductionType == "undefined" ){
+                $reactions.transition("/Срочный рынок_уменьшение гарантийного обеспечения/Уточнение способа уменьшения");
+            } else {
+                $reactions.transition("/Срочный рынок_уменьшение гарантийного обеспечения/Ответ_" + $session.GOreductionType.name);
+            }
+        
+            
+        state: Ответ_Открытие моносчета
+            a: В рамках договора с раздельными моносчета'ми, по счету для срочного рынка размер гарантийного обеспечения равен биржевому. Для открытия моносче'та, нужно авторизоваться в личном кабинете на сайте фина'м точка ру.
+            a: Нажать кнопку, Открыть новый счет, далее выбрать, Показать все продукты, далее выбрать Брокерскую компанию, Договор с отдельными брокерскими счетами.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+                
+        state: Ответ_Отключение ФС и ВС
+            a: Чтобы отключить фондовую и валютную секцию по единому счету, нужно проверить счет на соответствие следующим требованиям. Сумма средств на счете должна быть более 10000 рублей.
+            a: По счету отсутствуют сделки с ценными бумагами и валютой. Ваш инвестиционный профиль должен быть умеренный или агрессивный.
+            a: Для смены инвест профиля, нужно авторизоваться в личном кабинете на сайте фина'м точка ру, в правом верхнем углу личного кабинета нажать на значок персоны, далее выбрать, Инвестиционный профиль.
+            a: Если счет соответствует всем требованиям, обратитесь к менеджеру фина'м для отключения фондовой и валютной секции.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+
+            
+        state: Ответ_Подключение ПГО
+            # a: Услуга пониженного гарантийного обеспечения может быть недоступна 29 декабря и 3 января.
+            # a: Также обращаем ваше внимание, что в период новогодних праздников, по части инструментов могут быть повышены ставки риска и увеличен коэффициент залога, с которым валюта ю ань принимается в обеспечение. Про'сим учитывать данную информацию при планировании торговых операций.
+            a: Обращаем ваше внимание, Услуга пониженного гарантийного обеспечения может быть недоступна в ближайшие дни в связи с возможной повышенной волатильностью курса рубля. Про'сим учитывать данную информацию при планировании торговых операций.
+            a: Узнать условия подключения, подключить или отключить услугу пониженного гарантийного обеспечения, можно в личном кабинете на сайте едо'кс точка фина'м точка ру.
+            a: Для этого в разделе, Услуги, выберите пункт меню Прочие операции, далее выберите, Услуга Пониженное ГэО'.
+            a: Услуга действует в будние дни, с семи утра до девятнадцати тридцати по московскому времени, по ограниченному списку инструментов.
+            a: Ознакомиться со списком ставок риска по ценным бумагам при подключенной услуге Пониженное ГэО' можно на сайте фина'м точка ру.
+            a: В верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, и в выпадающем меню выберите пункт Список маржинальных бумаг.
+            a: Далее скачайте файл с названием, Параметры используемые фина'м для обслуживания по Единому счету и счетам срочного рынка.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+        state: Ответ_Получение КПУР
+            a: Инвестор может получить категорию повышенного уровня риска, или КПУР, если сумма его активов на его брокерских счетах не менее трех миллионов рублей.
+            a: Либо, сумма активов более 600000 рублей, и он является клиентом брокера в течение последних 180 дней и заключал сделки с ценными бумагами или производными финансовыми инструментами на протяжении пяти и более дней.
+            a: Для КПУР гарантийное обеспечение ниже, чем для КСУР. Таким образом, статус клиента с повышенным уровнем риска дает больше возможностей для наращивания маржинальных позиций, или размера плеча, но и повышает финансовые риски.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+                
+ 
+        state: Уточнение способа уменьшения
+            a: Есть четыре способа снизить гарантийное обеспечение.
+            a: Использовать услугу Пониженное гарантийное обеспечение; открыть договор с раздельными моносчета'ми, или отключить фондовую и валютную секцию на едином счете; также можно получить статус клиента с повышенным уровнем риска, КПУР.
+            a: Какой способ вас интересует?
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @GOreductionType *
+                script:
+                    $session.GOreductionType = $parseTree._GOreductionType;
+                    $reactions.transition("/Срочный рынок_уменьшение гарантийного обеспечения");
+            
+        
+    state: Срочный рынок_покупка|продажа фьючерса
+        intent!: /026 Срочный рынок/Срочный рынок_покупка|продажа фьючерса
+        script:
+            $analytics.setMessageLabel("Срочный рынок_покупка|продажа фьючерса", "Интенты");
+        
+        go!: /Срочный рынок_покупка|продажа фьючерса/Ответ_Брокер
+        
+        state: Ответ_Брокер
+            a: Для торговли инструментами срочного рынка нужно пройти тестирование для неквалифицированных инвесторов по категории Производные финансовые инструменты.
+            a: Пройти тестирование можно в личном кабинете на сайте фина'м точка ру. Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус. Далее выберите, пройти тестирование.
+            a: Для квалифицированных инвесторов доступ предоставляется автоматически.
+            a: Выставить заявку на покупку или продажу фьючерса можно через любую торговую систему, с учетом параметров фьючерсного контракта, таких как гарантийное обеспечение, шаг цены и другие.
+            a: Ознакомиться со спецификацией фьючерсных контрактов можно на сайте московской биржи.
+            a: Обращаем ваше внимание, что Торговая сессия на срочном рынке начинается вечером и длится с 19:05 до 23:50, и продолжается на следующий день — с 10:00 до 14:00 и с 14:05 до 18:50 по московскому времени.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"  
+            # final answer
+            
+    
+    
+    state: Валюта
+        intent!: /027 Валюта
+        script:
+            $analytics.setMessageLabel("027 Валюта", "Интенты");
+        
+        a: Какая информация по валютным операциям Вас интересует? Купить или продать валюту. Купить или продать неполный лот валюты. Комиссии за хранение валют.
+        
+        q: * @currency_buy_sell * ||toState = "/Валюта_покупка|продажа"
+        q: * @incomplete_lot * ||toState = "/Валюта_неполный лот"
+        q: * @currency_storage * ||toState = "/Валюта_стоимость хранения"
+        q: * @choice_1 * ||toState = "/Валюта_покупка|продажа"
+        q: * @choice_2 * ||toState = "/Валюта_неполный лот"
+        q: * @choice_3 * ||toState = "/Валюта_стоимость хранения"
+        q: * @choice_last * ||toState = "/Валюта_стоимость хранения"
+        q: @repeat_please * ||toState = "."
+        
+        
+    state: Валюта_покупка|продажа
+        intent!: /027 Валюта/Валюта_покупка|продажа
+        
+        script:
+            $analytics.setMessageLabel("Валюта_покупка|продажа", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Валюта_покупка|продажа/Уточнение компании");
+            } else {
+                $reactions.transition("/Валюта_покупка|продажа/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: Операции с валютой в какой компании фина'м вас интересуют? Брокер; Банк, или Форекс?
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Валюта_покупка|продажа");    
+
+
+        state: Ответ_Брокер
+            a: Валютные пары торгуются на валютной секции московской биржи. Торговля валютными парами также доступна для счетов ИИС.
+            a: Чтобы купить или продать валюту, нужно воспользоваться поиском по инструменту в любой торговой системе, и выставить заявку с учетом лотности контракта.
+            a: В системе фина'м трейд можно выбрать инструмент из раздела, Валюты. В разделе, Мировые валюты, транслируются индикативные форекс-котировки, торги такими валютными парами недоступны.
+            a: Размер одного лота валюты отображается в поле выставления заявки, и в информации по инструменту в торговой системе. Стандартный размер одного лота валюты равен одной тысяче условных единиц, но есть исключения.
+            a: Полные лоты валюты доступны в виде контрактов с окончанием ТОДЪ, то есть биржевые расчеты пройдут в текущий рабочий день после 23 часов 50 минут по московскому времени.
+            a: Также полные лоты валюты доступны в виде контрактов с окончанием TOM, то есть расчеты пройдут на следующий рабочий день после 23 часов 50 минут.
+            a: Неполные лоты валют доступны в виде контрактов с окончанием ТэМэ ЭС, такие контракты торгуются кратно 0,01 единицы валюты.
+            a: Минимальная заявка от одной единицы валюты, расчеты на следующий рабочий день после 23 часов 50 минут по московскому времени.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+            
+        state: Ответ_Банк  
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        
+        
+    state: Валюта_неполный лот
+        intent!: /027 Валюта/Валюта_неполный лот
+        
+        script:
+            $analytics.setMessageLabel("Валюта_неполный лот", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Валюта_неполный лот/Уточнение компании");
+            } else {
+                $reactions.transition("/Валюта_неполный лот/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: Операции с валютой в какой компании фина'м вас интересуют? Брокер; Банк, или Форекс?
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Валюта_неполный лот");    
+
+
+        state: Ответ_Брокер
+            a: Валютные пары торгуются на валютной секции московской биржи. Торговля валютными парами также доступна для счетов ИИС.
+            a: Чтобы купить или продать валюту, нужно воспользоваться поиском по инструменту в любой торговой системе, и выставить заявку с учетом лотности контракта.
+            a: Неполные лоты валют доступны в виде контрактов с окончанием ТэМэ ЭС, такие контракты торгуются кратно 0,01 единицы валюты.
+            a: Минимальная заявка от одной единицы валюты, расчеты на следующий рабочий день после 23 часов 50 минут по московскому времени.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+            
+        state: Ответ_Банк  
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        
+        
+    state: Валюта_стоимость хранения
+        intent!: /027 Валюта/Валюта_стоимость хранения
+        
+        script:
+            $analytics.setMessageLabel("Валюта_стоимость хранения", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Валюта_стоимость хранения/Уточнение компании");
+            } else {
+                $reactions.transition("/Валюта_стоимость хранения/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: Операции с валютой в какой компании фина'м вас интересуют? Брокер; Банк, или Форекс?
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Валюта_стоимость хранения");    
+
+
+        state: Ответ_Брокер
+            a: Обращаем ваше внимание, в связи с повышенными рисками хранения валюты в российской юрисдикции; с 26 февраля 2024 года, повышены комиссии за хранение более 10000 единиц валюты в долларах США и британских фунтах.
+            a: Комиссия за хранение менее 10000 долларов или фунтов по-прежнему не взымается. Таким образом, при свободном остатке валюты от 10 до 100000 единиц, комиссия увеличена с 5 до 10% годовых, а при остатках валюты более 100000 единиц комиссия увеличена с 3 до 6% годовых.
+            a: Клиенты Фина'м могут сохранить сниженные ставки за хранение валюты; для этого, нужно подписать соглашение с рисками хранения валюты, по запросу через менеджера поддержки. После подписания согласия, ставки останутся прежними, комиссии за хранение составят;
+            a: 5% годовых, если сумма хранения от 10 до 100000 единиц валюты; И 3% годовых, если сумма хранения свыше 100000 единиц валюты.
+            a: Комиссия за хранение удерживается в рублях по курсу Банка России на дату списания, расчет осуществляется исходя из количества валюты на счете по состоянию на конец календарного дня. Списание происходит не позднее окончания соответствующего дня.
+            a: Комиссия за хранение долларов СэШэА не взимается по счетам Сегрегированный Global.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        
+        state: Ответ_Форекс
+            script:
+               $session.operatorPhoneNumber =  $session.company.phoneNumber;
+               $reactions.transition("/Оператор/Оператор по номеру");
+               # final scenario
+            
+            
+        state: Ответ_Банк  
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+            
+            
+        
+    state: Контакты  
+        intent!: /030 Контакты
+        script:
+            $analytics.setMessageLabel("030 Контакты", "Интенты");
+        
+        a: Какая информация о компании вас интересует? электронная почта или чат с поддержкой? адреса офисов? реквизиты компании? лицензии компании фина'м.
+        
+        q: * @pochta_chat_u * ||toState = "/Контакты_Почта"
+        q: * @requisites_u * ||toState = "/Контакты_Реквизиты"
+        q: * @YL_address_u * ||toState = "/Контакты_Юридический адрес"
+        q: * @license_u * ||toState = "/Контакты_Лицензии"
+        q: * @choice_1 * ||toState = "/Контакты_Почта"
+        q: * @choice_2 * ||toState = "/Контакты_Юридический адрес"
+        q: * @choice_3 * ||toState = "/Контакты_Реквизиты"
+        q: * @choice_4 * ||toState = "/Контакты_Лицензии"
+        q: * @choice_last * ||toState = "/Контакты_Лицензии"
+        q: @repeat_please * ||toState = "."
+        
+        
+    state: Контакты_Почта
+        intent!: /030 Контакты/Контакты_Почта
+        
+        script:
+            $analytics.setMessageLabel("Контакты_Почта", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Контакты_Почта/Уточнение компании");
+            } else {
+                $reactions.transition("/Контакты_Почта/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: Информация о какой компании холдинга Фина'м Вас интересует? Брокер; Банк, Управляющая компания, или Форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Контакты_Почта");    
+        
+        state: Ответ_Брокер
+            a: Служба технической поддержки работает в режиме 24 на 7. Написать сообщение или направить документы в поддержку брокера фина'м можно в чат или на электронную почту.
+            a: Адрес электронной почты поддержки доступен на сайте фина'м точка ру, в разделе сайта, о компании, в поле меню контакты и информация.
+            a: Чтобы написать в чат с поддержкой, можно воспользоваться чатом в торговой системе фина'м трейд. Либо воспользоваться чатом на сайте фина'м точка ру, для этого в верхнем правом углу нажмите, Ещё.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ответ_Банк
+            a: Адрес электронной почты, часы работы и прочая контактная информация банка представлены на сайте фина'м точка ру. В разделе сайта Банк, контактная информация.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ответ_Форекс
+            a: Служба технической поддержки работает в режиме 24 на 7. Адрес электронной почты и прочая контактная информация фина'м форекс представлены на сайте фина'м точка ру. В разделе сайта Форекс, контакты.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ответ_УК
+            a: Адрес электронной почты и прочая контактная информация Управляющей компании фина'м, представлены на сайте фина'м точка ру. В разделе сайта Управление активами, о компании.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+    
+    state: Контакты_Реквизиты
+        intent!: /030 Контакты/Контакты_Реквизиты
+        
+        script:
+            $analytics.setMessageLabel("Контакты_Реквизиты", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Контакты_Реквизиты/Уточнение компании");
+            } else {
+                $reactions.transition("/Контакты_Реквизиты/Ответ_" + $session.company.name);
+            }
+        
+        
+        state: Уточнение компании
+            a: Информация о какой компании холдинга Фина'м Вас интересует? Брокер; Банк, Управляющая компания, или Форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Контакты_Реквизиты");    
+        
+        state: Ответ_Брокер
+            a: Реквизиты для перевода денежных средств и ценных бумаг на брокерские счета фина'м, можно найти в личном кабинете на сайте, фина'м точка ру, в разделе, детали по счету.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ответ_Банк
+            a: Реквизиты ваших банковских счетов отображаются как в личном кабинете брокера так и в интернет банке фина'м. Юридические реквизиты Банка фина'м, представлены на сайте фина'м точка ру. В разделе сайта Банк, О Банке.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ответ_Форекс
+            a: Реквизиты для пополнения фина'м форекс, представлены в личном кабинете на сайте, фина'м форекс. В разделе мои счета, пополнение счета.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ответ_УК
+            a: Реквизиты Управляющей компании фина'м, для перевода средств по договорам доверительного управления, можно найти в личном кабинете на сайте, едо'кс фина'м точка ру, в разделе помощь.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+    state: Контакты_Юридический адрес
+        intent!: /030 Контакты/Контакты_Юридический адрес
+        script:
+            $analytics.setMessageLabel("Контакты_Юридический адрес", "Интенты");
+        
+        go!: /Контакты_Юридический адрес/Ответ_Брокер
+        
+        state: Ответ_Брокер
+            a: Юридический адрес группы компаний фина'м. Москва, почтовый индекс 12 70 06, Настасьинский переулок, дом 7 строение 2. Адреса и режим работы офисов компании представлены на сайте, фина'м точка ру.
+            a: В разделе сайта, о компании, контакты. Перед визитом в центральный офис в Москве, на Настасьинском переулке дом 7, строение 2, можно заказать парковочное место, обратившись к менеджеру компании.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+
+    state: Контакты_Лицензии
+        intent!: /030 Контакты/Контакты_Лицензии
+        script:
+            $analytics.setMessageLabel("Контакты_Лицензии", "Интенты");
+        
+        go!: /Контакты_Лицензии/Ответ_Брокер
+        
+        state: Ответ_Брокер
+            a: Перечень лицензий компаний группы фина'м представлен на сайте фина'м точка ру, внизу страницы. А также в разделе сайта, о компании. Для фина'м форекс лицензия находится в разделе, форекс.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+    
+    state: Комиссии
+        intent!: /007 Комиссии
+        script:
+            $analytics.setMessageLabel("007 Комиссии", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Комиссии/Уточнение компании");
+            } else {
+                $reactions.transition("/Комиссии_" + $session.company.name);
+            }
+
+        state: Уточнение компании
+            a: Уточните, вас интересуют комиссии брокера? Комиссии банка, Управляющей компании, или Форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Комиссии");
+
+    state: Комиссии_Брокер
+        intent!: /007 Комиссии/Комиссии_Брокер
+        script:
+            $analytics.setMessageLabel("Комиссии_Брокер", "Интенты");
+            
+            if (typeof $parseTree._comission_type != "undefined"){
+                $session.comission_type = $parseTree._comission_type;
+                $reactions.transition("/Комиссии_Брокер/Комиссия_" + $session.comission_type.name)
+            }
+            
+        a: Размер биржевых, брокерских, депозитарных или комиссий за кредитование, зависит от тарифного плана установленного по счету, рынка ценных бумаг, даты открытия счета.
+        a: Ознакомиться с описанием тарифных планов: ФриТрэйд, Стратег, Инвестор, Единый дневной, Единый консультационный, можно на сайте Фина'м точка ру. Для этого в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Тарифы.
+        a: Списание комиссии происходит в 23:59 по московскому времени. Размер комиссии за обслуживание брокерского счёта уменьшается на сумму других уплаченных брокерских комиссий.
+        a: Депозитарный тариф зависит от даты открытия счёта и даты последней смены тарифа. То есть по счетам, открытым или измененным после 26 ноября 2020 года применяется депозитарный Тарифный план номер 2 с бесплатным обслуживанием.
+        a: Полные условия всех тарифных планов приведены в Приложении № 7 Регламента брокерского обслуживания Фина'м. Чтобы открыть регламент, в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, документы и регламенты.
+        a: Про какую комиссию вы хотите узнать подробнее? Про комиссию за обслуживание брокерского счета, или про комиссии за депозитарий.
+        q: * @commission_transaction_u * ||toState = "/Комиссии_Брокер/Комиссия_сделки"
+        q: * @commission_service_u * ||toState = "/Комиссии_Брокер/Комиссия_обслуживание"
+        q: * @commission_depositary_u * ||toState = "/Комиссии_Брокер/Комиссия_депо"
+        q: * @choice_1 * ||toState = "/Комиссии_Брокер/Комиссия_обслуживание"
+        q: * @choice_2 * ||toState = "/Комиссии_Брокер/Комиссия_депо"
+        q: * @choice_last * ||toState = "/Комиссии_Брокер/Комиссия_депо"
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
+
+        state: Комиссия_сделки
+            a: Размер биржевых, брокерских, депозитарных или комиссий за кредитование, зависит от тарифного плана установленного по счету, рынка ценных бумаг, даты открытия счета.
+            a: Ознакомиться с описанием тарифных планов: ФриТрэйд, Стратег, Инвестор, Единый дневной, Единый консультационный, можно на сайте Фина'м точка ру.
+            a: Для этого в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Тарифы. Списание комиссии происходит в 23:59 по московскому времени.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Комиссия_обслуживание
+            a: Размер комиссии за обслуживание брокерского счета, зависит от выбранного тарифного плана, и уменьшается на размер брокерской комиссии, удержанной за операции, совершенные в течение месяца.
+            a: Списание в последний день месяца. Комиссии за обслуживание самых популярных тарифов. Для счетов новых клиентов Фина'м, в первые 30 дней обслуживания применяется тариф фри трейд, без абонентской платы.
+            a: Через 30 дней с момента открытия счета, тариф Фри трейд автоматически меняется на тариф стратег. Обслуживание по тарифному плану, Стратег, ноль рублей. Тарифный план Инвестор, 200 рублей.
+            a: Тарифные планы, Дневной, Консультационный и другие, 177 рублей в месяц.
+            a: Обращаем ваше внимание, если на момент удержания комиссии за обслуживание, сумма чистых активов на счете менее 2000 рублей, то комиссия взымается в размере 400 рублей в месяц вне зависимости от тарифного плана.
+            a: Ознакомиться подробнее можно на сайте Фина'м точка ру. Для этого в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Тарифы.
+            a: Полные условия всех тарифных планов приведены в Приложении № 7 Регламента брокерского обслуживания Фина'м. Чтобы открыть регламент, в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, документы и регламенты.
+            a: Хотите узнать подробнее про комиссии депозитария?
+            script:
+                $context.session = {};
+            q: @agree ||toState = "/Комиссии_Брокер/Комиссия_депо"
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+                
+        state: Комиссия_депо
+            a: Депозитарный тариф зависит от даты открытия счёта и даты последней смены тарифа. То есть по счетам, открытым или измененным после 26 ноября 2020 года применяется депозитарный Тарифный план номер 2, без абонентской платы.
+            a: С тарифами на услуги депозитария можно ознакомиться на сайте Фина'м точка ру. В верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Информация, Услуги депозитария.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+    state: Комиссии_Форекс
+        intent!: /007 Комиссии/Комиссии_Форекс
+        script:
+            $analytics.setMessageLabel("Комиссии_Форекс", "Интенты");
+            
+        a: При торговле с Фина'м Форекс всегда выгодные спрэды, и отсутствуют комиссии за сделки и обслуживание счёта. Обращаем ваше внимание на условия торговли, такие как спрэд, то есть разница покупки и продажи.
+        a: И своп, иными словами форвардные пункты; то есть перенос позиции через ночь, выходные или праздничные дни.
+        a: Актуальные условия торговли можно посмотреть на сайте Фина'м точка ру, в разделе сайта Форекс, в поле меню Трейдерам, Торговые условия.
+        a: А также информация об актуальном спрэде транслируется в терминале Meta Trader 4, в разделе Обзор рынка.
+        a: Чем я могу еще помочь?
+        script:
+            $context.session = {};
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
+        
+    state: Комиссии_Банк
+        intent!: /007 Комиссии/Комиссии_Банк
+        script:
+            $analytics.setMessageLabel("Комиссии_Банк", "Интенты");
+            $session.operatorPhoneNumber =  '3888';
+            $reactions.transition("/Оператор/Оператор по номеру");
+            # final scenario
+        
+    state: Комиссии_УК
+        intent!: /007 Комиссии/Комиссии_УК
+        script:
+            $analytics.setMessageLabel("Комиссии_УК", "Интенты");
+            $session.operatorPhoneNumber =  '1000';
+            $reactions.transition("/Оператор/Оператор по номеру");
+            # final scenario
+
+    state: EDOX
+        intent!: /008 EDOX
+        script:
+            $analytics.setMessageLabel("008 EDOX", "Интенты");
+            
+        a: Некоторые услуги и сервисы временно доступны в старой версии личного кабинета с доменом едо'кс. Зайти в новую, или старую версию личного кабинета можно на сайте фина'м точка ру.
+        a: В верхнем правом углу сайта нажмите, Личный кабинет, и авторизуйтесь. По умолчанию, логином от личного кабинета является номер телефона в международном формате. Для России, номер начинается с цифры, 7.
+        a: Далее выберите раздел кабинета Помощь. Далее слева нажмите кнопку перейти в старый дизайн.
+        a: Чем я могу еще помочь?
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
+
+  
+   
+    state: Обучение
+        intent!: /028 Обучение
+        script:
+            $analytics.setMessageLabel("028 Обучение", "Интенты");
+        
+        a: Учебный центр фина'м предоставляет видео курсы по торговым системам, услуги онлайн обучения, и услуги очного обучения и встреч для инвесторов. О чем вы хотите узнать подробнее?
+        q: * @ITS * ||toState = "/Обучение_ИТС"
+        q: * @learning_online * ||toState = "/Обучение_онлайн"
+        q: * @learning_offline * ||toState = "/Обучение_офлайн"
+        q: * @choice_1 * ||toState = "/Обучение_ИТС"
+        q: * @choice_2 * ||toState = "/Обучение_онлайн"
+        q: * @choice_3 * ||toState = "/Обучение_офлайн"
+        q: * @choice_last * ||toState = "/Обучение_офлайн"
+        q: @repeat_please * ||toState = "." 
+    
+    
+    state: Обучение_ИТС
+        intent!: /028 Обучение/Обучение_ИТС
+        script:
+            $analytics.setMessageLabel("Обучение_ИТС", "Интенты");
+            
+            if ( typeof $parseTree._ITS != "undefined" ){
+                $session.ITS = $parseTree._ITS;
+            }
+            if ( typeof $session.ITS == "undefined" ){
+                $reactions.transition("/Обучение_ИТС/Уточнение по ИТС");
+            } else {
+                $reactions.transition("/Обучение_ИТС/ИТС_" + $session.ITS.name);
+            }
+        
+        state: Уточнение по ИТС
+            a: Какая торговая система вас интересует? Фина'м трейд, Транза'к, Квик, сервис транза'к коннектор, или мета трейдер 5.
+            state: Ожидание ответа
+                q: * @ITS *
+                script:
+                    $session.ITS = $parseTree._ITS;
+                    $reactions.transition("/Обучение_ИТС");
+                
+        state: ИТС_Quik
+            a: Просмотреть бесплатный видео курс по торговой системе КВИК, можно на портале учебного центра фина'м.
+            a: Для этого, на сайте фина'м точка ру, выберите раздел Обучение, и нажмите на название раздела Дистанционное обучение.
+            a: После авторизации на портале учебного центра, пролистайте страницу сайта вниз, и выберите видео курс, Как настроить торговый терминал КВИК.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+                
+        state: ИТС_Transaq
+            a: Просмотреть бесплатный видео курс по торговой системе Транза'к, можно на портале учебного центра фина'м.
+            a: Для этого, на сайте фина'м точка ру, выберите раздел Обучение, и нажмите на название раздела Дистанционное обучение. После авторизации на портале учебного центра выберите раздел База знаний.
+            a: Видео курс по торговой системе Транза'к находится внизу страницы.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+                
+        state: ИТС_FT
+            a: Просмотреть бесплатный видео курс по торговой системе Фина'м трейд, можно на портале учебного центра фина'м.
+            a: Для этого, на сайте фина'м точка ру, выберите раздел Обучение, и нажмите на название раздела Дистанционное обучение.
+            a: После авторизации на портале учебного центра, пролистайте страницу сайта вниз, и выберите видео курс, Как начать пользоваться Фина'м трейд, или отдельный подробный курс по Мобильному приложению Фина'м трейд.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+                
+        state: ИТС_TrConnector
+            a: Подробную информацию по сервису транза'к коннектор можно посмотреть на сайте фина'м точка ру. Для этого, в верхней части страницы выберите раздел Инвестиции; далее выберите Торговые платформы, Все платформы.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+                
+        state: ИТС_MT5
+            script:
+                $session.operatorPhoneNumber = '1000'
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: ИТС_MT4
+            script:
+                $session.operatorPhoneNumber = '3887'
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        
+    
+    state: Обучение_онлайн
+        intent!: /028 Обучение/Обучение_онлайн
+        script:
+            $analytics.setMessageLabel("Обучение_онлайн", "Интенты");
+        a: На портале учебного центра фина'м представлены бесплатные и платные курсы и вебинары, для начинающих и опытных инвесторов. Для начинающих инвесторов доступен бесплатный Online-курс Первые шаги.
+        a: Чтобы ознакомиться с курсами и их расписанием, на сайте фина'м точка ру, выберите раздел Обучение, и нажмите на название раздела Дистанционное обучение.
+        a: Чтобы открыть расписание видеосеминаров и присоединиться, на сайте фина'м точка ру, выберите раздел Обучение, и в поле меню,  Дистанционное обучение, выберите, вебинары.
+        a: Чем я могу еще помочь?
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
+        
+    state: Обучение_офлайн
+        intent!: /028 Обучение/Обучение_офлайн
+        script:
+            $analytics.setMessageLabel("Обучение_офлайн", "Интенты");
+        a: В учебном центре фина'м проводятся очные занятия, курсы и встречи для начинающих и опытных инвесторов.
+        a: Чтобы посмотреть расписание и присоединиться, на сайте фина'м точка ру, выберите раздел Обучение, и в поле меню, Очное обучение, выберите, секреты инвестирования.
+        a: Чем я могу еще помочь?
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
 
 
 
-    # init:
+    state: Overnight
+        intent!: /029 Overnight
+        script:
+            $analytics.setMessageLabel("029 Overnight", "Интенты");
+            
+        a: Какая информация по займу ценных бумаг брокером, или операции овернайт, вас интересует? Информация по займу ценных бумаг брокером? отключение займа ценных бумаг? информация о сделках РЕПО'.
+        q: * @margin_info_u * ||toState = "/Overnight_info"
+        q: * @margin_close_u * ||toState = "/Overnight_off"
+        q: * @repo_info_u * ||toState = "/Overnight_REPO"
+        q: * @choice_1 * ||toState = "/Overnight_info"
+        q: * @choice_2 * ||toState = "/Overnight_off"
+        q: * @choice_3 * ||toState = "/Overnight_REPO"
+        q: * @choice_last * ||toState = "/Overnight_REPO"
+        q: @repeat_please * ||toState = "."
         
-    #     var unnecessaryWords = /^(Как|Я хотел бы|Как я могу)/;
+    
+    state: Overnight_info
+        intent!: /029 Overnight/Overnight_info
+        script:
+            $analytics.setMessageLabel("Overnight_info", "Интенты");
+            
+        a: Согласно пункту 17 точка 12 регламента брокерского обслуживания, брокер имеет право брать бумаги клиентов для внутреннего учета. Это не приводит к потере права совершать действия с ценными бумагами.
+        a: Данная операция отображается в справке по счету, в графе, Сделки РЕПО', сделки СВОП, сделки займа ЦБ! За предоставление бумаг для внутреннего учета, вы получаете дополнительное вознаграждение, 0,05% годовых от стоимости ценных бумаг.
+        a: Если ценные бумаги находились на внутреннем учете компании в момент дивидендной отсечки, брокер возместит вам сумму дивидендов, увеличенную в 1,15 раза.
+        a: Если вы планируете участвовать в собрании акционеров, то за несколько дней до даты фиксации обратитесь к менеджеру, и установите запрет на использование ваших ценных бумаг на период корпоративного события.
+        a: Чем я могу еще помочь?
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
+    
+    state: Overnight_off
+        intent!: /029 Overnight/Overnight_off
+        script:
+            $analytics.setMessageLabel("Overnight_off", "Интенты");
+            
+        a: Согласно пункту 17 точка 12 регламента брокерского обслуживания, брокер имеет право брать бумаги клиентов для внутреннего учета. Это не приводит к потере права совершать действия с ценными бумагами.
+        a: Данная операция отображается в справке по счету, в графе, Сделки РЕПО', сделки СВОП, сделки займа ЦБ! За предоставление бумаг для внутреннего учета, вы получаете дополнительное вознаграждение, 0,05% годовых от стоимости ценных бумаг.
+        a: Если ценные бумаги находились на внутреннем учете компании в момент дивидендной отсечки, брокер возместит вам сумму дивидендов, увеличенную в 1,15 раза.
+        a: Если вы планируете участвовать в собрании акционеров, то за несколько дней до даты фиксации обратитесь к менеджеру, и установите запрет на использование ваших ценных бумаг на период корпоративного события.
+        a: Чем я могу еще помочь?
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
+        
+    state: Overnight_REPO
+        intent!: /029 Overnight/Overnight_REPO
+        script:
+            $analytics.setMessageLabel("Overnight_REPO", "Интенты");
+            
+        a: Сделки РЕПО', являются сделками переноса ваших необеспеченных позиций.
+        a: В брокерском отчете отображаются две сделки: сделка предоставления займа, то есть продажа или покупка ценных бумаг, и сделка возврата займа, то есть сделка обратного откупа, или продажи.
+        a: С помощью данных сделок вы получаете возможность взять в займ ценные бумаги у брокера, либо денежные средства под покупку ценных бумаг.
+        a: Сделки РЕПО' проводятся брокером автоматически, и фактически в них заложена комиссия по тарифу за займ денежных средств и ценных бумаг.
+        a: Обращаем ваше внимание, что с помощью сделок РЕПО', брокер не берет ваши ценные бумаги в займ.
+        a: Хотите получить информацию по займу брокером Ценных бумаг?
+        q: @agree ||toState = "/Overnight_info"
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
         
         
-    #     bind(
-    #         "preMatch",
-    #         function($context) {
-    #         if (unnecessaryWords) {
-    #             $context.request.query.replace(unnecessaryWords, '');
-    #         }
-    # );         
+    #Нецензурная брань
+    state: Censored
+        intent!: /031 Censored
+        script:
+            $analytics.setMessageLabel("031 Censored", "Интенты");
+            $session.operatorPhoneNumber = '1000'
+            $reactions.transition("/Оператор/Оператор по номеру");
+            # final scenario
+
+
+   
+    state: КВАЛ
+        intent!: /023 КВАЛ
+        script:
+            $analytics.setMessageLabel("023 КВАЛ", "Интенты");
+            $session.company = $parseTree._company;
+        a: Уточните ваш вопрос, вы хотите узнать: как получить статус квалифицированного инвестора? как перенести статус от другого брокера? или как проверить свой инвестиционный статус в фина'м.
+        q: * @kval_get_u * ||toState = "/КВАЛ_документы"
+        q: * @kval_perenos_u * ||toState = "/КВАЛ_перенос"
+        q: * @kval_sootvetstvie_u * ||toState = "/КВАЛ_соответствие"
+        q: * @choice_1 * ||toState = "/КВАЛ_документы"
+        q: * @choice_2 * ||toState = "/КВАЛ_перенос"
+        q: * @choice_3 * ||toState = "/КВАЛ_соответствие"
+        q: * @choice_last * ||toState = "/КВАЛ_соответствие"
+        q: @repeat_please * ||toState = "."
+        
+    state: КВАЛ_документы
+        intent!: /023 КВАЛ/КВАЛ_документы
+        script:
+            $analytics.setMessageLabel("КВАЛ_документы", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if (  typeof $session.company  == "undefined" ){
+                $reactions.transition("/КВАЛ_документы/Уточнение компании");
+            } else { 
+                $reactions.transition("/КВАЛ_документы/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: Уточните, Вас интересует информация по статусу квалифицированного инвестора по счетам брокера? управляющей компании, или Форекс.
+            q: @repeat_please * ||toState = "."
+            q: * @company * ||toState = "/КВАЛ_документы/Уточнение компании/Ожидание ответа"
+            
+            state: Ожидание ответа
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/КВАЛ_документы");
+            
+        state: Ответ_Брокер
+            a: Есть четыре способа получить статус квалифицированного инвестора в фина'м.
+            a: По торговому обороту от шести миллионов рублей; по сумме активов от шести миллионов рублей; по образованию; или по опыту работы. Так же вы можете перенести статус от другого брокера. Какой способ вас интересует?
+            q: @repeat_please * ||toState = "."
+            
+            state: Оборот
+                q: * @kval_conditions_Оборот *
+                a: Чтобы получить статус квалифицированного инвестора по обороту, за последние четыре квартала, должен быть выполнен торговый оборот на сумму более 6 миллионов рублей, в фина'м или у другого брокера, оборот можно суммировать из разных организаций.
+                a: А также должно быть совершено не менее одной сделки в месяц, и не менее 10 сделок в квартал.
+                a: Для подтверждения оборота нужно предоставить заверенный брокерский отчет в электронном виде, и договор об открытии счета, содержащий номер брокерского счёта и паспортные данные.
+                a: Отправить документы в отдел поддержки можно в чате или на электронную почту.
+                a: Проверить свой инвестиционный статус можно в личном кабинете на сайте фина'м точка ру. Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус.
+                a: Чем я могу еще помочь?
+                script: 
+                    $context.session = {};
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+            
+            state: Активы
+                q: * @kval_conditions_Активы *
+                a: Чтобы получить статус квалифицированного инвестора по сумме активов более шести миллионов, нужно предоставить соответствующие документы в отдел поддержки, в чате или на электронную почту.
+                a: Чтобы заявить денежные средства на банковских счетах нужно предоставить выписку с банковского счёта с паспортными данными.
+                a: Чтобы заявить денежные средства на брокерских счетах нужно предоставить заверенный брокерский отчет в электронном виде, и договор об открытии счета, содержащий номер брокерского счёта и паспортные данные.
+                a: Чтобы заявить активы на счетах, нужно предоставить выписку по счету ДЕПО, либо выписку по лицевому счету в реестре. Все документы должны быть на одну дату, и не старше 5 рабочих дней.
+                a: Проверить свой инвестиционный статус можно в личном кабинете на сайте фина'м точка ру. Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус.
+                a: Чем я могу еще помочь?
+                script: 
+                    $context.session = {};
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+            
+            state: Образование
+                q: * @kval_conditions_Образование *
+                a: Чтобы получить статус квалифицированного инвестора по образованию или квалификации, нужно предоставить соответствующие документы в отдел поддержки, в чате или на электронную почту.
+                a: Диплом о высшем экономическом образовании государственного образца выданный организацией, которая на момент выдачи диплома осуществляла аттестацию граждан в сфере профессиональной деятельности на рынке ценных бумаг.
+                a: А также можно предоставить свидетельство о квалификации, или международный сертификат.
+                a: Проверить свой инвестиционный статус можно в личном кабинете на сайте фина'м точка ру. Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус.
+                a: Чем я могу еще помочь?
+                script: 
+                    $context.session = {};
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+                
+            state: Работа
+                q: * @kval_conditions_Работа *
+                a: Чтобы получить статус квалифицированного инвестора по опыту работы, нужно предоставить соответствующие документы в отдел поддержки, в чате или на электронную почту.
+                a: Рассматривается опыт работы от двух лет, непосредственно связанный с совершением сделок с финансовыми инструментами, или подготовкой индивидуальных инвестиционных рекомендаций.
+                a: А также опыт работы от трех лет в должности, при назначении на которую требовалось согласование с Банком России.
+                a: Предоставить нужно скан подтверждающих документов, таких как трудовая книжка, трудовой договор с описанием деятельности, или уведомление о согласовании Банком России кандидата на должность.
+                a: Проверить свой инвестиционный статус можно в личном кабинете на сайте фина'м точка ру. Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус.
+                a: Чем я могу еще помочь?
+                script: 
+                    $context.session = {};
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+
+            
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: Ответ_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+                
+    state: КВАЛ_перенос
+        intent!: /023 КВАЛ/КВАЛ_перенос
+        script:
+            $analytics.setMessageLabel("КВАЛ_перенос", "Интенты");
+             
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if (  typeof $session.company  == "undefined" ){
+                $reactions.transition("/КВАЛ_перенос/Уточнение компании");
+            } else { 
+                $reactions.transition("/КВАЛ_перенос/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: Уточните, Вас интересует информация по статусу квалифицированного инвестора по счетам брокера? управляющей компании, или Форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/КВАЛ_перенос");
+
+        state: Ответ_Брокер    
+            a: Чтобы перенести статус квалифицированного инвестора от другого брокера, нужно предоставить в отдел поддержки, в чате или на электронную почту, заверенную выписку из реестра квалифицированных инвесторов.
+            a: В выписке должны быть указаны ваши паспортные данные, должно быть незаполненное поле Исключен из реестра, а также должно быть указание на совершение Всех видов сделок со Всеми финансовыми инструментами для квалифицированного инвестора.
+            a: Срок выписки не старше 5 рабочих дней.
+            a: Проверить свой инвестиционный статус можно в личном кабинете на сайте фина'м точка ру. Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            q: @repeat_please * ||toState = "."
+            # final answer
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: Ответ_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+    state: КВАЛ_соответствие
+        intent!: /023 КВАЛ/КВАЛ_соответствие
+        script:
+            $analytics.setMessageLabel("КВАЛ_соответствие", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if (  typeof $session.company  == "undefined" ){
+                $reactions.transition("/КВАЛ_соответствие/Уточнение компании");
+            } else { 
+                $reactions.transition("/КВАЛ_соответствие/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: Уточните, Вас интересует информация по статусу квалифицированного инвестора по счетам брокера? управляющей компании, или Форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/КВАЛ_соответствие");
+                    
+        state: Ответ_Брокер  
+            a: Проверить свой инвестиционный статус можно в личном кабинете на сайте фина'м точка ру. Для этого в правом верхнем углу нажмите на значок персоны, далее выберите, Инвестиционный статус. 
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: Ответ_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+    
+    state: Налоги
+        intent!: /025 Налоги
+        script:
+            $analytics.setMessageLabel("025 Налоги", "Интенты");
+            
+        a: Уточните ваш вопрос. Вас интересуют, Документы для налоговой? налоговые ставки? предварительный расчет налога? методика расчета налога? или возврат налога.
+        q: * @ndfl_documents_for_tax * ||toState = "/Документы для налоговой"
+        q: * @ndfl_tax_rates * ||toState = "/Налоговые ставки"
+        q: * @ndfl_tax_calculation * ||toState = "/Предварительный расчет"
+        q: * @ndfl__tax_calculation_method * ||toState = "/Методика расчета ндфл"
+        q: * @ndfl_tax_refund * ||toState = "/Возврат ндфл"
+        q: * @ndfl_resident * ||toState = "/Налоговое резидентство"
+        q: * @choice_1 * ||toState = "/Документы для налоговой"
+        q: * @choice_2 * ||toState = "/Налоговые ставки"
+        q: * @choice_3 * ||toState = "/Предварительный расчет"
+        q: * @choice_4 * ||toState = "/Методика расчета ндфл"
+        q: * @choice_5 * ||toState = "/Возврат ндфл"
+        q: * @choice_last * ||toState = "/Возврат ндфл"
+        q: @repeat_please * ||toState = "."
+        
+    state: Документы для налоговой
+        intent!: /025 Налоги/Документы для налоговой
+        script:
+            $analytics.setMessageLabel("Документы для налоговой", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+           
+            if (  typeof $session.company  == "undefined" ){
+                $reactions.transition("/Документы для налоговой/Уточнение компании");
+            } else { 
+                $reactions.transition("/Документы для налоговой/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: Налоговые документы для какого счёта вас интересуют? Брокерского счета; Банковского, счёта в Управляющей компании, или Форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Документы для налоговой");
+            
+        state: Ответ_Брокер
+            a: Для оформления налоговой декларации 3-НДФЛ через налоговый орган, Вам могут потребоваться документы от брокера, которые легко заказать в личном кабинете на сайте, фина'м точка ру, в разделе, Отчеты, Налоги и справки.
+            a: Например. Для получения налогового вычета по ИИС по стандартной процедуре можно заказать готовый Пакет документов для налогового вычета, содержащий заверенные документы об открытии ИИС и брокерский отчет.
+            a: Дополнительно могут понадобиться: Справка 2 НДФЛ с места работы, и платежное поручение об отправке денежных средств на ИИС.
+            a: А также, при необходимости просальдировать налог за счет убытков прошлых лет по обычному брокерскому счету, могут потребоваться такие документы, как 2 НДФЛ и справка об убытках.
+            a: Для отчетности по доходам по иностранным ценным бумагам на московской и спб биржах, нужны документы об открытии брокерского счета, и справка по форме 10 42 эс.
+            a: Но, если доход был получен через иностранные биржи, дополнительно запросите у менеджера уведомление о присвоении торгового кода, и уведомление о дивидендах налогах и комиссиях.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: Ответ_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+                
+        # state: Ответ_undefined
+        #     script:
+                
+        #         $context.session = {};
+        #         $reactions.transition("/NoMatch");        
+        
+    state: Налоговые ставки
+        intent!: /025 Налоги/Налоговый ставки
+        script:
+            $analytics.setMessageLabel("Налоговый ставки", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Налоговые ставки/Уточнение компании");
+            } else { 
+                $reactions.transition("/Налоговые ставки/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Брокер; Банк, Управляющая компания, или Форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Налоговые ставки");
+            
+        state: Ответ_Брокер
+            a: Расчет налога по доходу физических лиц, полученного от инвестиций, производится по следующим ставкам. Для налоговых резидентов российской федерации, налоговая ставка составляет 13% на доход до пяти миллионов рублей включительно.
+            a: Если суммарно доходы превышают 5 миллионов рублей, то налоговая ставка 15%. Прогрессивная ставка налога 15% применяется только к той сумме дохода, которая превышает 5 миллионов рублей в отчетном периоде.
+            a: Для налоговых нерезидентов российской федерации, ставка НДФЛ составляет 30%.
+            a: Хотите узнать подробную информацию о ставках налога при получении купонов и дивидендов?
+            script: 
+                $context.session = {};
+            q: @agree ||toState = "/Налоговые ставки/Уточнение_налоги_купоны_дивиденды"
+            q: @disagree ||toState = "/Могу еще чем то помочь?"
+            q: @repeat_please * ||toState = "."
+            # final answer
+        
+        state: Уточнение_налоги_купоны_дивиденды
+            a: По купонам, выплаченным и в рублях и в иностранной валюте, брокер удерживает и уплачивает налоги. Отчитываться в налоговую самостоятельно нет необходимости.
+            a: Налоговая ставка по купонам для резидентов эРэФ составляет 13%, и 30% для нерезидентов. По дивидендам, выплаченным в рублях, брокер удерживает и уплачивает налоги.
+            a: Отчитываться в налоговую самостоятельно нет необходимости. Налоговая ставка по дивидендам для резидентов эРэФ составляет 13%, и 15% для нерезидентов.
+            a: Но по дивидендам выплаченным в иностранной валюте до 2023-го года, включительно, брокер не удерживал и не уплачивал налоги. Отчитаться в налоговую службу нужно самостоятельно. С 2024-го года брокер будет самостоятельно удерживать налог с таких доходов.
+            a: Ставки налога по дивидендам в иностранной валюте могут отличаться в зависимости от биржи.
+            a: Для отчетности по доходам по иностранным ценным бумагам на московской и спб биржах, нужны документы об открытии брокерского счета, и справка по форме 10 42 эс.
+            a: Но, если доход был получен через иностранные биржи, дополнительно запросите у менеджера уведомление о присвоении торгового кода, и уведомление о дивидендах налогах и комиссиях.
+            a: Чем я могу еще помочь?
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: Ответ_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+                
+        state: Ответ_undefined
+            script:
+                $context.session = {};
+                $reactions.transition("/NoMatch");
+        
+    state: Предварительный расчет
+        intent!: /025 Налоги/Предварительный расчет
+        script:
+            $analytics.setMessageLabel("Предварительный расчет", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Предварительный расчет/Уточнение компании");
+            } else { 
+                $reactions.transition("/Предварительный расчет/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Брокер; Банк, Управляющая компания, или Форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Предварительный расчет");
+            
+        state: Ответ_Брокер
+            a: Текущий предварительный расчет налога доступен в личном кабинете на сайте фина'м точка ру. Для этого выберите меню, отчёты, далее выберите раздел, налоги и справки, во вкладке налоги, расчет налога по эмитентам.
+            a: Документ будет сформирован в течение нескольких минут. Рекомендуем обновить страницу.
+            a: Обращаем ваше внимание, что результаты расчета носят предварительный характер, и могут отличаться от фактического финансового результата для целей налогообложения.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: Ответ_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+                
+        # state: Ответ_undefined
+        #     script:
+        #         $context.session = {};
+        #         $reactions.transition("/NoMatch");
+        
+    state: Методика расчета ндфл
+        intent!: /025 Налоги/Методика расчета ндфл
+        script:
+            $analytics.setMessageLabel("Методика расчета ндфл", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Методика расчета ндфл/Уточнение компании");
+            } else { 
+                $reactions.transition("/Методика расчета ндфл/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Брокер; Банк, Управляющая компания, или Форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Методика расчета ндфл");
+            
+        state: Ответ_Брокер
+            a: Фина'м является налоговым агентом в отношении инвестиционных доходов, кроме доходов, полученных на валютной секции Московской биржи, и кроме дивидендов и купонов по иностранным ценным бумагам.
+            a: Брокер сам рассчитывает и удерживает налог. По итогам года, при выводе денег, либо ценных бумаг со счета, или при расторжении брокерского договора.
+            a: Налог рассчитывается отдельно за каждый календарный год. Обращаем ваше внимание, что по счетам ИИС, нет ежегодной отчетности. Налог рассчитывается и удерживается при расторжении договора ИИС.
+            a: Подробнее про методику расчёта НДФЛ можно прочитать в личном кабинете на сайте, едо'кс точка Фина'м точка ру, в разделе сайта, Помощь, Инструкции шаблоны, расчет ндфл.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: Ответ_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+                
+        # state: Ответ_undefined
+        #     script:
+        #         $context.session = {};
+        #         $reactions.transition("/NoMatch");
+        
+    state: Возврат ндфл
+        intent!: /025 Налоги/Возврат ндфл
+        script:
+            $analytics.setMessageLabel("Возврат ндфл", "Интенты");
+            
+            if ( typeof $parseTree._company != "undefined" ){
+                $session.company = $parseTree._company;
+            }
+            if ( typeof $session.company == "undefined" ){
+                $reactions.transition("/Возврат ндфл/Уточнение компании");
+            } else { 
+                $reactions.transition("/Возврат ндфл/Ответ_" + $session.company.name);
+            }
+                
+        state: Уточнение компании
+            a: В рамках какой компании ваш вопрос, Брокер; Банк, Управляющая компания, или Форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @company *
+                script:
+                    $session.company = $parseTree._company;
+                    $reactions.transition("/Возврат ндфл");
+            
+        state: Ответ_Брокер
+            a: При пересчете актуальной налоговой базы, может возникнуть ситуация излишне удержанного налога. Брокер обязательно уведомит об этом в личном кабинете клиента на сайте Фина'м точка ру.
+            a: После получения такого Уведомления об излишне удержанном налоге, можно сформировать Заявление на его возврат, в разделе личного кабинета Отчеты, в меню Налоги и справки.
+            a: Подписать заявление можно в течение трёх лет с момента завершения отчетного периода. Средства поступят по указанным в заявлении реквизитам в течение трёх месяцев.
+            a: Чтобы вернуть налог за счет убытков прошлых лет, нужно обратиться в налоговую службу. Налоговый кодекс позволяет учитывать убытки, образовавшиеся за предыдущие десять лет.
+            a: Для этого нужно заказать у брокера справку об убытках, и справку 2-НДФЛ в личном кабинете, в разделе Отчеты. По необходимости вы можете выбрать получение справки в электронном или бумажном виде.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ответ_Форекс
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+        
+        state: Ответ_Банк
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+            
+        state: Ответ_УК
+            script:
+                $session.operatorPhoneNumber =  $session.company.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+                # final scenario
+    
+    state: Налоговое резидентство
+        intent!: /025 Налоги/Налоговое резидентство
+        script:
+            $analytics.setMessageLabel("Налоговое резидентство", "Интенты");
+        a: Пожалуйста, уточните, вы являетесь гражданином рф?
+        q: @agree ||toState = "/Налоговое резидентство/РФ"
+        q: @disagree ||toState = "/Налоговое резидентство/НЕ РФ" 
+        q: @repeat_please * ||toState = "."
+        
+        state: РФ
+            a: Если вы получили гражданство РФ более 183 дней назад, то вы можете получить статус налогового резидента в брокере фина'м.
+            a: Для этого нужно лично посетить офис компании, подписать заявление, и предоставить паспорт с датой прописки более 183 дней.
+            a: Если вы хотите стать налоговым не' резидентом РФ в брокере фина'м, то нужно предоставить в электронном виде, в чате с поддержкой или на электронную почту, скан-копии всех страниц загранпаспорта или документ подтверждающий статус налогового резидента в другой стране.
+            a: В ответ, менеджер направит вам шаблон заявления; его нужно будет подписать на бумажном носителе и отсканировать.
+            a: Чем я могу еще помочь?
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+                
+        state: НЕ РФ
+            a: Для получения статуса налогового резидента РФ у брокера фина'м, нужно лично обратится в офис компании, подписать заявление, предоставить паспорт и дополнительные документы.
+            a: Если в вашем паспорте стои'т отметка о пересечении границы, то понадобится миграционная карта. Если отметка о пересечении границы в паспорте отсутствует;
+            a: то нужно предоставить: справку с места работы; копию трудовой книжки или трудового договора; табели учета рабочего времени за год.
+            a: Для упрощения процедуры, можно предоставить документ о признании налогового резидентства, оформленный самостоятельно в налоговой службе.
+            a: Предоставлять документы и подписывать заявление для подтверждения статуса налогового резидента необходимо до расчета налоговой базы;
+            a: То есть до момента вывода средств или активов, или до конца календарного года.
+            a: Чем я могу еще помочь?
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+                
+    state: Санкции_СПБ_биржа
+        intent!: /033 Санкции_СПБ биржа
+        script:
+            $analytics.setMessageLabel("033 Санкции_СПБ биржа", "Интенты");
+        a: На СПБ Бирже приостановлены торги Иностранными ценными бумагами. С 28 ноября СПБ биржа перевела иностранные ценные бумаги на неторговый раздел счета, торги такими активами приостановлены.
+        a: После перевода на неторговый раздел, бумаги исключены из торговых лимитов биржи, поэтому не отображаются в терминале, но их наличие отражено в личном кабинете брокера во вкладке Портфель, а также в справке по счету.
+        a: Фина'м получил от СПБ Биржи часть разблокированных средств инвесторов. Речь идет о рублевых активах, которые были распределены по счетам клиентов.
+        a: Согласно действующему механизму распределения доступ к части средств ограничен, а именно к гонконгским долларам и долларам США, полученным в результате продаж на СПБ Бирже.
+        a: Ограничения носят временный характер и будут сняты, как только СПБ Биржа добьется прогресса в получении разрешения от Управления по контролю за иностранными активами США.
+        a: Актуальная информация размещается на официальном сайте СПБ Биржи в разделе, новости. Обращаем ваше внимание, при торговле, на иностранных биржах, через брокера Фина'м, инфраструктура СПБ Биржи не задействована.
+        a: Вышестоящий брокер партнёр не раскрывает перед американскими биржами гражданство своих клиентов, поэтому риски в данном направлении минимальны.
+        a: Чем я могу еще помочь?
+        script: 
+            $context.session = {};
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
+    
+        
+    state: Котировки
+        intent!: /034 Котировки
+        
+        script:
+            $session.operatorPhoneNumber = '1000';
+            
+            if ( typeof $parseTree._list_stocks != "undefined" ){
+                $session.list_stocks = $parseTree._list_stocks;
+            }
+            if ( typeof $session.list_stocks == "undefined" ){
+                $reactions.transition("/Котировки/Уточнение актива");
+            } else {
+                $reactions.transition("/Котировки/Повторное уточнение актива");
+            }
+        
+        state: Уточнение актива
+            a: На данный момент я могу подсказать котировки по самым популярным российским акциям. Назовите наименование акции.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @list_stocks *
+                script:
+                    $session.list_stocks = $parseTree._list_stocks;
+                    $reactions.transition("/Котировки");
+                    
+        state: LocalCatchAll
+                event: noMatch
+                a: К сожалению, я еще не могу подсказать котировку по данному инструменту.
+                script:
+                    $session.operatorPhoneNumber =  '1000';
+                    $reactions.transition("/Оператор/Оператор по номеру");
+                    # final scenario
+                    
+        state: Повторное уточнение актива
+            a: Уточните, пожалуйста, Вы назвали акцию {{$session.list_stocks.name}} ?
+            q: * @agree * ||toState = "/Котировки/Отправка запроса"
+            q: * @disagree * ||toState = "/Оператор/Оператор по номеру"
+            q: @repeat_please * ||toState = "."
+        
+            
+        state: Уточнение АО или АП
+            a: Вас интересует информация, по обыкновенным или привилегированным акциям?
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @SS_SP *
+                script:
+                    $session.SS_SP = $parseTree._SS_SP;
+                    $reactions.transition($context.session.lastState + "/" + $session.SS_SP.name);    
+            
+        state: Отправка запроса
+            script:
+                if ( $session.list_stocks.preferenceOrstandart == "-" ){
+                    $context.session.lastState = $context.currentState;
+                    $reactions.transition("/Котировки/Уточнение АО или АП");
+                } else {
+                    $reactions.transition("/Котировки/Отправка запроса" + "/" + $session.list_stocks.preferenceOrstandart);
+                }
+            
+            state: АО
+                HttpRequest: 
+                    url = https://ftrr01.finam.ru/grpc-json/marketdata/v1/get_quotes
+                    method = PUT
+                    body = { "securities": { "id": { "security_id": {{$session.list_stocks.securityId}} } } }
+                    timeout = 100
+                    headers = [{"name":"Authorization","value": "eyJraWQiOiI4Nzg1ZTQxMS05NzFlLTQ0MWQtOTFkYS0zZDgyZWFmNWVlNDMiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhcmVhIjoidHQiLCJzY29udGV4dCI6IkNnc0lCeElIZFc1cmJtOTNiZ29vQ0FNU0pHWXlOak00T1RFM0xUazJZVGN0TkdVMlpDMWlOR1kzTFRBMFlqbG1NV1k1WWpCaVl3b0VDQVVTQUFvTENBQVNCM1Z1YTI1dmQyNEtLQWdDRWlRM05tRmxNekpsTkMwMVl6UTRMVFJtT1dJdE9URTVOeTFpTVRVd04yWTNOV1l3WTJRS0JRZ0lFZ0V4Q2dRSUNSSUFDZ1FJQ2hJQUNpZ0lCQklrT0RjNE5XVTBNVEV0T1RjeFpTMDBOREZrTFRreFpHRXRNMlE0TW1WaFpqVmxaVFF6R2d3SXZxbVZyQVlRd0xuOXd3RWlEQWkrMmIzQUJ4REF1ZjNEQVNnQyIsInppcHBlZCI6dHJ1ZSwiY3JlYXRlZCI6IjE3MDMyMzY3OTgiLCJyZW5ld0V4cCI6IjIwMTQzNjMxOTgiLCJzZXNzIjoiSDRzSUFBQUFBQUFBLzVQYXk4akJwTVNneGNiRjRoamtIQUdpQXp6OXZFRjBoSjlqTUlTT0JOUCtJYzVPRUw0N21PL3BHdUVPRlErRTByNGcyc2t4SkJocURzUzhZSGV3ZUlSanNDdUlkbzBJOElYS080UEZnUm9oNXZwQzdJSHpuV0hxZkxUWXVWampnMEtDd1FiNmVrSm9FRjhwbFV2RnhOQWt6ZExjd0VqWE9OVWtXZGZFMURoRjE5SWlPVTAzMVNETlBEbkozRExOM0RoWmlPdkNoQXU3TCt5NHNQZkNCaW0rQzNOQXJJdjlGM1lDeGZZcGlTZm1adVpWSm1ibTVEc2s1eGNWNktWbDVpWG02aFdWT25IazVldm01S2RuNW5Vd01nRUFqUVo1UWlvQkFBQSIsImlzcyI6InR4c2VydmVyIiwia2V5SWQiOiI4Nzg1ZTQxMS05NzFlLTQ0MWQtOTFkYS0zZDgyZWFmNWVlNDMiLCJmaXJlYmFzZSI6IiIsInNlY3JldHMiOiIzZ3NBVm0remwycGlUQktHeFdsYmFRPT0iLCJwcm92aWRlciI6IklOVEVSTkFMIiwic2NvcGUiOiJDQUVRQVEiLCJ0c3RlcCI6ImZhbHNlIiwiZXhwIjoyMDE0Mjc2Nzk4LCJqdGkiOiJmMjYzODkxNy05NmE3LTRlNmQtYjRmNy0wNGI5ZjFmOWIwYmMifQ.aG6-gjjHFzZl14OYitScvBl7eV_sxFjsnL3Tti7YuVoTujhgfYz7ii2N8Wk541ap35U0FF0o1-gRh_cLdoAJ1Q"},{"name":"Content-Type","value":"application\/json"}]
+                    vars = [ { "name": "quotes_resault", "value": "$httpResponse" } ]
+                    okState = /Котировки/Отправка запроса/Ответ на запрос
+                    errorState = /Котировки/Отправка запроса/Нет ответа на запрос
+                
+            state: АП    
+                HttpRequest: 
+                    url = https://ftrr01.finam.ru/grpc-json/marketdata/v1/get_quotes
+                    method = PUT
+                    body = { "securities": { "id": { "security_id": {{$session.list_stocks.securityId_SP}} } } } 
+                    timeout = 100
+                    headers = [{"name":"Authorization","value": "eyJraWQiOiI4Nzg1ZTQxMS05NzFlLTQ0MWQtOTFkYS0zZDgyZWFmNWVlNDMiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhcmVhIjoidHQiLCJzY29udGV4dCI6IkNnc0lCeElIZFc1cmJtOTNiZ29vQ0FNU0pHWXlOak00T1RFM0xUazJZVGN0TkdVMlpDMWlOR1kzTFRBMFlqbG1NV1k1WWpCaVl3b0VDQVVTQUFvTENBQVNCM1Z1YTI1dmQyNEtLQWdDRWlRM05tRmxNekpsTkMwMVl6UTRMVFJtT1dJdE9URTVOeTFpTVRVd04yWTNOV1l3WTJRS0JRZ0lFZ0V4Q2dRSUNSSUFDZ1FJQ2hJQUNpZ0lCQklrT0RjNE5XVTBNVEV0T1RjeFpTMDBOREZrTFRreFpHRXRNMlE0TW1WaFpqVmxaVFF6R2d3SXZxbVZyQVlRd0xuOXd3RWlEQWkrMmIzQUJ4REF1ZjNEQVNnQyIsInppcHBlZCI6dHJ1ZSwiY3JlYXRlZCI6IjE3MDMyMzY3OTgiLCJyZW5ld0V4cCI6IjIwMTQzNjMxOTgiLCJzZXNzIjoiSDRzSUFBQUFBQUFBLzVQYXk4akJwTVNneGNiRjRoamtIQUdpQXp6OXZFRjBoSjlqTUlTT0JOUCtJYzVPRUw0N21PL3BHdUVPRlErRTByNGcyc2t4SkJocURzUzhZSGV3ZUlSanNDdUlkbzBJOElYS080UEZnUm9oNXZwQzdJSHpuV0hxZkxUWXVWampnMEtDd1FiNmVrSm9FRjhwbFV2RnhOQWt6ZExjd0VqWE9OVWtXZGZFMURoRjE5SWlPVTAzMVNETlBEbkozRExOM0RoWmlPdkNoQXU3TCt5NHNQZkNCaW0rQzNOQXJJdjlGM1lDeGZZcGlTZm1adVpWSm1ibTVEc2s1eGNWNktWbDVpWG02aFdWT25IazVldm01S2RuNW5Vd01nRUFqUVo1UWlvQkFBQSIsImlzcyI6InR4c2VydmVyIiwia2V5SWQiOiI4Nzg1ZTQxMS05NzFlLTQ0MWQtOTFkYS0zZDgyZWFmNWVlNDMiLCJmaXJlYmFzZSI6IiIsInNlY3JldHMiOiIzZ3NBVm0remwycGlUQktHeFdsYmFRPT0iLCJwcm92aWRlciI6IklOVEVSTkFMIiwic2NvcGUiOiJDQUVRQVEiLCJ0c3RlcCI6ImZhbHNlIiwiZXhwIjoyMDE0Mjc2Nzk4LCJqdGkiOiJmMjYzODkxNy05NmE3LTRlNmQtYjRmNy0wNGI5ZjFmOWIwYmMifQ.aG6-gjjHFzZl14OYitScvBl7eV_sxFjsnL3Tti7YuVoTujhgfYz7ii2N8Wk541ap35U0FF0o1-gRh_cLdoAJ1Q"},{"name":"Content-Type","value":"application\/json"}]
+                    vars = [ { "name": "quotes_resault", "value": "$httpResponse" } ]
+                    okState = /Котировки/Отправка запроса/Ответ на запрос
+                    errorState = /Котировки/Отправка запроса/Нет ответа на запрос
+                
+            state: Ответ на запрос
+                script:
+                    if ($session.quotes_resault.quotes[0].status.message != ""){
+                        $reactions.transition("/Котировки/Отправка запроса/Нет информации"); 
+                    } else {
+                    
+                    $session.lastPrice = $session.quotes_resault.quotes[0].quote.last.num / Math.pow(10, $session.quotes_resault.quotes[0].quote.last.scale);
+                    $session.lastHigh = $session.quotes_resault.quotes[0].quote.lastHigh.num / Math.pow(10, $session.quotes_resault.quotes[0].quote.lastHigh.scale);
+                    $session.lastLow = $session.quotes_resault.quotes[0].quote.lastLow.num / Math.pow(10, $session.quotes_resault.quotes[0].quote.lastLow.scale);
+                    $session.lastChangePercent = $session.quotes_resault.quotes[0].quote.lastChangePercent.num / Math.pow(10, $session.quotes_resault.quotes[0].quote.lastChangePercent.scale);
+                    $session.lastChangePercent = ($session.lastChangePercent+"").replace("-", "- ");
+                    }  
+                a: Ожидайте, пожалуйста, проверяю    
+                a: Цена последней сделки: {{$session.lastPrice}}, 
+                a: максимальная за день: {{$session.lastHigh}}, 
+                a: минимальная за день: {{$session.lastLow}}, 
+                a: Изменение от цены открытия: {{$session.lastChangePercent}}%
+                a: Желаете узнать информацию по другой бумаге?
+                script: 
+                    $context.session = {};
+                q: @list_stocks ||toState = "/Котировки"   
+                q: @agree ||toState = "/Котировки"
+                q: @disagree ||toState = "/Могу еще чем то помочь?"
+                q: @repeat_please * ||toState = "."
+                # final answer
+                    
+            state: Нет информации
+                a: Я не смогла уточнить информацию.
+                script:
+                    $session.operatorPhoneNumber =  '1000';
+                    $reactions.transition("/Оператор/Оператор по номеру");
+                    # final scenario
+                    
+            state: Нет ответа на запрос
+                a: На данный момент сервис недоступен. 
+                script:
+                    $session.operatorPhoneNumber =  '1000';
+                    $reactions.transition("/Оператор/Оператор по номеру");
+                    # final scenario
+
+    state: Доступные биржи
+        intent!: /035 Доступные биржи
+        
+        script:
+            $analytics.setMessageLabel("035 Доступные биржи", "Интенты");
+            
+            if ( typeof $parseTree._exchanges != "undefined" ){
+                $session.exchanges = $parseTree._exchanges;
+            }
+            if ( typeof $parseTree._section != "undefined" ){
+                $session.section = $parseTree._section;
+            }            
+            if ( typeof $session.exchanges == "undefined" ){
+                $reactions.transition("/Доступные биржи/Уточнение биржи");
+            } else {
+                $reactions.transition("/Доступные биржи/" + $session.exchanges.name);
+            }
+    
+        state: Уточнение биржи
+            a: Клиентам фина'м доступны торги на Московской и СПБ Биржах. Американских биржах, Бирже Гонконга, и площадка форекс. Назовите биржу, чтобы узнать подробнее.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @exchanges *
+                script:
+                    $session.exchanges = $parseTree._exchanges;
+                    $reactions.transition("/Доступные биржи");
+            
+         
+        state: Уточнение секции на Московской бирже
+            a: Какая секция Московской биржи Вас интересует? Фондовая, срочная, или валютная секция.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @section *
+                script:
+                    $session.section = $parseTree._section;
+                    $reactions.transition("/Доступные биржи/Московская биржа/" + $session.section.name);
+
+                    
+        # state: Уточнение секции Американского рынка
+        #     a: Уточните, пожалуйста, какая секция Американского рынка Вас интересует Nyse/Nasdaq или CME/CBOE?
+        #     q: @repeat_please * ||toState = "."
+        #     state: Ожидание ответа
+        #         q: * @section *
+        #         script:
+        #             $session.section = $parseTree._section;
+        #             $reactions.transition("/Доступные биржи/Американский рынок/" + $session.section.name);                    
+            
+         
+        state: Московская биржа
+            script:
+                if ( typeof $session.section == "undefined" ){
+                    $reactions.transition("/Доступные биржи/Уточнение секции на Московской бирже");
+                } else {
+                    $reactions.transition("/Доступные биржи/Московская биржа/" + $session.section.name);
+                }
+
+            
+            state: Фондовая секция
+                a: На Московской бирже предоставляется доступ Фондовому рынку, где торгуются преимущественно российские ценные бумаги, акции, облигации, фонды, и депозитарные расписки.
+                a: Так же клиентам Фина'м доступна внебиржевая торговля заблокированными ценными бумагами.
+                a: Если вам интересно узнать подробнее, назовите тему. Время торгов на бирже, или режим расчетов по сделкам.
+                script:
+                    $context.session = {};
+                q: @trading_time ||toState = "/Время торгов/Московская биржа/Фондовая секция"
+                q: @calculation_mode ||toState = "/Режим расчетов/Московская биржа"
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+            
+            state: Срочная секция
+                a: Фина'м предоставляет доступ к фьючерсным и опционным контрактам московской биржи. Торги фьючерсами и опционами не имеют отложенных расчетов.
+                a: Фактическое начисление вариационной маржи' происходит только в основной клиринг с 18:50 по 19:00 по московскому времени.
+                a: Если вам интересно узнать подробнее, назовите тему, время торгов на бирже, или подробнее о торговле на срочном рынке?
+                script:
+                    $context.session = {};
+                q: @trading_time ||toState = "/Время торгов/Московская биржа/Срочная секция"
+                q: @forts_details ||toState = "/Срочный рынок"    
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+            
+            state: Валютная секция
+                go!: /Валюта_покупка|продажа/Ответ_Брокер
+                # a: Информация по валютной секции ММВБ
+                # script:
+                #     $context.session = {};
+                # q: @repeat_please * ||toState = "."
+                # q: @disagree ||toState = "/Могу еще чем то
+            
+        state: СПБ биржа
+            a: На СПБ Бирже приостановлены торги Иностранными ценными бумагами. Биржа предпринимает все возможные действия, чтобы предоставить доступ к активам с учетом введенных ограничений.
+            a: Расчеты по сделкам совершенным 1 и 2 ноября проведены, но денежные средства от сделок временно заблокированы в связи с задержками в исполнении выводов СПБ Биржей.
+            a: По факту вывода денежных средств с Биржи, денежные средства будут разблокированы. Обращаем ваше внимание, что данными заблокированными средствами нельзя погасить маржинальные позиции.
+            a: Актуальная информация размещается на официальном сайте СПБ Биржи в разделе, новости. Обращаем ваше внимание, при торговле, на иностранных биржах, через брокера Фина'м, инфраструктура СПБ Биржи не задействована.
+            a: Вышестоящий брокер партнёр не раскрывает перед американскими биржами гражданство своих клиентов, поэтому риски в данном направлении минимальны.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Форекс
+            a: Фина'м Форекс предоставляет возможность торговли более чем 20 видами валютных пар. При торговле с Фина'м Форекс всегда выгодные спрэды, и отсутствуют комиссии за сделки и обслуживание счёта.
+            a: Обращаем ваше внимание на условия торговли, такие как спрэд, то есть разница покупки и продажи. И своп, иными словами форвардные пункты; то есть перенос позиции через ночь, выходные или праздничные дни.
+            a: Актуальные условия торговли можно посмотреть на сайте Фина'м точка ру, в разделе сайта Форекс, в поле меню Трейдерам, Торговые условия.
+            a: А также информация об актуальном спрэде транслируется в терминале Meta Trader 4, в разделе Обзор рынка.
+            a: Хотите узнать подробнее о расписании торговых сессий на площадке форекс?
+            script:
+                $context.session = {};
+            q: @agree ||toState = "/Время торгов/Форекс"
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Американский рынок
+            a: В рамках американских бирж найс, насд'ак и си би оуи, предоставляется доступ к иностранным акциям и фондам, и опционам.
+            a: Торговля на американских биржах доступна квалифицированным инвесторам со счетами типа, Единый счет, счет U S Market Options, счет Сегрегированный Global, и со счетом Иностранные биржи.
+            a: Все расчеты производятся в долларах США, автоконвертация валюты при покупке не осуществляется. Торги бумагами на иностранных биржах проходят в режиме Т+2, то есть расчеты проходят через день после заключения сделки.
+            a: Хотите узнать подробнее о расписании торговых сессий на американских биржах?
+            script:
+                $context.session = {};
+            q: @agree ||toState = "/Время торгов/Американский рынок"
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            # script:
+            #     if ( typeof $session.section == "undefined" ){
+            #         $reactions.transition("/Доступные биржи/Уточнение секции Американского рынка");
+            #     } else {
+            #         $reactions.transition("/Доступные биржи/Американский рынок/" + $session.section.name);
+            #     }
+            
+            # state: Nyse_Nasdaq
+            #     a: Информация по Nyse/Nasdaq
+            #     # script: 
+            #     #     $context.session = {};
+            #     # q: @repeat_please * ||toState = "."
+            #     # q: @disagree ||toState = "/Могу еще чем то
+
+            # state: CME_CBOE
+            #     a: Информация по CME/CBOE
+            #     # script: 
+            #     #     $context.session = {};
+            #     # q: @repeat_please * ||toState = "."
+            #     # q: @disagree ||toState = "/Могу еще чем то
+                
+        state: Гонконгская биржа
+            a: Ценные бумаги Гонконга, листинго'ванные на СПБ бирже, доступны без статуса квалифицированного инвестора, при наличии подписанного в личном кабинете Уведомления о рисках.
+            a: И про'йденного тестирования на тему, иностранные ценные бумаги требующие тестирования. Все активы торгуются в гонконгских долларах, автоконвертация валюты при покупке не происходит.
+            a: Минимальный объем заявки, 8000 гонконгских долларов. Маржинальная торговля недоступна. Нерезидентам эРэФ, торговля недоступна, кроме граждан Республики Беларусь.
+            a: Основная торговая сессия проходит с 8:00 до 11:00 по московскому времени. В выходные дни торги не проводятся.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Внебиржевой рынок
+            a: Фина'м предоставляет сервис по продаже и покупке на Московской и СПБ Биржах иностранных ценных бумаг, ранее заблокированных европейскими депозитариями Euroclear и Clearstream.
+            a: В рамках сервиса заблокированные ИЦБ представляют собой торговый инструмент с тикером, состоящим из оригинального торгового кода бумаги и окончания, SPBZ, либо MM Бэ Зэ.
+            a: Торги доступны в дни работы бирж с 11:00 до 17:00 по московскому времени, через торговые системы фина'м трейд и ТРАНЗА'К.
+            a: В терминале фина'м трейд список доступных инструментов находится в левом вертикальном меню в разделе Рынки, в подборках Заблокированные инструменты.
+            a: Все поручения на сделки являются неторговыми и проводятся исключительно между клиентами Фина'м. Валюта расчетов, рубли РФ. Комиссия за сделку, 0,8%. Сервис не доступен для ИИС.
+            a: Для покупки заблокированных бумаг, нужен статус квалифицированного инвестора. Для продажи - статус не требуется.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        # state: Европейские биржи (добавить сущность на каждую биржу)
+        #     a: Информация по Европейским биржам.
+        #     # script: 
+        #     #     $context.session = {};
+        #     # q: @repeat_please * ||toState = "."
+        #     # q: @disagree ||toState = "/Могу еще чем то
+        
+    
+        
+    state: Время торгов
+        intent!: /036 Время торгов
+
+        script:
+            $analytics.setMessageLabel("036 Время торгов", "Интенты");
+            
+            if ( typeof $parseTree._exchanges != "undefined" ){
+                $session.exchanges = $parseTree._exchanges;
+                $session.tempExchanges = $parseTree._exchanges;
+            }
+            if ( typeof $parseTree._section != "undefined" ){
+                $session.section = $parseTree._section;
+                $session.tempSection = $parseTree._section;
+            }            
+            if ( typeof $session.exchanges == "undefined" ){
+                $reactions.transition("/Время торгов/Уточнение биржи");
+            } else {
+                $reactions.transition("/Время торгов/Праздники?");
+            }    
+    
+        state: Уточнение биржи
+            a: Расписание торговых сессий на какой бирже Вас интересует? На Московской, СПБ Бирже, на Американских биржах, Бирже Гонконга, или на площадке форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @exchanges *
+                script:
+                    $session.exchanges = $parseTree._exchanges;
+                    $session.tempExchanges = $parseTree._exchanges;
+                    $reactions.transition("/Время торгов");
+            
+         
+        state: Уточнение секции на Московской бирже
+            a: Какая секция Московской биржи Вас интересует? Фондовая, срочная, или валютная секция.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @section *
+                script:
+                    $session.section = $parseTree._section;
+                    $session.tempSection = $parseTree._section;
+                    $reactions.transition("/Время торгов/Московская биржа/" + $session.section.name);
+
+                    
+        # state: Уточнение секции Американского рынка
+        #     a: Уточните, пожалуйста, какая секция Американского рынка Вас интересует Nyse/Nasdaq или CME/CBOE?
+        #     q: @repeat_please * ||toState = "."
+        #     state: Ожидание ответа
+        #         q: * @section *
+        #         script:
+        #             $session.section = $parseTree._section;
+        #             $reactions.transition("/Время торгов/Американский рынок/" + $session.section.name);                    
+            
+        state: Праздники?
+            script:
+                if ( $session.holidays == "holidays" ){
+                    $reactions.transition("/Время торгов/Праздники?/Оповещение");
+                } else {
+                    $reactions.transition("/Время торгов/" + $session.tempExchanges.name);
+                }
+                
+            state: Оповещение        
+                # a: 23 февраля 2024 года — День защитника Отечества в России, торги и расчеты на Московской и СПБ Бирже не проводятся.
+                script:
+                    $reactions.transition("/Время торгов/" + $session.tempExchanges.name);
+
+         
+        state: Московская биржа
+            script:
+                if ( typeof $session.section == "undefined"){
+                    $reactions.transition("/Время торгов/Уточнение секции на Московской бирже");
+                } else {
+                    $reactions.transition("/Время торгов/Московская биржа/" + $session.tempSection.name);
+                }
+                
+            
+            state: Фондовая секция
+                a: Основная торговая сессия, на фондовом рынке акций и облигаций московской биржи, проходит с 10:00 до 18:40 по московскому времени. Премаркет основной сессии с 9:50 до 10:00, и постмаркет основной сессии с 18:40 до 18:50.
+                a: Премаркет вечерней сессии проходит с 19:00 до 19:05, и вечерняя сессия с 19:05 до 23:50 по московскому времени. В выходные дни торги не проводятся.
+                a: Чем я могу еще помочь?
+                script:
+                    # SessionClearing036();
+                    $session.exchanges = undefined;
+                    $session.section = undefined;
+                q: @repeat_please * ||toState = "/Время торгов/Праздники?"
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+            
+            state: Срочная секция
+                a: Торговая сессия начинается вечером и длится с 19:05 до 23:50, и продолжается на следующий день с 9 до 14:00 и с 14:05 до 18:50 по московскому времени. Клиринг проходит с 14 до 14:05, и с 18:50 до 19:05.
+                a: Фактическое начисление вариационной маржи' происходит только в основной клиринг с 18:50 до 19:00 по московскому времени.
+                a: Чем я могу еще помочь?
+                script:
+                    # SessionClearing036();
+                    $session.exchanges = undefined;
+                    $session.section = undefined;
+                q: @repeat_please * ||toState = "/Время торгов/Праздники?"
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+            
+            state: Валютная секция
+                a: Торги драгоценными металлами в режиме TOM проводятся с 6:50 до 19:00 по московскому времени. Торги валютными парами в режиме SPТ, ТОМ, и ТМС проводятся с 6:50 до 19:00 по московскому времени.
+                a: Торги валютными парами в режиме TOD и СВОП проводятся согласно регламенту брокерского обслуживания, приложение 24 точка 1.
+                a: То есть торговая сессия для пар в режиме TOD начинается с 6:50, а заканчивается в зависимости от валютной пары.
+                a: Торговая сессия валютной па'ры доллар рубль длится до 17:25; па'ры евро рубль и евро доллар торгуются до 14:45; па'ры доллар юань, и юань рубль до 11:50. Пары с белорусским рублём, турецкой лирой, и казахстанским тенге' к рублю эРэФ, торгуются до 11:45; и пара гонконгский доллар рубль, торгуется до 10:25 по московскому времени.
+                a: Чем я могу еще помочь?
+                script:
+                    # SessionClearing036();
+                    $session.exchanges = undefined;
+                    $session.section = undefined;
+                q: @repeat_please * ||toState = "/Время торгов/Праздники?"
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+            
+        state: СПБ биржа
+            a: На СПБ Бирже Российские ценные бумаги торгуются в основную сессию с 10:00 до 18:50 по московскому времени. Основная торговая сессия американских бумаг с 8:00 до 19:00. Вечерняя сессия с 19:00 до 1:45 ночи.
+            a: По ETF фондам доступ только до 00:00. Обращаем ваше внимание, что по разным категориям инструментов время начала торгов отличается, подробнее на сайте спб биржи.
+            a: Основная торговая сессия для гонконгских бумаг с 8:00 до 00:00 по московскому времени. В выходные дни торги не проводятся.
+            a: Чем я могу еще помочь?
+            script:
+                $session.exchanges = undefined;
+                $session.section = undefined;
+            q: @repeat_please * ||toState = "/Время торгов/Праздники?"
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Форекс
+            a: На внебиржевом валютном рынке форекс почти круглосуточные торги. В зимнее время торговая сессия открывается в понедельник, в 01:06 ночи, и закрывается в субботу в 00:58 по московскому времени.
+            a: В летнее время торговая сессия открывается в понедельник, в 00:06 ночи, и закрывается в пятницу, в 23:58 по московскому времени. В будние дни перерыв в торгах с 23:59 до 00:05 по московскому времени.
+            a: Чем я могу еще помочь?
+            script:
+                $session.exchanges = undefined;
+                $session.section = undefined;
+            q: @repeat_please * ||toState = "/Время торгов/Праздники?"
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+            
+        state: Американский рынок
+            a: В зимнее время основная торговая сессия на американских биржах проходит с 17:30 до 00:00 по московскому времени. Опционы торгуются только в основную сессию.
+            a: Премаркет для фондового рынка акций с 12 до 17:29, и постмаркет с 00:00 до 01 ночи по московскому времени. Во время премаркета рыночные заявки не принимаются.
+            a: Постмаркет недоступен для сегрегированных счетов. В выходные дни торги не проводятся.
+            a: Чем я могу еще помочь?
+            script:
+                $session.exchanges = undefined;
+                $session.section = undefined;
+            q: @repeat_please * ||toState = "/Время торгов/Праздники?"
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+
+            # state: CME_CBOE
+            #     a: Информация по CME/CBOE
+            #     # script: 
+            #     #     $context.session = {};
+            #     # q: @repeat_please * ||toState = "."
+            #     # q: @disagree ||toState = "/Могу еще чем то 
+           
+            # state: Nyse_Nasdaq
+            #     a: Информация по Nyse/Nasdaq
+            #     # script: 
+            #     #     $context.session = {};
+            #     # q: @repeat_please * ||toState = "."
+            #     # q: @disagree ||toState = "/Могу еще чем то 
+
+            
+        state: Гонконгская биржа
+            a: На гонконгской бирже основная торговая сессия проходит с 8:00 до 11:00 по московскому времени. В выходные дни торги не проводятся.
+            a: Чем я могу еще помочь?
+            script:
+                $session.exchanges = undefined;
+                $session.section = undefined;
+            q: @repeat_please * ||toState = "/Время торгов/Праздники?"
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Внебиржевой рынок
+            a: Внебиржевые торги заблокированными ценными бумагами на Московской и СПБ биржах проходят с 11:00 до 17:00 по московскому времени.
+            a: В выходные дни торги не проводятся. Основная сессия внебиржевых торгов на Московской бирже с центральным контрагентом проходит с 10:00 до 18:40 по московскому времени.
+            a: Вечерняя сессия с 19:05 до 23:50 по московскому времени. В выходные дни торги не проводятся.
+            a: Чем я могу еще помочь?
+            script:
+                $session.exchanges = undefined;
+                $session.section = undefined;
+            q: @repeat_please * ||toState = "/Время торгов/Праздники?"
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        # state: Европейские биржи (добавить сущность на каждую биржу)
+        #     a: Информация по Европейским биржам.
+        #     # script: 
+        #     #     $context.session = {};
+        #     # q: @repeat_please * ||toState = "."
+        #     # q: @disagree ||toState = "/Могу еще чем то
+        
+        
+    state: Режим расчетов
+        intent!: /037 Режим расчетов
+        
+        script:
+            $analytics.setMessageLabel("037 Режим расчетов", "Интенты");
+            
+            if ( typeof $parseTree._exchanges != "undefined" ){
+                $session.exchanges = $parseTree._exchanges;
+                $session.tempExchanges = $parseTree._exchanges;
+            }
+            if ( typeof $session.exchanges == "undefined" ){
+                $reactions.transition("/Режим расчетов/Уточнение биржи");
+            } else {
+                $reactions.transition("/Режим расчетов/Праздники?");
+            }    
+    
+        state: Уточнение биржи
+            a: Торги на биржах осуществляются в разных режимах расчетов. Таких как, T+0, то есть расчеты в день сделки. Т+1, то есть расчеты на следующий день.
+            a: И Т+2, то есть расчеты через день после сделки. Это значит, что регистрация прав на ценные бумаги или валюту может происходить не в момент заключения сделки, а позднее, в зависимости от биржи и торгуемого актива.
+            a: Назовите биржу, чтобы узнать подробнее. Московская биржа. СПБ Биржа. Американские биржи, Гонконг, или площадка форекс.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @exchanges *
+                script:
+                    $session.exchanges = $parseTree._exchanges;
+                    $session.tempExchanges = $parseTree._exchanges;
+                    $reactions.transition("/Режим расчетов");
+                    # final answer
+            
+        state: Праздники?
+            script:
+                if ( $session.holidays == "holidays" ){
+                    $reactions.transition("/Режим расчетов/Праздники?/Оповещение");
+                } else {
+                    $reactions.transition("/Режим расчетов/" + $session.tempExchanges.name);
+                }
+                
+            state: Оповещение        
+                # a: 23 февраля 2024 года — День защитника Отечества в России, торги и расчеты на Московской и СПБ Бирже не проводятся.
+                script:
+                    $reactions.transition("/Режим расчетов/" + $session.tempExchanges.name);
+         
+        state: Московская биржа
+            a: Торги на Московской бирже акциями, инвестиционными паями, ETF, и облигациями, проводятся в режиме Т+1. А накопленный купонный доход от облигаций считается на дату расчетов по сделке и перечисляется продавцу в тот же день.
+            a: Торги валютой на бирже осуществляются в разных режимах, понять режим торгов валютной пары можно по окончанию тикера.
+            a: То есть у валютной пары с окончанием TOD, расчеты проходят день в день, с окончанием TOM, или TMS расчеты пройдут на следующий день, и у пары с окончанием SPT расчеты пройдут через день после сделки.
+            a: Торги фьючерсами и опционами на срочном рынке не имеют отложенных расчетов. Фактическое начисление вариационной маржи' происходит только в основной клиринг с 18:50 по 19:00 по московскому времени.
+            a: Чем я могу еще помочь?
+            script:
+                $session.exchanges = undefined;
+                $session.section = undefined;
+            q: @repeat_please * ||toState = "/Режим расчетов/Праздники?"
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+        state: СПБ биржа
+            a: Торги на СПБ Бирже российскими и квазироссийскими акциями проводятся в режиме Т+1, то есть расчеты проходят на следующий день после заключения сделки.
+            a: Расчеты по международным ценным бумагам проходят в режиме Т+2, то есть расчеты проходят через день после сделки.
+            a: Чем я могу еще помочь?
+            script:
+                $session.exchanges = undefined;
+                $session.section = undefined;
+            q: @repeat_please * ||toState = "/Режим расчетов/Праздники?"
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Форекс
+            a: При торговле на форекс, валюта не поставляется на счет. Расчеты проходят мгновенно по рыночной цене.
+            a: Чем я могу еще помочь?
+            script:
+                $session.exchanges = undefined;
+                $session.section = undefined;
+            q: @repeat_please * ||toState = "/Режим расчетов/Праздники?"
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Американский рынок
+            a: Торги международными ценными бумагами на иностранных биржах проходят в режиме Т+2, то есть расчеты проходят через день после заключения сделки.
+            a: Чем я могу еще помочь?
+            script:
+                $session.exchanges = undefined;
+                $session.section = undefined;
+            q: @repeat_please * ||toState = "/Режим расчетов/Праздники?"
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+        state: Гонконгская биржа
+            a: Торги международными ценными бумагами на иностранных биржах проходят в режиме Т+2, то есть расчеты проходят через день после заключения сделки.
+            a: Чем я могу еще помочь?
+            script:
+                $session.exchanges = undefined;
+                $session.section = undefined;
+            q: @repeat_please * ||toState = "/Режим расчетов/Праздники?"
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Внебиржевой рынок
+            a: Расчеты по внебиржевым торгам заблокированными ценными бумагами проходят в режиме T+2, то есть актив поставляется через день после заключения сделки.
+            a: Внебиржевые торги на ММВБ ОТС с ЦК осуществляются в режиме Т+1, то есть расчеты проходят на следующий день после заключения сделки.
+            a: Чем я могу еще помочь?
+            script:
+                $session.exchanges = undefined;
+                $session.section = undefined;
+            q: @repeat_please * ||toState = "/Режим расчетов/Праздники?"
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        # state: Европейские биржи (добавить сущность на каждую биржу)
+        #     a: Информация по Европейским биржам.
+        #     # script: 
+        #     #     $context.session = {};
+        #     # q: @repeat_please * ||toState = "."
+        #     # q: @disagree ||toState = "/Могу еще чем то                
+        
+
+    state: Демо счет
+        intent!: /038 Демо счет
+        script:
+            $analytics.setMessageLabel("038 Демо счет", "Интенты");
+        
+        a: Назовите торговую систему, чтобы узнать подробнее о демо счете; Фина'м трейд; квик; транза'к; платформа форекс.
+        
+        q: * @demo_FT_u * ||toState = "/Демо счет_информация по ИТС/FT"
+        q: * @demo_Quik_u * ||toState = "/Демо счет_информация по ИТС/Quik"
+        q: * @demo_transaq_u * ||toState = "/Демо счет_информация по ИТС/Transaq"
+        q: * @demo_MT4_u * ||toState = "/Демо счет_информация по ИТС/MT4"
+        q: * @choice_1 * ||toState = "/Демо счет_информация по ИТС/FT"
+        q: * @choice_2 * ||toState = "/Демо счет_информация по ИТС/Quik"
+        q: * @choice_3 * ||toState = "/Демо счет_информация по ИТС/Transaq"
+        q: * @choice_4 * ||toState = "/Демо счет_информация по ИТС/MT4"
+        q: @repeat_please * ||toState = "."
+        state: Ожидание ответа
+                q: * @ITS *
+                script:
+                    $session.ITS = $parseTree._ITS;
+                    $reactions.transition("/Демо счет_информация по ИТС");
+        
+    state: Демо счет_информация по ИТС
+        intent!: /038 Демо счет/Демо счет_информация по ИТС    
+
+        script:
+            $analytics.setMessageLabel("Демо счет_информация по ИТС", "Интенты");
+            
+            if ( typeof $session.ITS != "undefined" ){
+                $session.ITS_demo = $parseTree._ITS;
+            }
+            if ( typeof $parseTree._ITS_demo != "undefined" ){
+                $session.ITS_demo = $parseTree._ITS_demo;
+            }
+            if ( typeof $session.ITS_demo == "undefined" ){
+                $reactions.transition("/Демо счет");
+            } else {
+                $reactions.transition("/Демо счет_информация по ИТС/" + $session.ITS_demo.name);
+            }         
+  
+            
+        state: Quik
+            a: Подать заявку на открытие учебного демо счёта квик джуниор, можно на сайте фина'м точка ру. Для этого, в верхней части страницы сайта выберите раздел Инвестиции; далее выберите раздел Торговые платформы; КВИК. Далее нажмите желтую кнопку демо счет.
+            a: После подтверждения заявки на вашу электронную почту придет письмо с логином, паролем и ссылка на загрузку торговой системы. На одну электронную почту регистрация возможна один раз в год.
+            a: Торги на демо счете доступны в рабочие часы бирж. В выходные и праздничные дни торги не проводятся, и демо счета недоступны для торговли. На Фондовом рынке торги идут с 10 до 18:45.
+            a: На срочном рынке, с 09:00 до 22:00 по московскому времени, с перерывами на клиринг.
+            a: Если необходимо подключить срочную секцию в учебный терминал квик джуниор, после установки программы и выполнения настроек, обратитесь к менеджеру Фина'м, и сообщите ему логин своего учебного счета.
+            a: Логин состоит из цифр и начинается с шести нолей.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+
+                    
+        state: FT
+            a: Открыть демо счет в системе фина'м трейд можно на сайте фина'м точка ру. Кнопка Демо счет находится на странице сайта, справа от большой желтой кнопки открыть счет. Далее нажмите на кнопку Открыть демо-счет, и заполните форму заявки.
+            a: После подтверждения заявки на вашу электронную почту придет письмо с логином, паролем и ссылкой на загрузку торговой системы. На одну электронную почту регистрация возможна один раз в год.
+            a: Торги на демо счете доступны в рабочие часы бирж. В выходные и праздничные дни торги не проводятся, и демо счета недоступны для торговли. На Фондовом рынке торги идут с 10 до 18:45.
+            a: На срочном рынке, с 09:00 до 22:00 по московскому времени, с перерывами на клиринг.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+                
+        state: Transaq
+            a: Открыть демо счет в системе транза'к можно на сайте фина'м точка ру. Кнопка Демо счет находится на странице сайта, справа от большой желтой кнопки открыть счет. Далее нажмите на кнопку Открыть демо-счет, и заполните форму заявки.
+            a: После подтверждения заявки на вашу электронную почту придет письмо с логином, паролем и ссылкой на загрузку торговой системы. На одну электронную почту регистрация возможна один раз в год.
+            a: Торги на демо счете доступны в рабочие часы бирж. В выходные и праздничные дни торги не проводятся, и демо счета недоступны для торговли. На Фондовом рынке торги идут с 10 до 18:45.
+            a: На срочном рынке, с 09:00 до 22:00 по московскому времени, с перерывами на клиринг.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: MT4
+            a: Подать заявку на открытие учебного демо счёта форекс, можно на сайте фина'м точка ру. Для этого, в разделе сайта, форекс, выберите Платформа Meta Trader четыре. Дале выберите демо-счет, и заполните форму заявки.
+            a: После подтверждения заявки на вашу электронную почту придет письмо с логином, паролем и ссылкой на загрузку торговой системы. На одну электронную почту регистрация возможна один раз в год.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+                
+        state: TrConnector
+            a: Подать заявку на открытие учебного демо счёта транза'к конэктор, можно на сайте фина'м точка ру. Для этого, в верхней части страницы выберите раздел Инвестиции; далее выберите Торговые платформы, Все платформы.
+            a: Далее выберите сервис транза'к конэктор и заполните заявку на демо счет. После подтверждения заявки на вашу электронную почту придет письмо с логином и паролем. Загрузка дистрибутива не требуется.
+            a: Для подключения к стороннему программному обеспечению, достаточно указать логин и пароль от сервера.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+                
+        state: MT5
+            a: На текущий момент открытие демо-счёта Meta Trader пять, через фина'м невозможно. Вы можете подключить демо-счет через сайт разработчика.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+    state: Демо счет_ошибка в ИТС
+        intent!: /038 Демо счет/Демо счет_ошибка в ИТС
+        script:
+            $analytics.setMessageLabel("Демо счет_ошибка в ИТС", "Интенты");
+        
+        go!: /Демо счет_ошибка в ИТС/Ответ
+        
+        state: Ответ
+            a: Демо-счета помогают ознакомиться с функционалом торговой системы. Торги на демо счете доступны только в рабочие часы бирж. В выходные и праздники торги не проводятся, и демо счета недоступны для торговли.
+            a: На Фондовом рынке торги идут с 10 до 18:45. На срочном рынке, с 09:00 до 22:00 по московскому времени, с перерывами на клиринг. Виртуальные средства доступны только для учебной торговли, и недоступны для снятия.
+            a: Регистрация демо счёта на одну электронную почту возможна только один раз в год. Если у вас возникла техническая проблема в торговле на демо счете, и перезагрузка торгового терминала не помогла, то обратитесь к менеджеру поддержки.
+            script:
+                $context.session = {};
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            q: @repeat_please * ||toState = "."
+            # final answer
+        
+        
+    
+    state: Демо счет_подключение срочного рынка
+        intent!: /038 Демо счет/Демо счет_подключение срочного рынка
+        script:
+            $analytics.setMessageLabel("Демо счет_подключение срочного рынка", "Интенты");
+        
+        go!: /Демо счет_подключение срочного рынка/Ответ
+        
+        state: Ответ
+            a: Чтобы подключить срочную секцию в учебный терминал квик джуниор, после установки программы и выполнения настроек, обратитесь к менеджеру Фина'м, и сообщите ему логин своего учебного счета. Логин состоит из цифр и начинается с шести нолей.
+            a: Чем я могу еще помочь?
+            script:
+                $context.session = {};
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            q: @repeat_please * ||toState = "."
+            # final answer
+            
+
+            
+    state: 040 Сегрегированные счета
+        intent!: /040 Сегрегированные счета
+        script:
+            $analytics.setMessageLabel("040 Сегрегированные счета", "Интенты");
+        
+        a: Квалифицированным инвесторам со счетом Сегрегированный Global, доступна торговля Акциями и опционами на американских биржах; хранение активов в зарубежном депозитарии, а также хранение валюты без комиссии.
+        a: Какую информацию о сегрегированном счете рассказать подробнее; Открытие счета; пополнение; вывод средств, или налогообложение.
+        
+        q: * @smma_open_u * ||toState = "/Сегрегированные счета_Открытие счета"
+        q: * @SMMA_Replenishment_u * ||toState = "/Сегрегированные счета_Пополнение ДС_ЦБ"
+        q: * @SMMA_Withdrawal_u * ||toState = "/Сегрегированные счета_Вывод ДС_ЦБ"
+        q: * @SMMA_tax_u * ||toState = "/Сегрегированные счета_Уведомление налоговой"
+        q: * @choice_1 * ||toState = "/Сегрегированные счета_Открытие счета"
+        q: * @choice_2 * ||toState = "/Сегрегированные счета_Пополнение ДС_ЦБ"
+        q: * @choice_3 * ||toState = "/Сегрегированные счета_Вывод ДС_ЦБ"
+        q: * @choice_4 * ||toState = "/Сегрегированные счета_Уведомление налоговой"
+        q: * @choice_last * ||toState = "/Сегрегированные счета_Уведомление налоговой"
+        q: @repeat_please * ||toState = "."
+        
+    
+    state: Сегрегированные счета_Открытие счета
+        intent!: /040 Сегрегированные счета/Сегрегированные счета_Открытие счета
+        
+        script:
+            $analytics.setMessageLabel("Сегрегированные счета_Открытие счета", "Интенты");
+            $reactions.transition("/Сегрегированные счета_Открытие счета/Ответ_Брокер");
+            
+        state: Ответ_Брокер
+            a: Открытие счёта Сегрегированный Global, с хранением активов за рубежом, доступно только квалифицированным инвесторам, при личном посещении офиса или дистанционно.
+            a: Для открытия счёта нужен паспорт РФ, и второй документ на выбор из перечисленных: заграничный паспорт, водительское удостоверение, справка из банка, или счет за коммунальные услуги сроком не старше 6 месяцев, и с указанием ФИО и а'дреса.
+            a: Открытие счёта дистанционно, доступно только для действующих клиентов, квалифицированных инвесторов, у которых уже были ранее открыты счета в компании фина'м при личном посещении офиса компании.
+            a: Авторизуйтесь в личном кабинете на сайте фина'м точка ру, и выберите открыть счет, далее выберите иностранные рынки, Сегрегированный Global. Счет открывается в течение одного дня.
+            a: Торговля доступна с момента пополнения счёта. Так как счет открывается в иностранной компании, то в течение одного месяца с даты открытия счета, нужно уведомить налоговую службу.
+            a: Например, через сайт налог точка ру, в разделе Жизненные ситуации, выбрать, информировать о счете в банке расположенном за пределами РФ.
+            a: Хотите получить консультацию у оператора по открытию брокерских счетов?
+            script: 
+                # $context.session = {};
+                $session.operatorPhoneNumber =  '1000';
+            q: @agree ||toState = "/Оператор/Оператор по номеру"    
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        
+    
+    state: Сегрегированные счета_Пополнение ДС_ЦБ
+        intent!: /040 Сегрегированные счета/Сегрегированные счета_Пополнение ДС_ЦБ
+        
+        script:
+            $analytics.setMessageLabel("Сегрегированные счета_Пополнение ДС_ЦБ", "Интенты");
+            $reactions.transition("/Сегрегированные счета_Пополнение ДС_ЦБ/Ответ_Брокер");
+     
+
+        state: Ответ_Брокер
+            a: Валюта счёта Сегрегированный Global - доллар США. Пополнить сегрегированный счет по реквизитам можно как долларами США, так и рублями РФ. При пополнении счёта рублями РФ, конвертация в доллар США, происходит по текущему курсу плюс 4%.
+            a: Перед пополнением счёта, а также при необходимости перевода ценных бумаг, рекомендуем проконсультироваться с менеджером поддержки.
+            a: Чем я могу еще помочь?
+            script: 
+                # $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        
+        
+    state: Сегрегированные счета_Вывод ДС_ЦБ
+        intent!: /040 Сегрегированные счета/Сегрегированные счета_Вывод ДС_ЦБ
+        
+        script:
+            $analytics.setMessageLabel("Сегрегированные счета_Вывод ДС_ЦБ", "Интенты");
+            $reactions.transition("/Сегрегированные счета_Вывод ДС_ЦБ/Ответ_Брокер");
+        
+
+        state: Ответ_Брокер
+            a: Поручение на вывод денежных средств со счёта Сегрегированный Global можно подать через личный кабинет брокера партнера Lime Trading. Вывод доступен от 20 долларов США, евро или от 3000 рублей.
+            a: Вывод средств на счета банка фина'м без комиссии, однако, есть комиссия за зачисление долларов и евро на банковский счет в фина'м банке: 3% от суммы операции, но не менее 300 долларов США или евро.
+            a: Подробнее о способах вывода средств и комиссиях можно узнать на сайте брокера партнера Lime Trading, или у менеджера поддержки брокера фина'м.
+            a: Хотите получить консультацию?
+            script: 
+                # $context.session = {};
+                $session.operatorPhoneNumber = '1000';
+            q: @agree ||toState = "/Оператор/Оператор по номеру"
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        
+        
+    state: Сегрегированные счета_Уведомление налоговой
+        intent!: /040 Сегрегированные счета/Сегрегированные счета_Уведомление налоговой
+        
+        script:
+            $analytics.setMessageLabel("Сегрегированные счета_Уведомление налоговой", "Интенты");
+            $reactions.transition("/Сегрегированные счета_Уведомление налоговой/Ответ_Брокер");
+
+        state: Ответ_Брокер
+            a: Так как счет открывается в иностранной компании, то в течение одного месяца с даты открытия счета, нужно уведомить налоговую службу.
+            a: Например, через сайт налог точка ру, в разделе Жизненные ситуации, выбрать, информировать о счете в банке расположенном за пределами РФ.
+            a: По доходам полученным от торговли в рамках счёта Сегрегированный Global, отчитываться не нужно, Брокер фина'м является налоговым агентом.
+            a: Однако, по дивидендам, полученным в иностранной валюте, нужно отчитываться самостоятельно в федеральную налоговую службу.
+            a: Чем я могу еще помочь?
+            script: 
+                # $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+    
+    
+    state: Опционы
+        intent!: /041 Опционы
+        
+        script:
+            $analytics.setMessageLabel("041 Опционы", "Интенты");
+            
+            if ( typeof $parseTree._derivatives_markets != "undefined" ){
+                $session.derivatives_markets = $parseTree._derivatives_markets;
+            }
+        
+        a: Уточните, какая информация вас интересует; доступы к торговле опционами; виды опционов; доска опционов; поставка базового актива.
+        
+        q: * @access_to_options * ||toState = "/Опционы_Получение доступа"
+        q: * @type_options * ||toState = "/Опционы_Виды опционов"
+        q: * @options_board * ||toState = "/Опционы_Доска опционов"
+        q: * @delivery * ||toState = "/Опционы_Поставка"
+        q: * @choice_1 * ||toState = "/Опционы_Получение доступа"
+        q: * @choice_2 * ||toState = "/Опционы_Виды опционов"
+        q: * @choice_3 * ||toState = "/Опционы_Доска опционов"
+        q: * @choice_4 * ||toState = "/Опционы_Поставка"
+        q: * @choice_last * ||toState = "/Опционы_Поставка"
+        q: @repeat_please * ||toState = "."
+        
+    
+    state: Опционы_Получение доступа
+        intent!: /041 Опционы/Опционы_Получение доступа
+        
+        script:
+            $analytics.setMessageLabel("Опционы_Получение доступа", "Интенты");
+            
+            if ( typeof $parseTree._derivatives_markets != "undefined" ){
+                $session.derivatives_markets = $parseTree._derivatives_markets;
+            }
+            if ( typeof $session.derivatives_markets == "undefined" ){
+                $reactions.transition("/Опционы_Получение доступа/Уточнение рынка");
+            } else {
+                $reactions.transition("/Опционы_Получение доступа/" + $session.derivatives_markets.name);
+            } 
+        
+        
+        state: Уточнение рынка
+            a: Вас интересуют опционы на московской, или на американской бирже.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @derivatives_markets *
+                script:
+                    $session.derivatives_markets = $parseTree._derivatives_markets;
+                    $reactions.transition("/Опционы_Получение доступа");  
+
+            
+        state: FORTS
+            a: На Московской бирже представлены расчетные опционы на акции; и поставочные опционы на фьючерсы; статус квалифицированного инвестора для торговли не требуется.
+            a: Торговля опционами, доступна с раздельными брокерскими моно счетами, в торговых системах фина'м трейд, транза'к и квик; С единым брокерским счетом, доступны, только опционы на акции, и только в торговой системе Квик.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+
+        state: MMA
+            script:
+                $reactions.transition("/Доступные биржи/Американский рынок");
+
+        
+    
+    state: Опционы_Виды опционов
+        intent!: /041 Опционы/Опционы_Виды опционов
+        
+        script:
+            $analytics.setMessageLabel("Опционы_Виды опционов", "Интенты");
+            
+            if ( typeof $parseTree._derivatives_markets != "undefined" ){
+                $session.derivatives_markets = $parseTree._derivatives_markets;
+            }
+            if ( typeof $session.derivatives_markets == "undefined" ){
+                $reactions.transition("/Опционы_Виды опционов/Уточнение рынка");
+            } else {
+                $reactions.transition("/Опционы_Виды опционов/" + $session.derivatives_markets.name);
+            } 
+        
+        
+        state: Уточнение рынка
+            a: Вас интересуют опционы на московской, или на американской бирже.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @derivatives_markets *
+                script:
+                    $session.derivatives_markets = $parseTree._derivatives_markets;
+                    $reactions.transition("/Опционы_Виды опционов");  
+
+            
+        state: FORTS
+            a: На Московской бирже представлены два типа опционов; премиальные расчетные опционы на акции; и маржи'руемые поставочные опционы на фьючерсы; статус квалифицированного инвестора для торговли не требуется.
+            a: Премиальный опцион на акции – немаржи'руемый, и подразумевает единоразовую уплату премии покупателем; а также он расчетный, и не предполагает поставки базового актива, и исполняется биржей автоматически в день исполнения.
+            a: При покупке маржи'руемого опциона на фьючерсы, уплата премии распределяется на весь срок жизни контракта, в виде ежедневного перечисления вариационной маржи'.
+            a: Опционы на фьючерсы исполняются автоматически в день исполнения контракта, дополнительные заявки не требуются; если нужно исполнить досрочно или отказаться от исполнения опциона, обратитесь в отдел голосового трейдинга.
+            a: На договорах с раздельными брокерскими моно счета'ми, доступна торговля обоими видами опционов в торговых системах фина'м трейд, транза'к и квик; На едином брокерском счете, доступна торговля только опционами на акции, и только в торговой системе Квик.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        
+        state: MMA
+            a: Фина'м предоставляет доступ к торгам американскими опционами на Чикагской бирже опционов, Chicago Board Options Exchange. Торговля доступна в торговых системах фина'м трейд и транзак ю эс. 
+            a: Базовый актив опционов - американские акции. Режим торгов поставочный. При открытии позиции списывается премия в полном объеме; гарантийное обеспечение не блокируется.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+
+        
+        
+    state: Опционы_Доска опционов
+        intent!: /041 Опционы/Опционы_Доска опционов
+        
+        script:
+            $analytics.setMessageLabel("Опционы_Доска опционов", "Интенты");
+            
+            if ( typeof $parseTree._ITS != "undefined" ){
+                $session.ITS = $parseTree._ITS;
+            }
+            if ( typeof $session.ITS == "undefined" ){
+                $reactions.transition("/Опционы_Доска опционов/Уточнение ИТС");
+            } else {
+                $reactions.transition("/Опционы_Доска опционов/" + $session.ITS.name);
+            }
+        
+        
+        state: Уточнение ИТС
+            a: Назовите, доска опционов в какой торговой системе вас интересует; фина'м трейд, транзак, или квик.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @ITS *
+                script:
+                    $session.ITS = $parseTree._ITS;
+                    $reactions.transition("/Опционы_Доска опционов");    
+
+
+        state: FT
+            a: Чтобы открыть доску опционов в торговой системе фина'м трейд; авторизуйтесь в системе; в левом вертикальном меню выберите раздел Рынки; выберите нужный фьючерс, то есть базовый актив для опциона; после этого справа от кнопки Заявка, будет доступна кнопка Опционы.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        state: Quik
+            a: Чтобы открыть доску опционов в торговой системе квик; авторизуйтесь в системе; сверху на панели инструментов нажмите, Создать окно, Все типы окон, Доска опционов.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Transaq
+            a: Чтобы открыть доску опционов в торговой системе транзак; авторизуйтесь в системе; сверху на панели инструментов нажмите Таблицы, Финансовые инструменты. Правой кнопкой мыши по таблице инструментов, с помощью поиска, добавьте в таблицу нужный базовый актив опциона – фьючерс. Правой кнопкой мыши по добавленному фьючерсу выберите меню, Доска опционов.
+            a: Хотите узнать про доску опционов в транзак Ю эс?
+            script: 
+                $context.session = {};
+            q: @agree ||toState = "/Опционы_Доска опционов/Transaq/Transaq US"    
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            state: Transaq US
+                a: Чтобы открыть доску опционов в торговой системе транзак Ю эс; авторизуйтесь в системе; Сверху на панели инструментов нажмите Таблицы, Финансовые инструменты Financial Instruments.
+                a: Для нужной бумаги из таблицы Финансовые инструменты выберите Option Chain. Откроется окно Option Families. Выберите нужную серию опционов по дате экспирации.
+                a: Откроется доска опционов, где можно выбрать конкретный опцион и выставить заявку.
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+        
+        
+    state: Опционы_Поставка
+        intent!: /041 Опционы/Опционы_Поставка
+        
+        script:
+            $analytics.setMessageLabel("Опционы_Поставка", "Интенты");
+            
+            if ( typeof $parseTree._derivatives_markets != "undefined" ){
+                $session.derivatives_markets = $parseTree._derivatives_markets;
+            }
+            if ( typeof $session.derivatives_markets == "undefined" ){
+                $reactions.transition("/Опционы_Поставка/Уточнение рынка");
+            } else {
+                $reactions.transition("/Опционы_Поставка/" + $session.derivatives_markets.name);
+            } 
+        
+        
+        state: Уточнение рынка
+            a: Вас интересуют опционы на московской, или на американской бирже.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @derivatives_markets *
+                script:
+                    $session.derivatives_markets = $parseTree._derivatives_markets;
+                    $reactions.transition("/Опционы_Поставка");  
+
+            
+        state: FORTS
+            a: На Московской бирже, опционы на акции - расчетные, они не предполагают поставки базового актива, и исполняются биржей автоматически в день экспирации.
+            a: Опционы на фьючерсы, исполняются автоматически в день экспирации; и инвестор получает открытую позицию по фьючерсу. Исполнить опцион досрочно, либо отказаться от его исполнения можно через отдел голосового трейдинга.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        
+        state: MMA
+            a: Американский опцион на акции, можно исполнить в любой торговый день через отдел голосового трейдинга.
+            a: В последний день обращения, исполнение опциона происходит автоматически, но только в том случае, если опцион в деньгах; то есть его исполнение выгодно покупателю.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+    
+    state: Время работы
+        intent!: /042 Время работы
+        
+        script:
+            $analytics.setMessageLabel("042 Время работы", "Интенты");
+            
+            if ( $session.holidays == 'holidays' ){
+                $reactions.transition("/Время работы/Праздники");
+            } else {
+                $reactions.transition("/Время работы/Рабочие дни");
+            }                
+        
+        state: Праздники
+            # a: В период с 23 по 25 февраля - Выходные дни в офисах Фина'м.
+            # a: В новогодние праздники с первого по восьмое января, менеджеры поддержки работают в дежурном режиме; время ожидания ответа оператора может быть увеличено.
+            # a: Выходные дни в офисах Фина'м, с тридцатого декабря по второе января, а также  шестого, и седьмого января. В Москве, с третьего по пятое, и восьмого января работает только Центральный офис Фина'м, в Наста'сьинском переулке с 10 до 19 часов по московскому времени;
+            # a: А также восьмого января работает отделение на Кутузовском проспекте. Региональные отделения, с третьего по пятое, и восьмого января работают в дежурном режиме, график работы можно посмотреть на сайте фина'м точка ру, в разделе сайта, о компании, контакты.
+            # a: Отделения в городах Набережные Челны, Пятигорск, Киров – не работают в праздники. Отделение в городе Псков работает только пятого и восьмого января.
+            go!: /Время работы/Рабочие дни
+                
+        state: Рабочие дни
+            a: Дистанционная поддержка клиентов работает 24 на 7. Часы работы и адреса офисов компании, представлены на сайте, фина'м точка ру. В разделе сайта, о компании, контакты.
+            a: Хотите узнать о времени торгов на биржах? Я могу рассказать вам.
+            script: 
+                $context.session = {};
+            q: @agree ||toState = "/Время торгов"
+            q: @repeat_please * ||toState = "/Время работы"
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+    
+    state: Тест 7924
+        q!: Тестовый текст
+        a: Перевожу вас на оператора. Пожалуйста, оставайтесь на линии.
+        script: 
+                $session.operatorPhoneNumber =  '7924';
+                $reactions.transition("/Оператор/Оператор по номеру");
+                
+    
+    state: Тест Invite
+        q!: Тест первый
+        a: Перевожу вас на оператора. Пожалуйста, оставайтесь на линии.
+        script: 
+            $response.replies = $response.replies || [];
+            $response.replies.push({
+                "type": "switch",
+                "sipUri": "1000@10.77.102.30",
+                "continueCall": false,
+                "continueRecording": false
+            });
+                
+    state: Блокировка карт
+        intent!: /018 Блокировка карт
+        script: 
+                $analytics.setMessageLabel("018 Блокировка карт", "Интенты");
+                $session.operatorPhoneNumber =  '3411';
+                $reactions.transition("/Оператор/Оператор по номеру");
+            # final scenario
+                
+    state: Юридическое лицо
+        intent!: /044 Юридическое лицо
+        script: 
+                $analytics.setMessageLabel("044 Юридическое лицо", "Интенты");
+                $session.operatorPhoneNumber =  '1000';
+                $reactions.transition("/Оператор/Оператор по номеру");
+            # final scenario    
+                
+    state: Удаление данных
+        intent!: /043 Удаление данных
+        script: 
+                $analytics.setMessageLabel("043 Удаление данных", "Интенты");
+                $session.operatorPhoneNumber =  '1000';
+                $reactions.transition("/Оператор/Оператор по номеру");
+            # final scenario    
+                
+    
+        
+    state: Доходы
+        intent!: /045 Доходы
+        
+        a: Какие доходы Вас интересуют. Дивиденды или купоны?
+        
+        q: * @dividend * ||toState = "/Доходы_Дивиденды"
+        q: * @coupon * ||toState = "/Доходы_Купоны"
+        q: * @choice_1 * ||toState = "/Доходы_Дивиденды"
+        q: * @choice_2 * ||toState = "/Доходы_Купоны"
+        q: * @choice_last * ||toState = "/Доходы_Купоны"
+        q: @repeat_please * ||toState = "."
+        
+    
+    state: Доходы_Дивиденды
+        intent!: /045 Доходы/Доходы_Дивиденды
+        
+        a: Вас интересуют. Подробности выплаты дивидендов, дивидендный календарь, или налоговая отчетность?
+        
+        q: * @dividend_payment_u * ||toState = "/Дивиденды_Выплаты по дивидендам"
+        q: * @dividend_calendar_u * ||toState = "/Дивиденды_Дивидендный календарь"
+        q: * @dividend_taxes_u * ||toState = "/Дивиденды_Налоги"
+        q: * @choice_1 * ||toState = "/Дивиденды_Выплаты по дивидендам"
+        q: * @choice_2 * ||toState = "/Дивиденды_Дивидендный календарь"
+        q: * @choice_3 * ||toState = "/Дивиденды_Налоги"
+        q: * @choice_last * ||toState = "/Дивиденды_Налоги"
+        q: @repeat_please * ||toState = "."
+        
+
+        
+    state: Дивиденды_Выплаты по дивидендам
+        intent!: /045 Доходы/Доходы_Дивиденды/Дивиденды_Выплаты по дивидендам
+        
+        go!: /Дивиденды_Выплаты по дивидендам/Ответ
+        
+        state: Ответ
+            a: Максимальный срок выплаты дивидендов со стороны эмитентов составляет 10 рабочих дней. Со стороны брокера данный процесс занимает еще до 7 рабочих дней. 
+            a: На практике, фина'м производит выплаты клиентам в течение одного рабочего дня с момента получения средств от эмитента. Перечисление выплат дивидендов в иностранной валюте может занимать больше времени, так как в переводе средств участвуют банки-корреспонденты.
+            a: Выплата дивидендов предусмотрена на тот брокерский счет, где учитывалась данная ценная бумага.  Вы можете оформить или отменить выплату дохода на другой брокерский или банковский счет.
+            a: Чтобы выплаты доходов автоматически зачислялись на другой счет, нужно подать заявку в личном кабинете.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        
+        
+    state: Дивиденды_Дивидендный календарь
+        intent!: /045 Доходы/Доходы_Дивиденды/Дивиденды_Дивидендный календарь
+        
+        script:
+            if ( typeof $parseTree._list_stocks != "undefined" ){
+                $session.list_stocks = $parseTree._list_stocks;
+                $reactions.transition("/Дивиденды_Дивидендный календарь/Повторное уточнение актива");
+            }
+            else if ( typeof $session.list_stocks == "undefined" ){
+                $reactions.transition("/Дивиденды_Дивидендный календарь/Уточнение актива");
+            } else {
+                $reactions.transition("/Дивиденды_Дивидендный календарь/Отправка запроса");
+            }
+        
+        state: Уточнение актива
+            a: На данный момент я знаю ограниченное число российских акций. Уточните наименование акции, которая вас интересует.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @list_stocks *
+                script:
+                    $session.list_stocks = $parseTree._list_stocks;
+                    $reactions.transition("/Дивиденды_Дивидендный календарь/Повторное уточнение актива");
+                    
+            state: LocalCatchAll
+                event: noMatch
+                a: К сожалению, информация по данной ценной бумаге не найдена. Я только учусь и знаю ограниченное число голубых фишек.        
+                    
+        state: Повторное уточнение актива
+            a: Правильно ли я Вас услышала. Вы назвали акцию {{$session.list_stocks.name}} ?
+            q: * @agree * ||toState = "/Дивиденды_Дивидендный календарь"
+            q: * @disagree * ||toState = "/Дивиденды_Дивидендный календарь/Уточнение актива"
+            q: @repeat_please * ||toState = "."
+
+                
+                
+        state: Уточнение АО или АП
+            a: Вас интересует информация, по обыкновенным или привилегированным акциям?
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @SS_SP *
+                script:
+                    $session.SS_SP = $parseTree._SS_SP;
+                    # $reactions.answer($context.session.lastState + "/" + $session.SS_SP.name);
+                    $reactions.transition($context.session.lastState + "/" + $session.SS_SP.name);
+          
+
+        state: Отправка запроса
+            script:
+                if ( $session.list_stocks.preferenceOrstandart == "-" ){
+                    $context.session.lastState = $context.currentState;
+                    $reactions.transition("/Дивиденды_Дивидендный календарь/Уточнение АО или АП");
+                } else {
+                    $reactions.transition("/Дивиденды_Дивидендный календарь/Отправка запроса" + "/" + $session.list_stocks.preferenceOrstandart);
+                }
+                
+            state: АО
+                HttpRequest: 
+                    url = https://ftrr01.finam.ru/grpc-json/dividends/v1/future_dividends
+                    method = PUT
+                    body = { "filter": { "securityList": { "id": [ "{{$session.list_stocks.securityId}}" ] } } }
+                    timeout = 100
+                    headers = [{"name":"Authorization","value": "eyJraWQiOiIxMGEyMTFjMi0wMWE5LTRjZTQtOGJlYi0wYmQ3OWQ1YzMzNjYiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhcmVhIjoidHQiLCJzY29udGV4dCI6IkNnc0lCeElIZFc1cmJtOTNiZ29vQ0FNU0pEazBPV1EwTjJZMUxUazVaamd0TkRnMFpDMWhaamcyTFRkbU1XUTJZMlE0TVRVM1lnb0VDQVVTQUFvTENBQVNCM1Z1YTI1dmQyNEtLQWdDRWlReU5HVm1ORGhqWmkxaE5UZGtMVFE0TXpjdE9UWTJNaTAwWkdReE9HTTVZVEV4TWpZS0JRZ0lFZ0V4Q2dRSUNSSUFDZ1FJQ2hJQUNpZ0lCQklrTVRCaE1qRXhZekl0TURGaE9TMDBZMlUwTFRoaVpXSXRNR0prTnpsa05XTXpNelkyRWdRSUh4SUFHZ3NJaW9LbHJBWVFnTjd6YUNJTENJcXl6Y0FIRUlEZTgyZ29BZyIsInppcHBlZCI6dHJ1ZSwiY3JlYXRlZCI6IjE3MDM0OTM4OTgiLCJyZW5ld0V4cCI6IjIwMTQ2MjAyOTgiLCJzZXNzIjoiSDRzSUFBQUFBQUFBLzFOSzVWSXhzelF6TkxKSU1kZTFURFF5MGpVeFNqTFd0VEJMc2RSTk5ESTNzalEwc2JBMHNVd1Y0cm93NGNMdUN6c3U3TDJ3UVlydndod1E2MkwvaFoxQXNYMUs0b201bVhtVmlaazUrUTdKK1VVRmVtbVplWW01ZWtXbFRoeDUrYm81K2VtWmVSMk1UQURJNW0vT2FnQUFBQSIsImlzcyI6InR4c2VydmVyIiwia2V5SWQiOiIxMGEyMTFjMi0wMWE5LTRjZTQtOGJlYi0wYmQ3OWQ1YzMzNjYiLCJmaXJlYmFzZSI6IiIsInNlY3JldHMiOiIzUXdZQjhoMzZhZkYwRFhZYU01cEZBPT0iLCJwcm92aWRlciI6IklOVEVSTkFMIiwic2NvcGUiOiJDQUVRQVEiLCJ0c3RlcCI6ImZhbHNlIiwiZXhwIjoyMDE0NTMzODk4LCJqdGkiOiI5NDlkNDdmNS05OWY4LTQ4NGQtYWY4Ni03ZjFkNmNkODE1N2IifQ.EOPuGUkPzR0pc8MujtUjmnHBug2ETi2AMKwtfpqA0BaHVk4JVDfZnxtgqZAyKbksDLe2YZeSk45C9pArrKBabA"},{"name":"Content-Type","value":"application\/json"}]
+                    vars = [ { "name": "future_dividends_resault", "value": "$httpResponse" } ]
+                    okState = /Дивиденды_Дивидендный календарь/Отправка запроса/АО/Ответ на запрос
+                    errorState = /Дивиденды_Дивидендный календарь/Отправка запроса/АО/Нет ответа на запрос
+                
+                state: Ответ на запрос
+                    script:
+                        if ($session.future_dividends_resault == ""){
+                          $reactions.transition("/Дивиденды_Дивидендный календарь/Отправка запроса/АО/Ответ на запрос/Нет информации"); 
+                        }
+                        if(parseInt($session.future_dividends_resault[0].item[0].lastBuyDate.day) < 10){
+                            $session.future_dividends_resault[0].item[0].lastBuyDate.day = "0" + $session.future_dividends_resault[0].item[0].lastBuyDate.day;
+                        }
+                        if(parseInt($session.future_dividends_resault[0].item[0].reestrCloseDate.day) < 10){
+                            $session.future_dividends_resault[0].item[0].reestrCloseDate.day = "0" + $session.future_dividends_resault[0].item[0].reestrCloseDate.day;
+                        }
+                        if(parseInt($session.future_dividends_resault[0].item[0].lastBuyDate.month) < 10){
+                            $session.future_dividends_resault[0].item[0].lastBuyDate.month = "0" + $session.future_dividends_resault[0].item[0].lastBuyDate.month;
+                        }
+                        if(parseInt($session.future_dividends_resault[0].item[0].reestrCloseDate.month) < 10){
+                            $session.future_dividends_resault[0].item[0].reestrCloseDate.month = "0" + $session.future_dividends_resault[0].item[0].reestrCloseDate.month;
+                        }
+                    a: Ближайшая дата дивидендной отсечки по акциям {{$session.list_stocks.name}}: {{$session.future_dividends_resault[0].item[0].reestrCloseDate.day}}.{{$session.future_dividends_resault[0].item[0].reestrCloseDate.month}}.{{$session.future_dividends_resault[0].item[0].reestrCloseDate.year}}, последний день для покупки с дивидендами: {{$session.future_dividends_resault[0].item[0].lastBuyDate.day}}.{{$session.future_dividends_resault[0].item[0].lastBuyDate.month}}.{{$session.future_dividends_resault[0].item[0].lastBuyDate.year}}
+                    a: Чем я могу еще помочь?
+                    script: 
+                        $context.session = {};
+                    q: @repeat_please * ||toState = "."
+                    q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                    # final answer
+                    
+                    state: Нет информации
+                        a: Информации о датах дивидендной отсечки по акциям {{$session.list_stocks.name}} пока в календаре нет.
+                        a: Чем я могу еще помочь?
+                        script: 
+                            $context.session = {};
+                        q: @repeat_please * ||toState = "."
+                        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                        # final answer
+                    
+                state: Нет ответа на запрос
+                    a: На данный момент сервис недоступен, рекомендуем обратиться к менеджеру. 
+                    a: Чем я могу еще помочь?
+                    script: 
+                        $context.session = {};
+                    q: @repeat_please * ||toState = "."
+                    q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                    # final answer
+                    
+            
+            state: АП    
+                HttpRequest: 
+                    url = https://ftrr01.finam.ru/grpc-json/dividends/v1/future_dividends
+                    method = PUT
+                    body = { "filter": { "securityList": { "id": [ "{{$session.list_stocks.securityId_SP}}" ] } } }
+                    timeout = 100
+                    headers = [{"name":"Authorization","value": "eyJraWQiOiIxMGEyMTFjMi0wMWE5LTRjZTQtOGJlYi0wYmQ3OWQ1YzMzNjYiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhcmVhIjoidHQiLCJzY29udGV4dCI6IkNnc0lCeElIZFc1cmJtOTNiZ29vQ0FNU0pEazBPV1EwTjJZMUxUazVaamd0TkRnMFpDMWhaamcyTFRkbU1XUTJZMlE0TVRVM1lnb0VDQVVTQUFvTENBQVNCM1Z1YTI1dmQyNEtLQWdDRWlReU5HVm1ORGhqWmkxaE5UZGtMVFE0TXpjdE9UWTJNaTAwWkdReE9HTTVZVEV4TWpZS0JRZ0lFZ0V4Q2dRSUNSSUFDZ1FJQ2hJQUNpZ0lCQklrTVRCaE1qRXhZekl0TURGaE9TMDBZMlUwTFRoaVpXSXRNR0prTnpsa05XTXpNelkyRWdRSUh4SUFHZ3NJaW9LbHJBWVFnTjd6YUNJTENJcXl6Y0FIRUlEZTgyZ29BZyIsInppcHBlZCI6dHJ1ZSwiY3JlYXRlZCI6IjE3MDM0OTM4OTgiLCJyZW5ld0V4cCI6IjIwMTQ2MjAyOTgiLCJzZXNzIjoiSDRzSUFBQUFBQUFBLzFOSzVWSXhzelF6TkxKSU1kZTFURFF5MGpVeFNqTFd0VEJMc2RSTk5ESTNzalEwc2JBMHNVd1Y0cm93NGNMdUN6c3U3TDJ3UVlydndod1E2MkwvaFoxQXNYMUs0b201bVhtVmlaazUrUTdKK1VVRmVtbVplWW01ZWtXbFRoeDUrYm81K2VtWmVSMk1UQURJNW0vT2FnQUFBQSIsImlzcyI6InR4c2VydmVyIiwia2V5SWQiOiIxMGEyMTFjMi0wMWE5LTRjZTQtOGJlYi0wYmQ3OWQ1YzMzNjYiLCJmaXJlYmFzZSI6IiIsInNlY3JldHMiOiIzUXdZQjhoMzZhZkYwRFhZYU01cEZBPT0iLCJwcm92aWRlciI6IklOVEVSTkFMIiwic2NvcGUiOiJDQUVRQVEiLCJ0c3RlcCI6ImZhbHNlIiwiZXhwIjoyMDE0NTMzODk4LCJqdGkiOiI5NDlkNDdmNS05OWY4LTQ4NGQtYWY4Ni03ZjFkNmNkODE1N2IifQ.EOPuGUkPzR0pc8MujtUjmnHBug2ETi2AMKwtfpqA0BaHVk4JVDfZnxtgqZAyKbksDLe2YZeSk45C9pArrKBabA"},{"name":"Content-Type","value":"application\/json"}]
+                    vars = [ { "name": "future_dividends_resault", "value": "$httpResponse" } ]
+                    okState = /Дивиденды_Дивидендный календарь/Отправка запроса/АО/Ответ на запрос
+                    errorState = /Дивиденды_Дивидендный календарь/Отправка запроса/АО/Нет ответа на запрос
+                
+                state: Ответ на запрос
+                    script:
+                        if ($session.future_dividends_resault == ""){
+                          $reactions.transition("/Дивиденды_Дивидендный календарь/Отправка запроса/АО/Ответ на запрос/Нет информации"); 
+                        }
+                        if(parseInt($session.future_dividends_resault[0].item[0].lastBuyDate.day) < 10){
+                            $session.future_dividends_resault[0].item[0].lastBuyDate.day = "0" + $session.future_dividends_resault[0].item[0].lastBuyDate.day;
+                        }
+                        if(parseInt($session.future_dividends_resault[0].item[0].reestrCloseDate.day) < 10){
+                            $session.future_dividends_resault[0].item[0].reestrCloseDate.day = "0" + $session.future_dividends_resault[0].item[0].reestrCloseDate.day;
+                        }
+                        if(parseInt($session.future_dividends_resault[0].item[0].lastBuyDate.month) < 10){
+                            $session.future_dividends_resault[0].item[0].lastBuyDate.month = "0" + $session.future_dividends_resault[0].item[0].lastBuyDate.month;
+                        }
+                        if(parseInt($session.future_dividends_resault[0].item[0].reestrCloseDate.month) < 10){
+                            $session.future_dividends_resault[0].item[0].reestrCloseDate.month = "0" + $session.future_dividends_resault[0].item[0].reestrCloseDate.month;
+                        }
+                    a: Ближайшая дата дивидендной отсечки по акциям {{$session.list_stocks.name}}: {{$session.future_dividends_resault[0].item[0].reestrCloseDate.day}}.{{$session.future_dividends_resault[0].item[0].reestrCloseDate.month}}.{{$session.future_dividends_resault[0].item[0].reestrCloseDate.year}}, последний день для покупки с дивидендами: {{$session.future_dividends_resault[0].item[0].lastBuyDate.day}}.{{$session.future_dividends_resault[0].item[0].lastBuyDate.month}}.{{$session.future_dividends_resault[0].item[0].lastBuyDate.year}}
+                    a: Чем я могу еще помочь?
+                    script: 
+                        $context.session = {};
+                    q: @repeat_please * ||toState = "."
+                    q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                    # final answer
+                    
+                    state: Нет информации
+                        a: Информации о датах дивидендной отсечки по акциям {{$session.list_stocks.name}} пока в календаре нет.
+                        a: Чем я могу еще помочь?
+                        script: 
+                            $context.session = {};
+                        q: @repeat_please * ||toState = "."
+                        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                        # final answer
+                    
+                state: Нет ответа на запрос
+                    a: На данный момент сервис недоступен, рекомендуем обратиться к менеджеру. 
+                    a: Чем я могу еще помочь?
+                    script: 
+                        $context.session = {};
+                    q: @repeat_please * ||toState = "."
+                    q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                    # final answer
+                
+        
+        
+    state: Дивиденды_Налоги
+        intent!: /045 Доходы/Доходы_Дивиденды/Дивиденды_Налоги
+        
+        go!: /Налоговые ставки/Уточнение_налоги_купоны_дивиденды
+            
+            
+                
+    state: Доходы_Купоны
+        intent!: /045 Доходы/Доходы_Купоны
+        
+        a: Вас интересуют. Даты выплаты купонов, способы получения, или налоговая отчетность?
+        
+        q: * @coupon_payment_u * ||toState = "/Купоны_Дата выплат по купонам"
+        q: * @coupon_method_u * ||toState = "/Купоны_Способы получения"
+        q: * @coupon_taxes_u * ||toState = "/Купоны_Налоги"
+        q: * @choice_1 * ||toState = "/Купоны_Дата выплат по купонам"
+        q: * @choice_2 * ||toState = "/Купоны_Способы получения"
+        q: * @choice_3 * ||toState = "/Купоны_Налоги"
+        q: * @choice_last * ||toState = "/Купоны_Налоги"
+        q: @repeat_please * ||toState = "."
+        
+        
+    state: Купоны_Дата выплат по купонам
+        intent!: /045 Доходы/Доходы_Купоны/Купоны_Дата выплат по купонам
+        
+        go!: /Купоны_Дата выплат по купонам/Ответ
+        
+        state: Ответ
+            a: Максимальный срок выплаты купонов со стороны эмитента составляет 10 рабочих дней. Со стороны брокера данный процесс занимает еще до 7 рабочих дней. 
+            a: На практике, фина'м производит выплаты клиентам в течение одного рабочего дня с момента получения средств от эмитента. Перечисление выплат купонов в иностранной валюте может занимать больше времени, так как в переводе средств участвуют банки-корреспонденты.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+    
+            
+    state: Купоны_Способы получения
+        intent!: /045 Доходы/Доходы_Купоны/Купоны_Способы получения
+        
+        go!: /Купоны_Способы получения/Ответ
+        
+        state: Ответ
+            a: Выплата купонов предусмотрена на тот брокерский счет, где учитывалась данная ценная бумага.  Вы можете оформить или отменить выплату дохода на другой брокерский или банковский счет. 
+            a: Чтобы выплаты доходов автоматически зачислялись на другой счет, нужно подать заявку в личном кабинете.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+    state: Купоны_Налоги
+        intent!: /045 Доходы/Доходы_Купоны/Купоны_Налоги
+        
+        go!: /Налоговые ставки/Уточнение_налоги_купоны_дивиденды
+    
+    state: Заказ денег в кассе
+        intent!: /046 Заказ денег в кассе
+        script: 
+                //$analytics.setMessageLabel("044 Юридическое лицо", "Интенты");
+                $session.operatorPhoneNumber =  '1000';
+                $reactions.transition("/Оператор/Оператор по номеру");
+            # final scenario
+    
+    
+    state: Обезличенные сделки
+        intent!: /047 Обезличенные сделки
+        
+        a: Подключить или отключить поток обезличенных сделок можно в личном кабинете старого дизайна на сайте едо'кс точка фина'м точка ру.
+        a: Выберите раздел Торговля; Далее выберите пункт Информационно-торговые системы; разверните вкладку Ещё, выберите Подключение обезличенных сделок. Выполните подключение. 
+        a: Через час после подписания заявления активируется поток данных. Обязательно переподключи'тесь к торговому серверу. Обращаем ваше внимание, что для подключения потока обезличенных сделок по классу Индексы, нужно обратиться к менеджеру поддержки.
+        a: Чем я могу еще помочь?
+        script: 
+            $context.session = {};
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
+    
+    
+    
+    state: Заявки 
+        intent!: /049 Заявки
+        
+        a: Уточните, вы хотите узнать; Как купить или продать актив; Узнать о видах заявок;  Узнать статус или редактировать заявку; или у вас возникает ошибка в торговой системе.
+        
+        q: * @buy_sell_u * ||toState = "/Заявки_Покупка - Продажа"
+        q: * @order_working_u * ||toState = "/Заявки_Редактирование_Снятие_Статус заявки"
+        q: * @order_type_u * ||toState = "/Заявки_Виды заявок"
+        q: * @order_error_u * ||toState = "/Заявки_Ошибки"
+        q: * @choice_1 * ||toState = "/Заявки_Покупка - Продажа"
+        q: * @choice_2 * ||toState = "/Заявки_Редактирование_Снятие_Статус заявки"
+        q: * @choice_3 * ||toState = "/Заявки_Виды заявок"
+        q: * @choice_4 * ||toState = "/Заявки_Ошибки"
+        q: * @choice_last * ||toState = "/Заявки_Ошибки"
+        q: @repeat_please * ||toState = "."
+        
+        
+    state: Заявки_Покупка - Продажа
+        intent!: /049 Заявки/Заявки_Покупка - Продажа
+        
+        script:
+            if ( typeof $parseTree._asset_type != "undefined" ){
+                $session.asset_type = $parseTree._asset_type;
+            }
+            if ( typeof $session.asset_type == "undefined" ){
+                $reactions.transition("/Заявки_Покупка - Продажа/Уточнение актива");
+            } else {
+                $reactions.transition("/Заявки_Покупка - Продажа/"+ $session.asset_type.type);
+            }
+        
+        state: Уточнение актива
+            a: Операции с каким видом активов вас интересуют? Например, акции, облигации, фьючерсы, опционы или валюта?
+            q: * @choice_1 * ||toState = "/Заявки_Покупка - Продажа/Ценные бумаги"
+            q: * @choice_2 * ||toState = "/Заявки_Покупка - Продажа/Ценные бумаги"
+            q: * @choice_3 * ||toState = "/Заявки_Покупка - Продажа/Срочный рынок/Фьючерсы"
+            q: * @choice_4 * ||toState = "/Заявки_Покупка - Продажа/Срочный рынок/Опционы"
+            q: * @choice_last * ||toState = "/Заявки_Покупка - Продажа/Валюта"
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @asset_type *
+                script:
+                    $session.asset_type = $parseTree._asset_type;
+                    $reactions.transition("/Заявки_Покупка - Продажа");
+                    
+            state: LocalCatchAll
+                event: noMatch
+                a: Возможно, я не так вас поняла. Уточните вид актива, с которым планируете торговые операции.       
+    
+        
+        state: Ценные бумаги
+            a: Чтобы открыть позицию в терминале фина'м трейд, можно найти желаемый инструмент через поиск, или уже готовую подборку инструментов, и нажать кнопку заявка. Также открыть позицию можно нажатием на стакан, или нажатием правой кнопки мыши на свечу на графике.
+            a: В других торговых системах, открытие позиции доступно из таблицы инструментов, нажатием правой кнопки мыши по графику, или стакану. В любой торговой системе можно закрыть позицию, перейдя в раздел «Портфель».
+            a: Например, в терминале фина'м трейд достаточно нажать на строку с нужным активом, а в транза'к и квик, нажать правой кнопкой мыши по позиции в портфеле и выбрать действие. Также закрыть позицию можно с помощью новой заявки, то есть купленные инструменты нужно продать, а проданные в шорт позиции нужно откупить.
+            a: Прежде чем открыть или закрыть позицию, убедитесь, что она активна, что вы выбрали верный счет и на нем есть средства, обратите внимание на торговое время на бирже, и проверьте наличие уже выставленных ранее заявок.
+            go!: /Заявки_Покупка - Продажа/Ценные бумаги/Общая информация
+            # final answer
+
+            
+            state: Общая информация
+                a: Для покупки иностранных торговых инструментов недружественных стран-эмитентов требуется статус квал инвестора, при необходимости закрыть уже имеющуюся позицию по иностранным активам используйте транза'к, квик или отдел голосового трейдинга.
+                a: Выберите и назовите тему, чтобы узнать подробнее; как продать дробный лот акции; или как торговать заблокированными иностранными ценными бумагами.
+                script: 
+                    $context.session = {};
+                q: * @incomplete_lot_u * ||toState = "/Заявки_Покупка - Продажа/Ценные бумаги/Дробный лот"
+                q: * @blocking_icb_u * ||toState = "/Заявки_Покупка - Продажа/Ценные бумаги/Заблокированные ЦБ"
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+                
+            state: Дробный лот
+                a: Режим торгов в неполном лоте, доступен в торговых системах квик и транза'к. В системе транза'к, в форме ввода заявки нужно выбрать режим неполные лоты;
+                a: В системе Квик, в профиле поиска инструментов, нужно выбрать инструмент с припиской неполный лот. Чтобы продать неполный лот ценных бумаг, также можно обратиться в отдел голосового трейдинга.
+                a: Чем я могу еще помочь?
+                script: 
+                    $context.session = {};
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+                
+            state: Заблокированные ЦБ
+                a: Фина'м предоставляет сервис по продаже и покупке на Московской бирже, иностранных ценных бумаг, ранее заблокированных европейскими депозитариями. Торги на СПБ Бирже временно приостановлены.
+                a: В рамках сервиса, заблокированные бумаги представляют собой торговый инструмент с уникальным тикером, состоящим из оригинального торгового кода бумаги, и окончания эМ эМ Бэ Зэт. Торги в рабочее время биржи с 11 до 17:00 по москве, через системы транза'к и фина'м трейд.
+                a: В терминале фина'м трейд список доступных инструментов находится в левом вертикальном меню в разделе Рынки, в подборках Заблокированные инструменты. Все поручения на сделки являются неторговыми и проводятся исключительно между клиентами Фина'м.
+                a: Расчёты в валюте рубль РФ. Комиссия за сделку 0,8%. Недоступно для ИИС. Для покупки заблокированных бумаг нужен статус квалифицированного инвестора, для продажи - статус не требуется.
+                a: Перед совершением сделок нужно подписать Согласие на торговые операции с заблокированными бумагами. Для этого, в личном кабинете на сайте едо'кс точка фина'м точка ру, в разделе Услуги, выберите пункт Операции с ценными бумагами, далее выберите Торговые операции с заблокированными ИЦБ.
+                a: Узнать подробнее об услуге можно на сайте фина'м точка ру, в разделе сайта, Инвестиции, во вкладке Во что инвестировать, Заблокированные иностранные ценные бумаги.
+                a: Чем я могу еще помочь?
+                script: 
+                    $context.session = {};
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+
+            
+        state: Срочный рынок
+            
+            script:
+                $reactions.transition("/Заявки_Покупка - Продажа/Срочный рынок/"+ $session.asset_type.name);
+            
+            state: Фьючерсы
+                a: Чтобы открыть позицию в терминале фина'м трейд, можно найти желаемый инструмент через поиск, или уже готовую подборку инструментов, и нажать кнопку заявка. Также открыть позицию можно нажатием на стакан, или нажатием правой кнопки мыши на свечу на графике.
+                a: В других торговых системах, открытие позиции доступно из таблицы инструментов, нажатием правой кнопки мыши по графику, или стакану. В любой торговой системе можно закрыть позицию, перейдя в раздел «Портфель».
+                a: Например, в терминале фина'м трейд достаточно нажать на строку с нужным активом, а в транза'к и квик, нажать правой кнопкой мыши по позиции в портфеле и выбрать действие.
+                a: Также закрыть позицию можно с помощью новой заявки, то есть купленные инструменты нужно продать, а проданные в шорт позиции нужно откупить.
+                a: Прежде чем открыть или закрыть позицию, убедитесь, что она активна, что вы выбрали верный счет и на нем есть средства, обратите внимание на торговое время на бирже, и проверьте наличие уже выставленных ранее заявок.
+                go!: /Срочный рынок_покупка|продажа фьючерса
+                # final answer
+                
+            state: Опционы   
+                a: Удобный вариант для поиска опционов в торговой системе – это доска опционов. При выставлении заявки в торговой системе важно учитывать доступное время торгов на бирже, лотность инструмента, и его доступность на данный момент.
+                a: В любой торговой системе можно закрыть позицию, перейдя в раздел «Портфель». Например, в терминале фина'м трейд достаточно нажать на строку с нужным активом, а в транза'к и квик – нажать правой кнопкой мыши по позиции в портфеле и выбрать действие.
+                a: Также закрыть позицию можно с помощью новой заявки, то есть купленные инструменты нужно продать, а проданные позиции нужно откупить. Прежде чем открыть или закрыть позицию, убедитесь, что она активна, что вы выбрали верный счет и на нем есть средства, и проверьте наличие уже выставленных заявок.
+                go!: /Опционы_Виды опционов
+                # final answer
+                
+        state: Валюта
+            a: Чтобы открыть позицию в терминале фина'м трейд, можно найти желаемый инструмент через поиск, или уже готовую подборку инструментов, и нажать кнопку заявка. Также открыть позицию можно нажатием на стакан, или нажатием правой кнопки мыши на свечу на графике.
+            a: В других торговых системах, открытие позиции доступно из таблицы инструментов, нажатием правой кнопки мыши по графику, или стакану. В любой торговой системе можно закрыть позицию, перейдя в раздел «Портфель».
+            a: Например, в терминале фина'м трейд достаточно нажать на строку с нужным активом, а в транза'к и квик, нажать правой кнопкой мыши по позиции в портфеле и выбрать действие.
+            a: Также закрыть позицию можно с помощью новой заявки, то есть купленные инструменты нужно продать, а проданные в шорт позиции нужно откупить.
+            a: Прежде чем открыть или закрыть позицию, убедитесь, что она активна, что вы выбрали верный счет и на нем есть средства, обратите внимание на торговое время на бирже, и проверьте наличие уже выставленных ранее заявок.
+            go!: /Валюта_покупка|продажа
+            # final answer
+            
+        state: Форекс
+            a: Компания Фина'м, не предоставляет доступ к торговле форвардными и CFD контрактами.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+    
+    state: Заявки_Редактирование_Снятие_Статус заявки
+        intent!: /049 Заявки/Заявки_Редактирование_Снятие_Статус заявки
+        
+        go!: /Заявки_Редактирование_Снятие_Статус заявки/Ответ_Брокер
+        
+        state: Ответ_Брокер
+            a: Редактировать или снять заявку можно в торговой системе на странице отображения портфеля в разделе Заявки. Необходимо нажать на интересующую заявку и выбрать действие.
+            a: Заявки со статусами исполнена, отклонена или снята, не переносятся на следующую торговую сессию, и информация по ним очищается в системе. Статус заявки можно также проверить в торговом терминале.
+            a: Условные и стоп заявки до момента их исполнения хранятся на сервере торговой системы. Поэтому ордера, выставленные в одном терминале, не отображаются в другом до тех пор, пока не будут активированы.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+    
+    state: Заявки_Ошибки
+        intent!: /049 Заявки/Заявки_Ошибки
+        
+        script:
+            if ( typeof $parseTree._ITS_errors != "undefined" ){
+                $session.ITS_errors = $parseTree._ITS_errors;
+            }
+            if ( typeof $session.ITS_errors == "undefined" ){
+                $reactions.transition("/Заявки_Ошибки/Уточнение ошибки");
+            } else {
+                $reactions.transition("/Заявки_Ошибки/" + $session.ITS_errors.name);
+            }
+        
+        state: Уточнение ошибки
+            a: Пожалуйста, назовите текст из уведомления об ошибке.
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @ITS_errors *
+                script:
+                    $session.ITS_errors = $parseTree._ITS_errors;
+                    $reactions.transition("/Заявки_Ошибки");
+            
+        state: BAD_CLIENTID
+            a: Уведомление с текстом бэд кла'ент айди', или Попытка операции на несуществующий код клиента, может возникать в случае, если счет с данным торговым кодом не зарегистрирован. Регистрация торгового кода возможна до трех рабочих дней с момента отправки заявки.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Error 2 reading file
+            a: Уведомление с текстом Error to reading file означает, что при соединении с сервером, программа Квик не может найти файлы с публичной или секретной частью ключей.
+            a: Для устранения проблемы, нужно выполнить следующие настройки; открыть меню Система, перейти в настройки; Основные настройки; далее выбрать Основные; Программа; Шифрование; и нажать на кнопку в поле Настройки по умолчанию.
+            a: В появившейся форме, Текущие настройки, в полях Файл с публичными ключами, и Файл с секретными ключами, при нажатии на кнопки с многоточием в квадратных скобках, нужно указать местоположение публичного ключа pubring, и секретного ключа secring, соответственно.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: General protection fault
+            a: Уведомление с ошибкой General protection fault; Internal exception happened, означает что произошел программный сбой, и программа была завершена аварийно. В большинстве случаев работоспособность программы, можно восстановить путем удаления из директории, где хранится программа Квик, всех файлов с расширением Лог и Дат.
+            a: Если вышеприведенные рекомендации не помогут, то это означает, что файлы повреждены, и нужно повторно установить программу. Перед удалением можно сохранить файл с настройками вэ эн дэ, и ключи pubring и secring, в отдельную папку.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: HALT_INSTRUMENT
+            a: Уведомление с текстом HALT INSTRUMENT, может возникать в том случае, если по торговому инструменту приостановлены, заблокированы, или прекращены торги. 
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+        state: Вы используете ключи, не зарегистрированные на сервере
+            a: Данное сообщение об ошибке может возникать если пользователь пытается установить соединение с сервером Квик с ключами, незарегистрированными на сервере.
+            a: После подписания заявления на регистрацию публичной части ключа pubring, необходимо ожидать не менее часа. Регистрация новой пары ключей к одному идентификатору Квик, деактивирует предыдущую пару ключей.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Вы уже работаете в системе
+            a: Сервер Квик не допускает одновременную работу двух пользователей с одинаковыми ключами доступа. Для одновременной работы с одной парой ключей можно выбирать подключение к разным серверам.
+            a: Если такое сообщение получено при восстановлении соединения после обрыва, то достаточно повторить попытку через несколько секунд, когда сервер Квик прекратит обработку предыдущего соединения.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Дежурный режим
+            a: При выставлении Лимитных и Рыночных заявок в неторговое время, возникает сообщение Торговые операции недоступны в дежурном режиме; В этот период, доступно выставление только условных заявок, и стоп-лосса либо тэйк-про'фита. Торги на разных торговых площадках проводятся в разный период времени.
+            a: В выходные и праздничные дни, торги не проводятся, либо осуществляются в ограниченном формате. В рамках учебных демо счетов в неторговый период выставление всех типов заявок недоступно. Сервера учебных счетов начинают работать с 10:00 по москве. В выходные и праздничные дни торги не проводятся.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Доступное количество в портфеле 0
+            a: При продаже уже рассчитанных и поставленных валютных пар, или металлов, с помощью контрактов TOM или TMS, в портфеле может отображаться количество ноль, при этом выставление заявки будет доступно. Поставленные валюты и металлы отображаются как контракты TOD или TMS.
+            a: Проверить доступное количество для продажи можно в портфеле. При выставлении заявки на сумму, не превышающую остаток валюты/металлов в портфеле, короткая позиция не возникнет.
+            a: Для продажи валюты, доллар США, евро, или юань, в количестве менее 1000 единиц, то есть менее одного лота валюты, можно использовать инструменты с окончанием TMS.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Запрет трейдера на открытие позиций
+            a: Уведомление с текстом, Запрет трейдера на открытие позиций, означает, что открытие позиций в поставочных фьючерсах, в последний день обращения, за день до экспирации и поставки, недоступно. Используйте последующие контракты.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Ключ сервера или пользователя не найден
+            a: Данное уведомление возникает, когда пользователь совершает ошибку при наборе своего логина. В поле «Введите Ваше Имя» можно ввести только один первый символ, а не весь логин полностью, учитывайте раскладку клавиатуры (английская или русская).
+            a: Например, если логин «Смирнов», то можно ввести только букву «эС»; или, если логин состоит из цифр, например, 2 0 8 1 и так далее, можно ввести только первую цифру «2».
+            a: Пароль нужно вводить полностью. Обращаем ваше внимание, что верхний и нижний регистр (большие и маленькие буквы) программой идентифицируются как разные символы.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Недопустимое значение для данного инструмента
+            a: Уведомление с текстом, Недопустимое значение для данного инструмента, может возникать в том случае, если в форме заявки указано некорректное значение. Цена заявки должна соответствовать шагу цены по инструменту, информация указана в описании инструмента.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Не найден доступный маршрут или маркетные заявки в условных поручениях не разрешены
+            a: Уведомление с текстом Не найден доступный маршрут, или Маркетные заявки в условных поручениях не разрешены, может возникать случае, если нарушены условия выставления заявки. Например, на бирже Гонконга нужно соблюдать минимальный объем заявок от 8000 гонконгских долларов.
+            a: А также на американских биржах, во время премаркета и постмаркета, недоступно выставление рыночных заявок, рекомендуется работать с лимитными.
+            a: Обращаем ваше внимание, для исключения ошибок при срабатывания отложенных ордеров на американских биржах, запрещено выставление условных заявок, тэйк про'фита и стоп ло'сса с рыночным исполнением.
+            a: Чем я могу еще помочь? 
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+        state: Не пройдено тестирование
+            a: Уведомления с текстом: Не пройдено тестирование, Не подтвержден квалификационный уровень, или Вам запрещены сделки с инструментами, возникают в том случае если у вас отсутствует квалификационный уровень для работы с данным инструментом.
+            a: То есть нужно либо получить статус квалифицированного инвестора, либо пройти тестирование для неквалифицированных инвесторов, соответствующее категории инструмента;
+            a: Например, для торговли на срочной секции Мосбиржи, потребуется пойти тестирование на тему Производные финансовые инструменты, и Необеспеченные сделки. В то время как для торговли иностранными инструментами недружественных стран-эмитентов, нужен исключительно статус квал инвестора.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+        state: Нет кнопки Заявка (Замок)
+            a: По недоступным для торговли инструментам, кнопка Заявка заблокирована; в терминале Фина'м трейд, такие инструменты отмечены символом Замо'к. В торговых системах есть как торговые, так и индикативные инструменты.
+            a: Индикативные инструменты, такие как индексы, крипто валюты, или сырье, не торгуются, а несут информационный характер. Также, инструменты могут быть временно ограничены, на период корпоративных событий, или по инициативе вышестоящих организаций.
+            a: Фиолетовый символ Замка' в терминале Фина'м трейд говорит о том, что инструмент доступен со статусом квалифицированного инвестора. Также торговля может быть недоступна, по причине запрета торгов по счету; например, первичная активация счета происходит в течение нескольких часов после его пополнения от 150 рублей.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+        state: Не хватило памяти под объекты
+            a: Причиной уведомления, не хватило памяти под объекты, является недостаток ресурсов компьютера или программный сбой. Первым делом нужно проверить потребление оперативной памяти и загруженность ЦП в диспетчере задач Windows.
+            a: Для очистки временных файлов в системе Квик рекомендуется выполнить следующие действия: Первое, Закрыть программу Квик, если она при этом открыта.
+            a: Второе, в директории, где хранится программа Квик, удалить файлы с расширением log и Дат, кроме файлов Дат, в которых хранятся настройки внешних систем технического анализа если такие подключены. И запустить программу Квик.
+            a: Если приведенная рекомендация не поможет, то это означает, что файл с настройками, по умолчанию именуемый фина'м точка в н д, поврежден.
+            a: В таком случае нужно удалить файл с настройками; запустить программу без файла; и создать настройки заново, либо перезапустить настройки из предыдущего сохранения из папки вэ эн дэ сав.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+
+        state: Нехватка средств (Недостаточно обеспечения)
+            a: Уведомление с текстом, Нехватка средств, Недостаточно обеспечения, возникает, если средств на счёте недостаточно для выставления заявки. В первую очередь проверьте свободный денежный остаток в портфеле, а также убедитесь в отсутствии лишних активных заявок по каким-либо инструментам.
+            a: Под активные ордера блокируется обеспечение, что может помешать выставлению новой заявки. Обеспечение для открытия позиций с займом, или плечом, рассчитывается как разница оценки портфеля и заблокированной начальной маржи' по счету.
+            a: При выставлении рыночной заявки, требуется больше обеспечения по сравнению с лимитной; то есть для фьючерсов при выставлении рыночной заявки, блокируется в 1,5 раза больше гарантийного обеспечения. Рекомендуется работать лимитными заявками.
+            a: А также, по счетам типа Единая денежная позиция, со стандартным уровнем риска КСУР, на срочном рынке может блокироваться гарантийное обеспечение в 1,5 - 2 раза выше биржевого.
+            a: Хотите узнать подробнее о способах снизить гарантийное обеспечение?
+            script: 
+                $context.session = {};
+            q: @agree ||toState = "/Срочный рынок_уменьшение гарантийного обеспечения"
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Сделки по данному инструменту запрещены
+            a: Уведомление с текстом: Сделки по данному инструменту запрещены, или Данная ценная бумага не допущена к заключению сделок, может возникать в случае если заявка выставляется со счета нерезидента российской федерации. Данная проверка производится со стороны биржи.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Цена сделки вне лимита
+            a: По каждому инструменту существует свой диапазон выставления заявок. По инструментам срочного рынка, в спецификации контракта на бирже, указываются значения верхнего и нижнего лимита на момент последнего клиринга.
+            a: По ценным бумагам данный диапазон составляет от 5 до 15% от текущей стоимости инструмента. Биржа может ограничивать диапазон выставления заявок на свое усмотрение в случае резкого изменения цены инструмента.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        # .......    
+        # state: Не обновляется программа QUIK
+        #     a: Заглушка. Информация по ошибке Не обновляется программа QUIK
+        #     script: 
+        #         $context.session = {};
+        #     q: @repeat_please * ||toState = "."
+        #     q: @disagree ||toState = "/Могу еще чем то
+            
+        # state: Не обновляются данные на графиках/в таблицах
+        #     a: Заглушка. Информация по ошибке Не обновляются данные на графиках/в таблицах
+        #     script: 
+        #         $context.session = {};
+        #     q: @repeat_please * ||toState = "."
+        #     q: @disagree ||toState = "/Могу еще чем то
+        
+        # state: Нет данных в таблицах Сделки/Заявки
+        #     a: Заглушка. Информация по ошибке Нет данных в таблицах Сделки/Заявки
+        #     script: 
+        #         $context.session = {};
+        #     q: @repeat_please * ||toState = "."
+        #     q: @disagree ||toState = "/Могу еще чем то
+        
+        # state: Нет торгового кода в заявке
+        #     a: Заглушка. Информация по ошибке Нет торгового кода в заявке
+        #     script: 
+        #         $context.session = {};
+        #     q: @repeat_please * ||toState = "."
+        #     q: @disagree ||toState = "/Могу еще чем то
+        
+        # state: Вам запрещены сделки с инструментами
+        #     a: Заглушка. Информация по ошибке Вам запрещены сделки с инструментами
+        #     script: 
+        #         $context.session = {};
+        #     q: @repeat_please * ||toState = "."
+        #     q: @disagree ||toState = "/Могу еще чем то
+        
+        # state: Не подтвержден квалификационный уровень
+        #     a: Заглушка. Информация по ошибке Не подтвержден квалификационный уровень
+        #     script: 
+        #         $context.session = {};
+        #     q: @repeat_please * ||toState = "."
+        #     q: @disagree ||toState = "/Могу еще чем то
+            
+    
+    state: Заявки_Виды заявок
+        intent!: /049 Заявки/Заявки_Виды заявок
+        
+        script:
+            if ( typeof $parseTree._order_type != "undefined" ){
+                $session.order_type = $parseTree._order_type;
+            }
+            if ( typeof $session.order_type == "undefined" ){
+                $reactions.transition("/Заявки_Виды заявок/Уточнение типа заявки");
+            } else {
+                $reactions.transition("/Заявки_Виды заявок/" + $session.order_type.name);
+            }
+            
+        state: Уточнение типа заявки
+            a: Назовите, какой вид заявок вас интересует? Например, рыночная; условная; лимитная; стоп лосс, тэйк про'фит, или связанные заявки.
+            q: * @choice_1 * ||toState = "/Заявки_Виды заявок/Рыночная"
+            q: * @choice_2 * ||toState = "/Заявки_Виды заявок/Условная"
+            q: * @choice_3 * ||toState = "/Заявки_Виды заявок/Лимитная"
+            q: * @choice_4 * ||toState = "/Заявки_Виды заявок/Стоп-лосс"
+            q: * @choice_last * ||toState = "/Заявки_Виды заявок/Связанные"
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @order_type *
+                script:
+                    $session.order_type = $parseTree._order_type;
+                    $reactions.transition("/Заявки_Виды заявок");    
+        
+        state: Лимитная
+            a: Лимитная заявка исполняется по принципу лучшего исполнения. Для покупки, исполнение происходит по цене не выше указанной, то есть по значению меньше или равно; для продажи, исполнение происходит по цене не ниже указанной цены, то есть по значению больше или равно.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Условная
+            a: В торговых системах существуют несколько условий для исполнения заявок. Условие, время исполнения, означает, что заявка будет активирована и отправлена на биржу в указанное время.
+            a: Условие, Сделка выше или равна, считается выполненным, если сервер получил данные о появлении на рынке хотя бы одной сделки по цене выше или равно заданной в условии, при выполнении условия, заявка будет выставлена на биржу по цене заданной в поле цена исполнения.
+            a: Условие, Сделка ниже или равна, считается выполненным, если сервер получит данные о появлении на рынке хотя бы одной сделки по цене ниже или равно заданной в условии, при выполнении условия заявка будет выставлена на биржу по цене заданной в поле цена исполнения.
+            a: Условие, Срок действия заявки, можно выбрать, до отмены, до конца дня, до указанной даты.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Рыночная
+            a: Рыночная заявка исполняется по принципу лучшего исполнения; то есть при покупке автоматически будет выбрана наименьшая доступная цена, а при продаже наибольшая доступная цена. Обращаем ваше внимание на ряд важных моментов;
+            a: При выставлении рыночной заявки, требуется больше обеспечения по сравнению с лимитной; то есть для фьючерсов при выставлении рыночной заявки, блокируется в 1,5 раза больше гарантийного обеспечения.
+            a: Для некоторых инструментов рыночные заявки недоступны. Во время премаркета и пост маркета на американских биржах, недоступно выставление рыночных заявок; рекомендуем работать лимитными.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Стоп-лосс
+            a: Стоп-заявка предполагает, что инвестор заранее выбирает условия, при которых заявка активируется, и выставится либо лимитная либо рыночная заявка. При выставлении Стоп лосс нужно задать Цену активации и Цену исполнения.
+            a: При активации, на биржу будет выставлена заявка по цене, заданной в поле Цена исполнения. Заявка может быть выставлена со сроком действия, до отмены, до конца дня, до указанной даты.
+            a: Для закрытия коротких позиций следует выставлять стоп заявки на покупку, для закрытия длинных позиций, на продажу. Стоп лосс на продажу, активируется, когда цена на рынке станет меньше, либо равна, цене активации.
+            a: Стоп лосс на покупку, активируется, когда цена на рынке станет больше, либо равна, цене активации.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Тейк-профит
+            a: Тэйк про'фит предполагает, что инвестор заранее выбирает условия, при которых заявка активируется - и выставится лимитная либо рыночная. Для закрытия коротких позиций следует выставлять стоп заявки на покупку, для закрытия длинных позиций, на продажу.
+            a: Заявка может быть выставлена со сроком действия: до отмены, до конца дня, до указанной даты. Тэйк про'фит на продажу, активируется, когда цена на рынке станет больше либо равна цене активации.
+            a: Тэйк про'фит на покупку, активируется, когда цена на рынке станет меньше либо равна цене активации.
+            a: Вы хотите узнать подробнее про защитный спрэд и коррекцию?
+            script: 
+                $context.session = {};
+            q: @agree ||toState = "/Заявки_Виды заявок/Тейк-профит/Защитный спрэд и уровень коррекции"    
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            state: Защитный спрэд и уровень коррекции
+                a: Можно увеличить вероятность совершения сделки при исполнении тейка, задав условие, Защитный спрэд, либо использовав галочку, Рыночная. Если указать ноль, в поле Защитный спрэд, то на Биржу будет отправлена заявка с ценой, равной цене первой сделки на рынке, которая удовлетворяет цене активации.
+                a: Таким образом, для определения цены заявки, исполняющей тэйк про'фит на покупку, защитный спрэд прибавляется к цене рынка, в то время как для определения цены заявки исполняющей тэйк про'фит на продажу, защитный спрэд вычитается из цены рынка. Условие Коррекция, используется для того, чтобы включить механизм отслеживания тренда.
+                a: Данное условие используется следующим образом; Для тэйк про'фит на продажу, считается, что растущий тренд заканчивается в тот момент, когда после того, как рынок вырос до уровня цены активации или выше, он снизится на величину коррекции от максимальной цены.
+                a: В то время как для тэйк про'фит на покупку считается, что нисходящий тренд заканчивается в тот момент, когда после того, как рынок снизился до уровня цены активации или ниже, он вырастет на величину коррекции от минимальной цены.
+                a: Чем я могу еще помочь?
+                # Сделать отдельным интентом, чтобы клиент мог сразу уточнять инфу, а не через тейк профит
+                script: 
+                    $context.session = {};
+                q: @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+                # final answer
+            
+        state: Связанные
+            a: В веб терминале фина'м трейд, есть возможность выставить с графика лимитную заявку на закрытие позиции со связанными стоп-заявками, стоп-лоссом и тэйк-про'фитом. Обращаем ваше внимание, что привязать заявки к уже существующей заявке, невозможно.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+            
+    state: IPO  
+        intent!: /050 IPO
+        
+        a: Инвесторам фина'м, доступно участие в публичных размещениях ценных бумаг, и в аукционе облигаций федерального займа. Посмотреть календарь доступных размещений, подать или отменить заявку, узнать ее статус и номер, можно в личном кабинете, и в терминале фина'м трейд.
+        a: В личном кабинете, раздел Заявки айпио, находится внизу главной страницы личного кабинета, под перечнем активов. Нажмите на название раздела Заявки айпио, и разверните список.
+        a: После этого, справа от названия раздела, также появится переход в раздел доступных размещений, под названием, Публичные размещения акций и облигаций.
+        a: В терминале фина'м трейд, в левом вертикальном меню в разделе Первичные размещения, отмеченном значком ракеты; также содержится информация как о предстоящих размещениях, так и об уже поданных заявках, во вкладке Мои заявки.
+        a: Обращаем ваше внимание, что номер заявки размещения, появляется и отображается в списке поданных заявок, только в день технического размещения ценной бумаги.
+        a: Хотите узнать подробнее о комиссиях и условиях участия в первичном размещении?
+        script:
+            $context.session = {};
+        q: @agree ||toState = "/IPO_Условия участия"    
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        q: @repeat_please * ||toState = "."
+        # final answer
+            
+            
+    state: IPO_Условия участия
+        
+        script:
+            if ( typeof $parseTree._exchanges_IPO != "undefined" ){
+                $session.exchanges_IPO = $parseTree._exchanges_IPO;
+            }
+            if ( typeof $session.exchanges_IPO == "undefined" ){
+                $reactions.transition("/IPO_Условия участия/Уточнение типа рынка");
+            } else {
+                $reactions.transition("/IPO_Условия участия/" + $session.exchanges_IPO.name);
+            }
+            
+        state: Уточнение типа рынка
+            a: Вас интересует размещение на Российских, или Американских биржах?
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @exchanges_IPO *
+                script:
+                    $session.exchanges_IPO = $parseTree._exchanges_IPO;
+                    $reactions.transition("/IPO_Условия участия");    
+        
+        state: Российские
+            a: Для участия в российских размещениях, Статус квалифицированного инвестора не требуется, если иное не установлено эмитентом. Заявки принимаются минимально от 1000 рублей для размещений бумаг Финама, и от 10000 рублей для сторонних размещений, если иное не установлено эмитентом.
+            a: За участие в размещениях взымается комиссия от оборота на фондовой секции по вашему тарифному плану. А также следующие комиссии в зависимости от актива и биржи.
+            a: За участие в размещении облигаций на московской бирже, комиссия 0,04%, при обороте до 1000000 рублей в день; дополнительно взымается комиссия биржи за урегулирование в размере 0,015%.
+            a: За участие в размещении акций на московской бирже, комиссия 0,236% от суммы сделки; дополнительно взымается комиссия биржи за урегулирование 0,03%. За участие в размещении акций на СПБ бирже, взымается комиссия биржи за урегулирование 0,01%.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Американские
+            a: Размещение на зарубежных площадках доступно только со статусом квалифицированного инвестора. Заявки принимаются минимально от 1000 долларов США, если иное не установлено эмитентом.
+            a: Комиссия за участие составляет 5% от размещенной суммы, и взымается двумя частями: 2,5% взымается в рублях эРэФ, и 2,5% в долларах США. На момент подачи заявки по счету необходимо обеспечить свободные доллары США в сумме, достаточной для подачи заявки.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+            
+            
+    state: Справка по счету 
+        intent!: /052 Справка по счету
+        
+        a: Посмотреть историю начислений, и списаний; изменение баланса за выбранный период; цены покупок и продаж; корпоративные действия по бумагам находящимся в портфеле; можно самостоятельно в личном кабинете, в истории операций или в справке по счету.
+        a: Заказать справку по брокерскому счету, можно в личном кабинете на сайте, фина'м точка ру, для этого выберите меню отчёты, далее выберите раздел, налоги и справки. Максимальный интервал получения справки по счету, 92 дня. При необходимости получить годовой отчет, справку можно сформировать 4 раза.
+        a: В разделе, брокерский отчет, автоматически выгружаются отчеты брокера на подпись. Также, историю операций по счету, можно посмотреть в личном кабинете, для этого выберите нужный счет, далее выберите вкладку, история.  Для заказа брокерского отчета на бумажном носителе обратитесь к менеджеру поддержки.
+        a: Назовите тему, чтобы узнать подробнее; я могу рассказать; про начисление пени; о сделках Своп; операциях репо'; или про торговый оборот.
+        
+        q: * @oborot_u * ||toState = "/Справка по счету_Торговый оборот"
+        q: * @penalties_u * ||toState = "/Справка по счету_Начисление пени"
+        q: * @swap_u * ||toState = "/Справка по счету_Сделки СВОП"
+        q: * @repo_u * ||toState = "/Справка по счету_Сделки РЕПО"
+        q: * @choice_1 * ||toState = "/Справка по счету_Начисление пени"
+        q: * @choice_2 * ||toState = "/Справка по счету_Сделки СВОП"
+        q: * @choice_3 * ||toState = "/Справка по счету_Сделки РЕПО"
+        q: * @choice_4 * ||toState = "/Справка по счету_Торговый оборот"
+        q: * @choice_last * ||toState = "/Справка по счету_Торговый оборот"
+        q: @repeat_please * ||toState = "."
+        # final answer
+        
+    state: Справка по счету_Торговый оборот
+        intent!: /052 Справка по счету/Справка по счету_Торговый оборот
+        a: Торговый оборот за выбранный период, можно изучить в справке по счету в разделе справки, Виды движений денежных средств. Заказать справку по брокерскому счету, можно в личном кабинете на сайте, фина'м точка ру; для этого выберите меню отчёты, далее выберите раздел, налоги и справки.
+        a: Также, торговый оборот за последние 4 завершенных квартала, с целью получения статуса квалифицированного инвестора, можно проверить в личном кабинете на сайте фина'м точка ру. Для этого, в правом верхнем углу личного кабинета, нажмите на значок персоны, далее выберите, Инвестиционный статус.
+        a: Обращаем ваше внимание, согласно требованиям Центрального банка эРэФ, валютные операции не учитываются при подсчете оборота для присвоения статуса квалифицированного инвестора.
+        a: Чем я могу еще помочь?
+        script: 
+            $context.session = {};
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
+        
+        
+    state: Справка по счету_Начисление пени
+        intent!: /052 Справка по счету/Справка по счету_Пени
+        a: Пеня, это комиссия за займ денежных средств, которая образовалась в результате списаний по тарифам. За каждый день немаржинального займа, Инвестор уплачивает Брокеру пеню, на сумму неисполненных обязательств.
+        a: Для того чтобы пеня не списывалась, нужно иметь свободные денежные средства на брокерском счете, для удержания комиссий, сопутствующих торговле. В базу немаржинальной задолженности, попадают все списания в минус, на практике, это начисленные комиссии за сделки и переносы займа.
+        a: С этой базы берется пеня по единой ставке, соответствующей комиссии за займ по тарифному плану.
+        a: Чем я могу еще помочь?
+        script: 
+            $context.session = {};
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
+
+    state: Справка по счету_Сделки СВОП
+        intent!: /052 Справка по счету/Справка по счету_СВОП
+        a: Брокер осуществляет перенос валютных позиций инвестора в том случае, если на брокерском счете не могут пройти расчеты за сделки с валютой. Такие технические операции называются СВОП, или, сделки переноса необеспеченных валютных позиций.
+        a: Фактически, на брокерских счетах, одна валюта выступает обеспечением для другой; И, если на дату расчетов по сделке, на брокерском счёте инвестора, отрицательная чистая позиция по рублям или другой валюте, то возникнет СВОП. Наглядно изучить расчет комиссии за сделки СВОП, можно на сайте Фина'м точка ру.
+        a: Для этого в верхней части страницы сайта выберите раздел Инвестиции, далее выберите раздел Тарифы, Сравнение тарифов.
+        a: Чем я могу еще помочь?
+        script: 
+            $context.session = {};
+        q: @repeat_please * ||toState = "."
+        q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+        # final answer
+        
+    state: Справка по счету_Сделки РЕПО
+        intent!: /052 Справка по счету/Справка по счету_РЕПО
+        go!: /Overnight_REPO
+        # script:
+        #     $reactions.transition("/Overnight_REPO");
+        
+       
+    
+    state: Подписание документов
+        intent!: /054 Подписание документов
+        
+        a: Назовите тему, чтобы узнать подробнее; настройка смс-подписи; настройка электронной подписи; или что делать если не удается подписать документ.
+        
+        q: * @ASP_SMS * ||toState = "/Подписание документов_СМС подпись"
+        q: * @ECP * ||toState = "/Подписание документов_ЭЦП"
+        q: * @document_errors_u * ||toState = "/Подписание документов_Трудности подписания"
+        q: * @choice_1 * ||toState = "/Подписание документов_СМС подпись"
+        q: * @choice_2 * ||toState = "/Подписание документов_ЭЦП"
+        q: * @choice_3 * ||toState = "/Подписание документов_Трудности подписания"
+        q: * @choice_last * ||toState = "/Подписание документов_Трудности подписания"
+        q: @repeat_please * ||toState = "."
+        
+    
+    state: Подписание документов_СМС подпись
+        intent!: /054 Подписание документов/Подписание документов_СМС подпись
+        
+        script:
+            $reactions.transition("/Подписание документов_СМС подпись/Ответ_Брокер");
+            
+        state: Ответ_Брокер
+            a: Чтобы подписывать электронные документы и поручения в личном кабинете, подключите SMS подпись. Это удобная и современная альтернатива ключу электронной подписи; она бессрочна, и не требует перевыпуска; для подписания документа, достаточно ввести код, полученный в виде СМС на указанный мобильный телефон.
+            a: Настроить СМС подпись можно в Личном кабинете, на сайте едо'кс точка фина'м точка ру; в разделе Сервис. Услуга предоставляется бесплатно.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        
+    
+    state: Подписание документов_ЭЦП
+        intent!: /054 Подписание документов/Подписание документов_ЭЦП
+        
+        script:
+            $reactions.transition("/Подписание документов_ЭЦП/Ответ_Брокер");
+     
+        state: Ответ_Брокер
+            a: Перед созданием ключа электронной подписи, скачайте и установите специальный Плагин для генерации электронной подписи; он доступен на устройствах с системой Windows, рекомендуется использовать браузер Google Chrome.
+            a: Чтобы скачать плагин, авторизуйтесь в личном кабинете на сайте едо'кс точка фина'м точка ру, и перейдите в раздел Помощь, далее выберите пункт, Инструкции шаблоны ПэО. Скачайте Плагин и выполните настройку.
+            a: После установки плагина для генерации электронной подписи, можно приступить к ее выпуску. Для этого, в личном кабинете, на сайте едо'кс точка фина'м точка ру, перейдите в раздел Сервис; далее выберете, Электронная подпись, Создание ключей, Создать сертификат.
+            a: В открывшемся диалоговом окне выберите пустую папку для хранения нового ключа, и нажмите Старт. Шевелите мышкой до заполнения индикатора. После успешного создания ключа нажмите, Активировать, а затем Сохранить.
+            a: Плагин должен быть включен в настройках браузера, проверить можно, нажав три точки справа вверху браузера, выбрать меню Дополнительные инструменты, Расширения.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+        
+        
+        
+    state: Подписание документов_Трудности подписания
+        intent!: /054 Подписание документов/Подписание документов_Трудности подписания
+
+        script:
+            if ( typeof $parseTree._signing_difficulties != "undefined" ){
+                $session.signing_difficulties = $parseTree._signing_difficulties;
+            }
+            if ( typeof $session.signing_difficulties == "undefined" ){
+                $reactions.transition("/Подписание документов_Трудности подписания/Уточнение типа ошибки");
+            } else {
+                $reactions.transition("/Подписание документов_Трудности подписания/" + $session.signing_difficulties.name);
+            }
+            
+        state: Уточнение типа ошибки
+            a: Уточните, вам не приходит смс код, или вы не можете найти документ?
+            q: @repeat_please * ||toState = "."
+            state: Ожидание ответа
+                q: * @signing_difficulties *
+                script:
+                    $session.signing_difficulties = $parseTree._signing_difficulties;
+                    $reactions.transition("/Подписание документов_Трудности подписания");
+                    
+        state: Не получается найти
+            a: Как правило, подписанные и неподписанные документы, можно найти в личном кабинете на сайте фина'м точка ру; в разделе Отчёты, документы.
+            a: А также, если вам нужно отследить статус поданного поручения на отправку или получение документа, нужно зайти в раздел, где вы оформляли поручение, и выбрать правильный временной интервал дат.
+            a: Чем я могу еще помочь?
+            script: 
+                $context.session = {};
+            q: @repeat_please * ||toState = "."
+            q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
+            # final answer
+            
+        state: Не приходит смс
+            
+            go!: /Авторизация_Не приходит СМС
+    
+            
+
+    state: Оператор
+        intent!: /010 Оператор
+        # a: 111
+        script:
+            $analytics.setMessageLabel("Запрос оператора клиентом", "Оператор");
+            # final scenario
+            if( typeof $parseTree._company != "undefined"){
+                    $session.operatorPhoneNumber =  $parseTree._company.phoneNumber;
+                    $reactions.transition("./Оператор по номеру");
+                }  
+            else if( typeof $parseTree._department != "undefined"){
+                $reactions.transition("/Оператор/Отдел");
+            }
+            else if( typeof $parseTree._additionalTelephone != "undefined"){
+                $reactions.transition("./Личные добавочные");
+            }
+            else if( typeof $parseTree._officePhone != "undefined"){
+                $reactions.transition("./Регион добавочные");
+            }
+            else if( typeof $parseTree._officePhone_question != "undefined"){
+                $reactions.transition("./Регион добавочные_уточнение улицы");
+            }
+         
+            else {
+                //$reactions.answer("6");
+                $reactions.transition("./Уточнение отдела");
+            }
+            
+        state: Уточнение отдела
+            a: Уточните название отдела, с которым хотите связаться; поддержка брокера; голосовой трейдинг, банковские услуги, управляющая компания, или форекс?
+            q: * @officePhone * ||toState = "/Оператор/Регион добавочные"
+            q: * @officePhone_question * ||toState = "/Оператор/Регион добавочные_уточнение улицы"
+            q: * @additionalTelephone * ||toState = "/Оператор/Личные добавочные"
+            q: * @company * ||toState = "/Оператор/Уточнение отдела/Выбрана компания"
+            q: * @department * ||toState = "/Оператор/Отдел"
+            q: * @repeat_please * ||toState = "."
+            q: финам* ||toState = "/Оператор/Под_Финам"
+            q: @disagree ||toState = "/Другой_вопрос"
+            q: сорок ||toState = "/Оператор/Уточнение отдела/Форекс"
+            q: * @choice_1 * ||toState = "/Оператор/Уточнение отдела/Поддержка брокера"
+            q: * @choice_2 * ||toState = "/Оператор/Уточнение отдела/Голосовой трейдинг"
+            q: * @choice_3 * ||toState = "/Оператор/Уточнение отдела/Банковские услуги"
+            q: * @choice_4 * ||toState = "/Оператор/Уточнение отдела/Управляющая компания"
+            q: * @choice_5 * ||toState = "/Оператор/Уточнение отдела/Форекс"
+            q: * @choice_last * ||toState = "/Оператор/Уточнение отдела/Форекс"
+            
+            state: Поддержка брокера
+                script:
+                    $session.operatorPhoneNumber = '1000';
+                    $reactions.transition("../../Оператор по номеру");
+            state: Голосовой трейдинг
+                script:
+                    $session.operatorPhoneNumber = '2200';
+                    $reactions.transition("../../Оператор по номеру");
+            state: Банковские услуги
+                script:
+                    $session.operatorPhoneNumber = '1000';
+                    $reactions.transition("../../Оператор по номеру");
+            state: Управляющая компания
+                script:
+                    $session.operatorPhoneNumber = '1000';
+                    $reactions.transition("../../Оператор по номеру");
+            state: Форекс
+                script:
+                    $session.operatorPhoneNumber = '3887';
+                    $reactions.transition("../../Оператор по номеру");
+            state: Выбрана компания
+                script:
+                        $session.operatorPhoneNumber =  $parseTree._company.phoneNumber;
+                        $reactions.transition("../../Оператор по номеру");
+            # Для того, что бы не сработало распознание родительского (не было цикла) 
+            state: Оператор
+                intent: /010 Оператор
+                go!: ../../NoMatchOperator
+            # state: noMatch
+            #     event: noMatch
+            #     go!: ../../NoMatchOperator
+                
+        # state: Оператор_Банк 
+        #     a: Уточните, Вас интересует обслуживание физических, или юридических лиц.
+        #     q: @repeat_please * ||toState = "."
+            
+        #     state: FL_YL
+        #         q: * @FL_YL *
+        #         script:
+        #             $session.operatorPhoneNumber = $parseTree._FL_YL.phoneNumber;
+        #         go!: ../../Оператор по номеру
+            
+        #     # Для того, что бы не сработало распознание родительского (не было цикла) 
+        #     state: Оператор
+        #         intent: /010 Оператор
+        #         go!: ../../NoMatchOperator
+            
+            # state: noMatch
+            #     event: noMatch
+            #     go!: ../../NoMatchOperator
+                    
+        state: Личные добавочные
+            script:
+                # $reactions.answer("2");
+                $analytics.setMessageLabel("Добавочный сотрудника", "Оператор"); 
+                # $session.operatorPhoneNumber = $parseTree._additionalTelephone.phoneNumber;
+                $session.operatorPhoneNumber = '1000';
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Регион добавочные_уточнение улицы
+            script:
+                if( $parseTree._officePhone_question.name  == 'Москва'){
+                    $reactions.transition("/Оператор/Регион добавочные_уточнение улицы/Москва");
+                } else if( $parseTree._officePhone_question.name  == 'Уфа'){
+                    $reactions.transition("/Оператор/Регион добавочные_уточнение улицы/Уфа");
+                } else if( $parseTree._officePhone_question.name  == 'Челябинск'){
+                    $reactions.transition("/Оператор/Регион добавочные_уточнение улицы/Челябинск");
+                } else if( $parseTree._officePhone_question.name  == 'Казань'){
+                    $reactions.transition("/Оператор/Регион добавочные_уточнение улицы/Казань");
+                }
+            
+            state: Москва
+                a: Уточните, с каким офисом в Москве вы хотите связаться. Центральное отделение в Наста'сьинском переулке; Офис в Перово; офис на Кутузовском; офис у Нахимовского; офис у метро Университет.
+                q: * @officePhone * ||toState = "/Оператор/Регион добавочные"
+                q: * @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Другой_вопрос"  
+            
+            state: Уфа
+                a: Назовите, с каким офисом в Уфе вы хотите связаться. Офис на улице Цюрупы, или офис на Пушкина.
+                q: * @officePhone_ufa * ||toState = "/Оператор/Регион добавочные_уточнение улицы/Уфа/Перевод на добавочный Уфа"
+                q: * @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Другой_вопрос"
+                
+                state: Перевод на добавочный Уфа
+                    script:
+                        # $reactions.answer("1Уфа");
+                        $analytics.setMessageLabel("Добавочный региона", "Оператор");
+                        $session.officePhone = $parseTree._officePhone_ufa.phoneNumber;
+                        $session.PhoneNumber = $parseTree._officePhone_ufa.phoneNumber;
+                        $response.replies = $response.replies || [];
+                        $session.officePhone = regionalOfficeCall($session.officePhone, $response, $client);
+                        $analytics.setSessionResult("Факт перевода");
+                    # a: Перевожу вас на {{ $session.officePhone }} {{ $session.PhoneNumber }}. Пожалуйста, оставайтесь на линии.
+                    a: Перевожу вас на {{ $session.officePhone }}. Пожалуйста, оставайтесь на линии.
+                
+            state: Челябинск
+                a: Назовите, с каким офисом в Челябинске вы хотите связаться. Офис на Красной улице, или офис на 40–летия Победы.
+                q: * @officePhone * ||toState = "/Оператор/Регион добавочные"
+                q: * @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Другой_вопрос"
+                
+            state: Казань
+                a: Назовите, с каким офисом в Казани вы хотите связаться. Офис на улице Декабристов, или офис на Пушкина.
+                q: * @officePhone_kazan * ||toState = "/Оператор/Регион добавочные_уточнение улицы/Казань/Перевод на добавочный Казань"
+                q: * @repeat_please * ||toState = "."
+                q: @disagree ||toState = "/Другой_вопрос"    
+                
+                state: Перевод на добавочный Казань
+                    script:
+                        # $reactions.answer("1Казань");
+                        $analytics.setMessageLabel("Добавочный региона", "Оператор");
+                        $session.officePhone = $parseTree._officePhone_kazan.phoneNumber;
+                        $session.PhoneNumber = $parseTree._officePhone_kazan.phoneNumber;
+                        $response.replies = $response.replies || [];
+                        $session.officePhone = regionalOfficeCall($session.officePhone, $response, $client);
+                        $analytics.setSessionResult("Факт перевода");
+                    # a: Перевожу вас на {{ $session.officePhone }} {{ $session.PhoneNumber }}. Пожалуйста, оставайтесь на линии.
+                    a: Перевожу вас на {{ $session.officePhone }}. Пожалуйста, оставайтесь на линии.
+        
+        state: Регион добавочные
+            script:
+                # $reactions.answer("1");
+                $analytics.setMessageLabel("Добавочный региона", "Оператор");
+                $session.officePhone = $parseTree._officePhone.phoneNumber;
+                $session.PhoneNumber = $parseTree._officePhone.phoneNumber;
+                $response.replies = $response.replies || [];
+                $session.officePhone = regionalOfficeCall($session.officePhone, $response, $client);
+                $analytics.setSessionResult("Факт перевода");
+            # a: Перевожу вас на {{ $session.officePhone }} {{ $session.PhoneNumber }}. Пожалуйста, оставайтесь на линии.
+            a: Перевожу вас на {{ $session.officePhone }}. Пожалуйста, оставайтесь на линии.
+            
+        state: Отдел
+            script:
+                #  $reactions.answer("3");
+                $analytics.setMessageLabel("Добавочный отдела", "Оператор");    
+                $session.operatorPhoneNumber = $parseTree._department.phoneNumber;
+                $reactions.transition("/Оператор/Оператор по номеру");
+        
+        state: Оператор по номеру
+            # a: {{ $session.operatorPhoneNumber }}
+            script:
+                var getPhoneByDateTimeResault = getPhoneByDateTime($session.operatorPhoneNumber);
+                $session.operatorPhoneNumber = getPhoneByDateTimeResault.phoneNumber;
+                $response.replies = $response.replies || [];
+                callProcessing($session.operatorPhoneNumber, $response, $client);
+                $session.departmentName = getPhoneByDateTimeResault.departmentName;
+                $analytics.setSessionResult("Факт перевода");
+                $analytics.setMessageLabel($session.operatorPhoneNumber, "Добавочные")
+                
+            if: $session.operatorPhoneNumber == '7924'
+                a: Для выставления заявки через голосовой трейдинг, подготовьте и назовите оператору ваш уникальный торговый код, который находится в личном кабинете в разделе Детали по счету. Перевожу вас на {{ $session.departmentName }}. Пожалуйста, оставайтесь на линии.
+            
+            elseif: $session.operatorPhoneNumber == '2200'
+                a: Для выставления заявки через голосовой трейдинг, подготовьте и назовите оператору ваш уникальный торговый код, который находится в личном кабинете в разделе Детали по счету. Перевожу вас на {{ $session.departmentName }}. Пожалуйста, оставайтесь на линии.
+            
+            elseif: $session.operatorPhoneNumber == '2222'
+                a: Чтобы получить персональную информацию по вашему брокерскому счету, подготовьте и назовите оператору ваш уникальный торговый код, который находится в личном кабинете в разделе Детали по счету. Перевожу вас на {{ $session.departmentName }}. Пожалуйста, оставайтесь на линии.
+            
+            else:    
+                a: Перевожу вас на {{ $session.departmentName }}. Пожалуйста, оставайтесь на линии.
+            # a: Перевожу вас на {{ $session.operatorPhoneNumber }}. Пожалуйста, оставайтесь на линии.
+            script:
+                 $context.session = {};
+            go!: / 
+                    
+        state: Под_Финам
+            script:
+                $session.operatorPhoneNumber = '1000';
+            go!: ../Оператор по номеру
+        
+        state: NoMatchOperator
+            event: noMatch
+            script:
+                $analytics.setMessageLabel("ОператорNoMatch", "Оператор"); 
+                $session.operatorPhoneNumber = '1000';
+            go!: ../Оператор по номеру
+    
+    state: Bye    
+        q!: @goodbye
+        go!: /Могу еще чем то помочь?/NO/Bye
+                     
+    state: Могу еще чем то помочь?
+        a: Я могу еще чем то помочь?
+        
+        state: Yes
+            q: * @agree *
+            a: Уточните, пожалуйста, ваш вопрос.
+
+        state: NO
+            q: * @disagree *
+            a: Пожалуйста, оцените консультацию от одного до пяти, если пять это отлично.
+                
+            state: Оценка
+                q: * @grade *
+                a: Были рады помочь вам! Если понадобится помощь, пожалуйста, позвоните снова. Всего доброго, до свидания!
+                script:
+                    $session.gradeValue = $parseTree._grade.value;
+                    $analytics.setMessageLabel($session.gradeValue, "Оценки");
+                    $dialer.hangUp();
+               
+            state: Bye
+                q: * @goodbye *
+                a: Спасибо за обращение! Если понадобится помощь, пожалуйста, позвоните снова. Всего доброго, до свидания!
+                script:
+                    $analytics.setMessageLabel("Нет оценки", "Оценки");
+                    $analytics.setSessionResult("Диалог завершен ботом, Нет оценки");
+                    $dialer.hangUp();
+                    
+            state: NoMatch
+                event: noMatch
+                a: Спасибо за обращение! Если понадобится помощь, пожалуйста, позвоните снова. Всего доброго, до свидания!
+                script:
+                    $analytics.setMessageLabel("Нет оценки", "Оценки");
+                    $analytics.setSessionResult("Диалог завершен ботом, NoMatch");
+                    $dialer.hangUp();
+                    
+    state: NoMatch || noContext = true
+        event!: noMatch
+        a: Возможно я не так вас поняла. Пожалуйста, перефразируйте свой вопрос.
+        script:
+            $analytics.setMessageLabel("Не распознан 1", "Теги действий");
+        
            
     state: Match
         event!: match
         script:
-            $reactions.answer("попали в Match");
-    #         $analytics.setMessageLabel("Нет четкого распознавания", "Теги действий");
-            # $session.targetState = $nlp.match($request.query, "/").targetState;
-    #     a: Уточните, пожалуйста, Вас интересует информация по {{$session.targetState}} ?
-        # state: Ожидание ответа 
-        #     q: * да * ||toState = "/Авторизация_Не приходит СМС/Перевод на оператора"
-        #     q: * нет * ||toState = "/Авторизация_Не приходит СМС/Повторить?"
-        
-            # $reactions.transition($nlp.match($request.query, "/").targetState);
+            $analytics.setMessageLabel("Нет четкого распознавания", "Теги действий");
+            $reactions.transition($nlp.match($request.query, "/").targetState);
             
-    state: Интент 1
-        intent!: /Интент 1
-        script: 
-                $reactions.answer("Интент 1");
-                
-    state: Интент 2
-        intent!: /Интент 2
+         
+     # Нераспознанная речь   
+    state: VoiceNoInput || noContext = true
+        event!: speechNotRecognized
         script:
-            $reactions.answer("Интент 2");
-
-
-
-
-    state: Start
-        q!: $regex</start>
-        script:
-            if ($client.greetedTime !== moment($jsapi.currentTime()).format("Do MMM YYYY")){
-                $client.greetedTime = moment($jsapi.currentTime()).format("Do MMM YYYY")
-                $reactions.transition("/Приветствие")
-                }
-            else {
-                $reactions.transition("/Повторное приветствие")
-                $client.greetedTime = {}
-                }
-
-    state: Проверка на вложенный файл_ЖП
-        event!: fileEvent
-        go!: /Перевод на оператора
-        
-    state: Проверка на длину текста_ЖП
-        event!: lengthLimit
-        go!: /Перевод на оператора
-        
-    state: Отмена вывода_ЖП
-        q!: @cancelWithdrawal_HC
-        go!: /Перевод на оператора
-        
-    state: ИИП_ЖП
-        q!: @iip_HC
-        go!: /Услуги компании_Готовые решения_ИИП
-        
-    state: Finex_ЖП
-        q!: @finex_HC
-        go!: /Ограничение ЦБ_FinEX
-            
-    state: ИМЯ_ФИО_ЖП
-        q!: @nameFIO_HC
-        go!: /Перевод на оператора
-    
-    state: Вармаржа_ЖП
-        q!: @varMarg_HC
-        go!: /Срочный рынок
-            
-    state: W8_ЖП
-        q!: @W8_HC
-        go!: /Форма W8BEN
-            
-    state: КД_ЖП
-        q!: @corpAction_HC
-        go!: /Корпоративные действия
-            
-    state: Валюта_ЖП
-        q!: @currencyCheck_HC
-        go!: /Валютный рынок
-            
-    state: Золотые слитки_ЖП
-        q!: @goldBars_HC
-        go!: /Драгметаллы_Комиссии_Купить золото
-            
-    state: 1042S_ЖП
-        q!: @1042S_HC
-        go!: /Документы_Налоговые_Справка 1042S
-            
-    state: Крипта_ЖП
-        q!: @crypto_HC
-        go!: /Криптовалюты
-            
-    state: Ускорение_ЖП
-        q!: @acceleration_HC
-        go!: /Перевод на оператора
-            
-    state: ЗПИФ майнинг_ЖП
-        q!: @ZPIFmining_HC
-        go!: /ЗПИФ на майнинг
-            
-    state: НЕ ИИС_ЖП
-        q!: @notIIS_HC
-        go!: /Перевод на оператора
-            
-    state: НЕ решен_НЕ помогли_ЖП
-        q!: @notResolved_HC
-        go!: /Перевод на оператора
-            
-    state: Дежурный режим_ЖП
-        q!: @standbyMode_HC
-        go!: /Ошибки заявок_Дежурный режим
-            
-    state: Праздники_ЖП
-        q!: @holidays_HC
-        go!: /Праздники
-            
-    state: Овернайт_ЖП
-        q!: @overnight_HC
-        go!: /Займ ЦБ
-            
-    state: Аристократы_ЖП
-        q!: @aristocrats_HC
-        go!: /Аристократы Финам
-            
-    state: Замок_ЖП
-        q!: @lock_HC
-        go!: /Ошибки заявок_Нет кнопки
-            
-    state: Пеня_ЖП
-        q!: @penalty_HC
-        go!: /Справка_Начисление пени
-            
-    state: Форекс_ЖП
-        q!: @forex_HC
-        go!: /Финам Форекс 
-            
-    state: Бонус_ЖП
-        q!: @bonus_HC
-        go!: /Финам-бонус
-            
-    state: Pre-IPO_Проверка_ЖП
-        q!: @Pre-IPO_HC
-        go!: /Pre-IPO
-            
-    state: Дивы_ЖП
-        q!: @dividends_HC
-        go!: /Выплата дохода_Вывод
-            
-    state: DMA_ЖП
-        q!: @DMS_HC
-        go!: /DMA
-            
-    state: Магазин_ЖП
-        q!: @stockStore_HC
-        go!: /Услуги компании_Акции в подарок
-            
-    state: Robo-Advisor_ЖП
-        q!: @Robo-Advisor_HC
-        go!: /Услуги компании_Помощники_Robo-Advisor
-            
-                
-    state: Структурные облигации_ЖП
-        q!: @structuredBonds_HC
-        go!: /Услуги компании_Готовые решения_Структурные облигации
-            
-                
-    # state: Файл_Скрин(страховака)
-    #     q!:
-    #     go!:
-            
-                
-    state: БКлФ_ЖП
-        q!: @BKLF_HC
-        go!: /Депозитарное поручение_Ещё_Перевод активов
-            
-                
-    state: Госслужащий_ЖП
-        q!: @gossluj_HC
-        go!: /Документы_Налоговые_Справка госслужащего
-            
-                
-    state: Авторизация_ЖП
-        q!: @authorization_HC
-        go!: /Авторизация
-            
-                
-    state: Все решено_ЖП
-        q!: @allClear_HC
-        go!: /Прощание
-            
-                
-    state: Отзыв_обратная связь_ЖП
-        q!: @feedback_HC
-        go!: /Отзыв
-            
-                
-    state: Хорошие оценки_ЖП
-        q!: @goodFeedback_HC
-        go!: /Оценки
-            
-                
-    state: Плохие оценки_ЖП
-        q!: @badFeedback_HC
-        go!: /Перевод на оператора
-            
-                
-    # state: Проверка перевода
-    #     q!:
-    #     go!:
-            
-                
-    # state: Проверка распознавания
-    #     q!:
-    #     go!:
-            
-            
-    state: Залоговые инструменты_ЖП
-        q!: @collateral_HC
-        go!: /Ограничение ЦБ
-            
-                
-    state: Comon_ЖП
-        q!: @comon_HC
-        go!: /Comon
-            
-                
-    state: Голосовая заявка_ЖП
-        q!: @voiceRequest_HC
-        go!: /Голосовой трейдинг
-            
-                
-    state: Регламент_ЖП
-        q!: @reglament_HC
-        go!: /Документы_Общие_Регламент
-            
-                
-    state: Обязательства
-        q!: @obyazatelstva_HC
-        go!: /Как закрыть позиции_Закрыть задолженность
-            
-            
-    state: Демо-счета_ЖП
-        q!: @demoAccount_HC
-        go!: /Демо-счет
-            
-                
-    state: ФИНАМ_ЖП   
-        q!: @finam_HC
-        go!: /О компании
-            
-    state: Учебные центры-вебинары_ЖП   
-        q!: @webinars_HC
-        go!: /Обучение на сайте_Учебный центр
-
-    state: Счет Иностранные биржи_ЖП   
-        q!: @foreighExchange_HC
-        go!: /Счет Иностранные биржи
-            
-    state: Стоп-лосс_ЖП   
-        q!: @stopLoss_HC
-        go!: /Заявки_Типы_Стоп_Тейк_SL
-        
-    state: Запрет трейдера_ЖП   
-        q!: @traderBan_HC
-        go!: /Ошибки заявок_Запрет трейдера
-            
-    state: ПГО_ЖП   
-        q!: @PGO_HC
-        go!: /Срочный рынок_Обеспечение_ПГО
-
-    state: IPO_ЖП   
-        q!: @IPO_HC
-        go!: /Корпоративные действия_Размещение
-            
-    state: QUIKX-WebQUIK_ЖП   
-        q!: @XWebQUIK_HC
-        go!: /ИТС_Другие_QUIK X        
-                
-    state: TRANSAQ Connector_ЖП   
-        q!: @TRConnector_HC
-        go!: /Сторонее ПО_TRANSAQ Connector
-            
-    state: MT5_ЖП   
-        q!: @MT5_HC
-        go!: /ИТС_Другие_MetaTrader 5
-
-    state: QUIK_ЖП   
-        q!: @QUIK_HC
-        go!: /ИТС_QUIK
-            
-    state: TRANSAQ_ЖП   
-        q!: @TRANSAQ_HC
-        go!: /ИТС_TRANSAQ           
-                
-    state: ИТС_ЖП   
-        q!: @ITS_HC
-        go!: /ИТС
-            
-    state: КПУР-КСУР_ЖП   
-        q!: @KPUR-KSUR_HC
-        go!: /Маржа_Уровни риска
-
-    state: АИ-скринер_ЖП   
-        q!: @AIscreener_HC
-        go!: /Услуги компании_Помощники_AI-cкринер
-            
-    state: Сегрегированный-NSR_ЖП   
-        q!: @SegregatedNSR_HC
-        go!: /Сегрегированный    
-                
-    state: Американский турнир_ЖП   
-        q!: @tournament_HC
-        go!: /Американский турнир
-            
-    state: ИИС_ЖП   
-        q!: IIS_HC
-        go!: /ИИС
-
-    state: Нужен человек_ЖП   
-        q!: @humanCall_HC
-        go!: /Перевод на оператора
-            
-    state: ЛЧИ_ЖП   
-        q!: @LCHI_HC
-        go!: /ЛЧИ        
-                
-    state: Алерт_ЖП   
-        q!: @alert_HC
-        go!: /ИТС_FinamTrade_Дополнительные функции_Алерты
-            
-    state: Поток обезличенных сделок_ЖП   
-        q!: @transactionsFlow_HC
-        go!: /ИТС_QUIK_Настройки_Поток сделок
-
-    state: Оферта по облигации_ЖП   
-        q!: @bondOffer_HC
-        go!: /Корпоративные действия_Оферта
-            
-    state: Замещение облигаций_ЖП   
-        q!: @bondReplacement_HC
-        go!: /Корпоративные действия_Замещение          
-                
-    state: Стороннее ПО_ЖП   
-        q!: @thirdpartySoft_HC
-        go!: /Сторонее ПО
-            
-    state: Вывод онлайн 24-7_ЖП   
-        q!: @withdraw24-7_HC
-        go!: /Движение ДС_Вывод_24-7
-
-    state: ЭП_ЖП   
-        q!: @ES_HC
-        go!: /Подпись
-            
-    state: Иностранные облигации_ЖП   
-        q!: @foreignBonds_HC
-        go!: /Иностранные облигации        
-                
-    state: Документы об открытии_ЖП   
-        q!: @openingDocuments_HC
-        go!: /Документы_Общие_Открытие счета
-            
-    state: Архив котировок_ЖП   
-        q!: @quotesArchive_HC
-        go!: /Экспорт котировок
-
-    state: Обучение на сайте_ЖП   
-        q!: @siteTraining_HC
-        go!: /Обучение на сайте
-            
-    state: Драги_ЖП   
-        q!: @drags_HC
-        go!: /Драгметаллы          
-                
-    state: Finam Invest_ЖП   
-        q!: @finamInvest_HC
-        go!: /Finam Invest
-            
-    state: ИПИФ Алгоритм роста_ЖП   
-        q!: @IPIFAlgoritmRosta_HC
-        go!: /ИПИФ «Алгоритм роста»
-
-    state: Банк_ЖП   
-        q!: @bank_HC
-        go!: /Банк
-            
-    state: Согласие с рисками СПБ_ЖП   
-        q!: @SPBrisks_HC
-        go!: /Документы_Общие_Торговля ЦБ на СПБ            
-                
-    state: Ставки риска_ЖП   
-        q!: @riskRates_HC
-        go!: /Маржа_Ставки риска
-            
-    state: Персона холдинга_ЖП   
-        q!: @holdingPerson_HC
-        go!: /Клиент с такими данными уже существует
-
-    state: Инвест-профиль_ЖП   
-        q!: @investProfile_HC
-        go!: /КВАЛ_Смена профиля
-            
-    state: СВОП_ЖП   
-        q!: @SVOP_HC
-        go!: /Валютный рынок_Комиссия СВОПзфкф          
-                
-    state: РЕПО_ЖП   
-        q!: @REPO_HC
-        go!: /Справка_Сделки РЕПО
-            
-    # state: Я-робот_ЖП   
-    #     q!: @yarobot_HC
-    #     go!: /Приветствие
-
-    state: Короткий вопрос_ЖП   
-        q!: @shortQuestion_HC
-        a: Извините, я вас не понимаю.
-            Пожалуйста, перефразируйте свой вопрос.
-            
-    state: Связаться с пресс-службой_ЖП   
-        q!: @press_HC
-        go!: /Пресса
-            
-    state: Тест-драйв_ЖП   
-        q!: @testDrive
-        go!: /Тест-драйв
-            
-    state: СБП_ЖП   
-        q!: @SBP_HC
-        go!: /Движение ДС
-            
-    state: Указ_ЖП   
-        q!: @decree_HC
-        go!: /Ограничение ЦБ
-        
-    state: Закрытие чата_ЖП
-        q!: @closeChat_HC
-        a: Благодарим за обращение!
-            Если понадобится помощь, пожалуйста, напишите снова.
-        EndSession:
-    
-    state: Пропали кнопки_ЖП
-        q!: @missedButtons_HC
-        a: Пожалуйста, напишите ваш вопрос снова.
-        
-    state: Завершение диалога (спасибо)_ЖП
-        q!: @spasibo_HC
-        go!: /Закрытие чата_ЖП
-        
-    state: Завершение диалога (до свидания)_ЖП
-        q!: @dosvidaniya_HC
-        go!: /Закрытие чата_ЖП 
-            
-    state: Приветствие
-        intent!: /033 Приветствие
-        a: Добрый день! Вас приветствует текстовый помощник финам! Какой у вас вопрос?
-
-    state: Повторное приветствие
-        a: Рады Вас видеть снова
-
-    # state: Bye
-    #     intent!: /пока
-    #     a: Пока пока
-    state: NoMatch
-        event!: noMatch
-        a: Я не понял. Вы сказали: {{$request.query}}
-
-    # state: Match
-    #     event!: match
-    #     a: {{$context.intent.answer}}
-
-    state: Перевод на оператора
-        # script:
-        #     if ($session.operator == null){
-        #         $reactions.transition($session.contextPath)
-        #         $session.operator = ''
-        #         }
-        q!: * @operator *
-        a: Перевожу Вас на оператора
-        buttons:
-            "Назад" -> /Start
-
-    state: Комиссии || sessionResult = "Готов, вопрос по хранению", sessionResultColor = "#15952F"
-        intent!: /001 Комиссии
-        a: Пожалуйста, выберите тип комиссии:
-        buttons:
-            "Комиссия биржи/Урегулирование сделок" -> /Комиссии_Биржа
-            "Комиссия брокера за сделку" -> /Комиссии_За сделку
-            "Комиссия брокера за обслуживание" -> /Комиссии_За обслуживание
-            "Другие комиссии" -> /Комиссии_Другие
-            "Справка по счету" -> /Справка по счету
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Комиссии_За сделку
-        a: Брокерская комиссия за сделки зависит от выбранного рынка и тарифного плана.
-                Списание комиссии происходит в 23:59 МСК.
-                Выберите тарифный план:
-        buttons:
-            "ФриТрейд" -> /Комиссии_За сделку_ФриТрейд
-            "Стратег" -> /Комиссии_За сделку_Стратег
-            "Инвестор" -> /Комиссии_За сделку_Инвестор
-            "Единый Дневной" -> /Комиссии_За сделку_Единый дневной
-            "Единый Консультационный" -> /Комиссии_За сделку_Единый Консультационный
-            "Другие тарифы" -> /Комиссии_За сделку_Другие
-            "Назад" -> /Комиссии
-
-    state: Комиссии_За обслуживание
-        a: Размер комиссии зависит от выбранного тарифного плана, но не превышает оценку счета на дату списания комиссии.
-            При этом сумма списания уменьшается на размер брокерской комиссии, удержанной за операции, совершенные в течение календарного месяца. 
-            Списание происходит в последний день месяца. 
-            Выберите тарифный план:
-        buttons:
-            "ФриТрейд" -> /Комиссии_За обслуживание_ФриТрейд
-            "Стратег" -> /Комиссии_За обслуживание_Стратег
-            "Инвестор" -> /Комиссии_За обслуживание_Инвестор
-            "Единый Дневной" -> /Комиссии_За обслуживание_Единый дневной
-            "Единый Консультационный" -> /Комиссии_За обслуживание_Единый Консультационный
-            "Другие тарифы" -> /Комиссии_За обслуживание_Другие
-            "Назад" -> /Комиссии
-
-    state: Комиссии_Другие
-        a: Пожалуйста, выберите тип комиссии:
-        buttons:
-            "Комиссии за ввод/вывод/хранение средств" -> /Комиссии_Другие_ВводВыводХранение
-            "Комиссия за маржинальную торговлю" -> /Комиссии_Другие_Маржинальная
-            "Комиссия за депозитарий" -> /Комиссии_Другие_Депозитарий
-            "Комиссия за автоследование" -> /Комиссии_Другие_Автоследование
-            "Назад" -> /Комиссии
-
-    state: Комиссии_Биржа
-        a: Брокер удерживает и передает биржевую комиссию по завершению торгового дня. В справке по счету данный пункт отображается как комиссия за урегулирование сделок.
-                Фактическое списание комиссии происходит в 23:59 МСК (внутри торгового дня происходит только блокировка необходимой суммы).
-                Выберите секцию:
-        buttons:
-            "Фондовый рынок МБ" -> /Комиссии_Биржа_ФондовыйМБ
-            "Срочный рынок МБ FORTS" -> /Комиссии_Биржа_СрочныйМБ
-            "Валютный рынок МБ" -> /Комиссии_Биржа_ВалютныйМБ
-            "Биржа СПБ" -> /Комиссии_Биржа_СПБ
-            "NYSE/NASDAQ" -> /Комиссии_Биржа_NYSENASDAQ
-            "Срочный рынок США" -> /Комиссии_Биржа_СрочныйСША
-            "Гонконг (HKEX)" -> /Комиссии_Биржа_Гонконг
-            "Внебиржевые сделки" -> /Комиссии_Биржа_Внебиржевые
-        buttons:
-            "Назад" -> /Комиссии
-
-    state: Комиссии_Биржа_ФондовыйМБ
-        a: 0,03% от оборота - за урегулирование сделок, заключенных на фондовой секции ММВБ, кроме сделок с облигациями.
-                0,015 % от оборота - за урегулирование сделок с облигациями.
-
-    state: Комиссии_Биржа_СрочныйМБ
-        a: ✅ За исполнение лимитных заявок, создающих ликвидность рынка (формирующих стакан спроса/предложения), комиссия со стороны биржи не удерживается.
-                ✅ За исполнение рыночных заявок, а также лимитных ордеров с мгновенным исполнением, комиссии взимаются согласно тарифам, указанным в спецификации каждого срочного контракта: https://www.moex.com/ru/derivatives/
-
-    state: Комиссии_Биржа_ВалютныйМБ
-        a: 1. Валютные пары:
-                ✅ За торговлю полными лотами (контракты TOD и TOM) — 0% для мейкеров и 0,0045% от оборота для тейкеров, при этом минимальная комиссия за сделку 50 ₽ (исключение USDRUB, EURRUB – 100 ₽), если заявка на совершение сделки подана объемом менее 50 лотов; если более 50 лотов – минимальная комиссия 0,02 ₽ для мейкеров и 1 ₽ для тейкеров. 
-                ✅ Комиссия за сделки СВОП составляет 0,0006% от суммы первой части сделки СВОП, но не менее 1 ₽ за сделку.
-                ✅ За торговлю мелкими лотами (контракты _TMS) — 0% для мейкеров и 0,075% от оборота для тейкеров, при этом минимальная комиссия за сделку 1 ₽.
-                2. Драгоценные металлы:
-                ✅ при покупке серебра 0,006375%, но не менее 1 ₽,
-                ✅ при продаже серебра 0,017875%, но не менее 1 ₽,
-                ✅ при покупке золота 1 ₽,
-                ✅ при продаже золота 0,02%, но не менее 1 ₽.
-
-    state: Комиссии_Биржа_СПБ
-        a: ✅ За совершение сделок с российскими и иностранными ценными бумагами (за исключением ценных бумаг гонконгского рынка) - 0,01% от оборота + 0,004 $ за каждую иностранную ценную бумагу.
-                ✅ За совершение сделок с ценными бумагами гонконгского рынка - 0,03 % от оборота. 
-                – при обороте в рублях РФ рублях – в рублях РФ.
-                – при обороте в долларах США – в долларах США.
-                – при обороте в иностранной валюте, отличной от долларов США – в долларах США (производится пересчет по курсу Банка России на дату совершения сделки).
-
-    state: Комиссии_Биржа_NYSENASDAQ
-        a: Внешние расходы включают:
-                ✅ Клиринговый сбор — 0,0005 $ за акцию, мин. 0,14 $; 
-                ✅ NSCC — 0,000175 $ за акцию, мин. 0,01 $; 
-                ✅ SEC — 0,00008 % от объема при продаже, мин. 0,01 $;
-                ❗ Премаркет и постмаркет — 0,003 $ за акцию, мин. 0,01 $.
-
-    state: Комиссии_Биржа_СрочныйСША
-        a: Внешние расходы включают:
-                ✅ Клиринговый сбор — 0,0005 $ за акцию, мин. 0,14 $; 
-                ✅ NSCC — 0,000175 $ за акцию, мин. 0,01 $; 
-                ✅ SEC — 0,00008 % от объема при продаже, мин. 0,01 $;
-                ❗ Премаркет и постмаркет — 0,003 $ за акцию, мин. 0,01 $.
-
-    state: Комиссии_Биржа_Гонконг
-        a: Внешние расходы включают:
-                ✅ Биржевой сбор: 0.1377%, мин. 1 HKD. 
-                ✅ Клиринговый сбор: 0.092%, мин. 40 HKD.
-
-    state: Комиссии_Биржа_Внебиржевые
-        a: ✅ Внебиржевые сделки (кроме указанных ниже) - 0,118%, но не менее 1450 ₽ (заявка формируется через менеджера).
-                ✅ Московская биржа (сделки с ЦК) - 0,03% от оборота. 
-                ✅ СПБ Биржа (торговля заблокированными ЦБ) - 0,8% от оборота.
-
-    state: Комиссии_За сделку_ФриТрейд
-        a: С детальным описанием тарифа можно ознакомиться по ссылке: https://www.finam.ru/documents/commissionrates/unified/freetrade
-
-    state: Комиссии_За сделку_Стратег
-        a: С детальным описанием тарифа можно ознакомиться по ссылке: https://www.finam.ru/documents/commissionrates/unified/strategist
-
-    state: Комиссии_За сделку_Инвестор
-        a: С детальным описанием тарифа можно ознакомиться по ссылке: https://www.finam.ru/documents/commissionrates/unified/investor
-
-    state: Комиссии_За сделку_Единый дневной
-        a: С детальным описанием тарифа можно ознакомиться по ссылке: https://www.finam.ru/documents/commissionrates/unified/daily
-
-    state: Комиссии_За сделку_Единый Консультационный
-        a: С детальным описанием тарифа можно ознакомиться по ссылке: https://www.finam.ru/documents/commissionrates/unified/consult
-
-    state: Комиссии_За сделку_Другие
-        a: Полные условия тарифных планов приведены в Приложении № 7 к Регламенту брокерского обслуживания «Финам», который доступен для ознакомления по ссылке: https://zaoik.finam.ru/broker/regulations/
-
-    state: Комиссии_За обслуживание_ФриТрейд
-        a: Комиссия 0 ₽.
-
-    state: Комиссии_За обслуживание_Стратег
-        a: Комиссия 0 ₽.
-
-    state: Комиссии_За обслуживание_Инвестор
-        a: Комиссия 200 ₽.
-            Если в последний рабочий день месяца оценка счета менее 2000 ₽ — 400 ₽.
-
-    state: Комиссии_За обслуживание_Единый дневной
-        a: Комиссия 177 ₽. Если в последний рабочий день месяца оценка счета менее 2000 ₽ — 400 ₽.
-
-    state: Комиссии_За обслуживание_Единый Консультационный
-        a: Комиссия 177 ₽. Если в последний рабочий день месяца оценка счета менее 2000 ₽ — 400 ₽.
-
-    state: Комиссии_За обслуживание_Другие
-        a: Пожалуйста, выберите тариф:
-        buttons:
-            "Единый Фиксированный" -> //Комиссии_За обслуживание_Единый дневной
-            "Единый Оптимум" -> //Комиссии_За обслуживание_Единый дневной
-            "Тест-Драйв" -> /Комиссии_За обслуживание_ФриТрейд
-            "Долгосрочный инвестор" -> /Комиссии_За обслуживание_ФриТрейд
-            "Стандартный ФОРТС" -> /Комиссии_За обслуживание_ФриТрейд
-            "Другие тарифы" -> /Комиссии_За обслуживание_Другие_Другие тарифы
-            "Назад" -> /Комиссии_За обслуживание
-
-    state: Комиссии_За обслуживание_Другие_Другие тарифы
-        a: Пожалуйста, выберите тариф:
-        buttons:
-            "Консультационный ФОРТС" -> /Комиссии_За обслуживание_Другие_Другие тарифы_Консультационный ФОРТС
-            "Дневной СПБ" -> /Комиссии_За обслуживание_Другие_Другие тарифы_Дневной СПБ
-            "Консультационный СПБ" -> /Комиссии_За обслуживание_Другие_Другие тарифы_Консультационный СПБ
-            "Назад" -> /Комиссии_За обслуживание_Другие
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Комиссии_За обслуживание_Другие_Другие тарифы_Консультационный ФОРТС
-        go!: /Комиссии_За обслуживание_Единый дневной
-
-    state: Комиссии_За обслуживание_Другие_Другие тарифы_Дневной СПБ
-        a: Комиссия 4,5 $.
-            Если в последний рабочий день месяца оценка счета менее 2000 ₽ — комиссии 400 ₽ в эквиваленте USD по курсу ЦБ.
-
-    state: Комиссии_За обслуживание_Другие_Другие тарифы_Консультационный СПБ
-        go!: /Комиссии_За обслуживание_Другие_Другие тарифы_Дневной СПБ
-
-    state: Комиссии_Другие_ВводВыводХранение
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Комиссии за ввод средств" -> /Движение ДС_Пополнение_Способы
-            "Комиссии за вывод средств" -> /Движение ДС_Вывод_Комиссия
-            "Комиссии за хранение валюты" -> /Комиссии_Другие_ВводВыводХранение_Хранение
-
-    state: Комиссии_Другие_ВводВыводХранение_Хранение
-    #под вопросом
-    state: Комиссии_Другие_Маржинальная
-        a: Расчет и удержание комиссии за займ производится ежедневно из расчета 365 дней.
-            Размер комиссии зависит от выбранного тарифного плана:
-        buttons:
-            "ФриТрейд" -> /Комиссии_Другие_Маржинальная_ФриТрейд
-            "Стратег" -> /Комиссии_Другие_Маржинальная_Стратег
-            "Инвестор" -> /Комиссии_Другие_Маржинальная_Стратег
-            "Единый дневной" -> /Комиссии_Другие_Маржинальная_ЕдиныйДневной
-            "Единый Консультационный" -> /Комиссии_Другие_Маржинальная_ЕдиныйКонсульт
-            "Другие" -> /Комиссии_Другие_Маржинальная_Другие
-            
-    state: Комиссии_Другие_Маржинальная_ФриТрейд
-        a: За маржинальные позиции, открытые и закрытые внутри одной торговой сессии, комиссия не удерживается, так как обязательства не переносятся на следующую торговую сессию.
-                ✅ Комиссии за займ по тарифу «ФриТрейд 2.0»: 
-                — в рублях — ключевая ставка ЦБ РФ + 15,5%
-                — в долларах — 26% 
-                — в гонконгских долларах — 50%
-                — в иной валюте — 9% (при сумме займа до 25 000 ед.)
-                — ценных бумаг (Московская биржа) — 13%
-                — ценных бумаг (СПБ Биржа) — 14%
-                — ценных бумаг (иностранные биржи) — 13,5%
-                ✅ Отличительные условия по архивному тарифу «ФриТрейд»: 
-                — в рублях — ключевая ставка ЦБ РФ + 16,5% (при сумме займа до 800 000 ₽)
-                — ценных бумаг (Московская биржа) — 22%
-                — в иной валюте — 15,5%
-
-    state: Комиссии_Другие_Маржинальная_Стратег
-        a: За маржинальные позиции, открытые и закрытые внутри одной торговой сессии, комиссия за займ не удерживается, так как обязательства не переносятся на следующую торговую сессию.
-            Комиссии за займ:
-                ✅ в рублях — ключевая ставка ЦБ РФ + 8%; 
-                ✅ в долларах — 15% (при сумме займа до 50000 $); 
-                ✅ в гонконгских долларах — 50%;
-                ✅ в иной валюте — 9% (при сумме займа до 25000 $); 
-                ✅ ценных бумаг (Московская биржа) — 13%; 
-                ✅ ценных бумаг (СПБ Биржа) — 14%; 
-                ✅ ценных бумаг (иностранные биржи) — 8%.
-
-    state: Комиссии_Другие_Маржинальная_ЕдиныйДневной
-        a: За маржинальные позиции, открытые и закрытые внутри одной торговой сессии, комиссия за займ не удерживается, так как обязательства не переносятся на следующую торговую сессию.
-            Комиссии за займ:
-                ✅ в рублях — ключевая ставка ЦБ РФ + 9,5% (при сумме займа до 800 000 ₽); 
-                ✅ в долларах — 15%; 
-                ✅ в гонконгских долларах — 50%;
-                ✅ в иной валюте — 9%; 
-                ✅ ценных бумаг (Московская биржа) — 13%; 
-                ✅ ценных бумаг (СПБ Биржа) — 14%; 
-                ✅ ценных бумаг (иностранные биржи) — 8%.
-
-    state: Комиссии_Другие_Маржинальная_ЕдиныйКонсульт
-        a: За маржинальные позиции, открытые и закрытые внутри одной торговой сессии, комиссия за займ не удерживается, так как обязательства не переносятся на следующую торговую сессию.
-            Комиссии за займ:
-                ✅ в рублях — ключевая ставка ЦБ РФ + 16%; 
-                ✅ в долларах — 15%; 
-                ✅ в гонконгских долларах — 50%;
-                ✅ в иной валюте — 9%; 
-                ✅ ценных бумаг (Московская биржа) — 28,55%; 
-                ✅ ценных бумаг (СПБ Биржа) — 14%; 
-                ✅   ценных бумаг (иностранные биржи) — 8%.
-
-    state: Комиссии_Другие_Маржинальная_Другие
-        a: За маржинальные позиции, открытые и закрытые внутри одной торговой сессии, комиссия за займ не удерживается, так как обязательства не переносятся на следующую торговую сессию. Подробная информация о комиссиях на всех тарифах: http://zaoik.finam.ru/documents/commissionrates/otheroperations
-
-    state: Комиссии_Другие_Депозитарий
-        a: Депозитарный тариф зависит от даты открытия счета и даты последней смены тарифа по счету.
-            По счетам, открытым после 26.11.2020, а также по счетам с измененными самостоятельно, после указанной даты, тарифными планами применяется Тарифный план 2. 
-            Выберите свой тариф:
-        buttons:
-            "Тарифный план 1" -> /Комиссии_Другие_Депозитарий_Тариф1
-            "Тарифный план 2" -> /Комиссии_Другие_Депозитарий_Тариф2
-            "Назад" -> /Комиссии_Другие
-
-    state: Комиссии_Другие_Автоследование
-        a: Чтобы узнать тариф и комиссии за использование сервиса:
-            ✅ выберите из списка интересующую вас стратегию https://www.comon.ru/strategies/ 
-            ✅ откройте вкладку «показатели» и выберите название тарифа в разделе «тариф автоследования» 
-            Также, со стоимостью сервиса «Финам Автоследование» по каждому тарифу можно ознакомиться по ссылке: https://docs.comon.ru/general-information/tariffs/ 
-            ❗ Списание комиссии происходит ежедневно.
-            В справке по счету комиссия отображена как списание по п. 16 Регламента брокерского обслуживания.
-
-    state: Комиссии_Другие_Депозитарий_Тариф1
-        a: 177 ₽ при наличии движения средств/активов на счете в течение календарного месяца.
-
-    state: Комиссии_Другие_Депозитарий_Тариф2
-        a: Комиссия 0 ₽.
-
-    state: Открытие_закрытие счетов || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent: /002 Открытие_закрытие счетов
-        if: (typeof $parseTree._open_close != "undefined")
+            $session.noInputCounter = $session.noInputCounter || 0;
+            $session.noInputCounter++;
+        if: $session.noInputCounter >= 10
+            a: Похоже проблема со связью. Перезвоните, пожалуйста, еще раз. 
             script:
-                {$session.open_close = $parseTree._open_close; $reactions.transition("/" + $session.open_close.name + "_счета")}
-        a: Выберите вариант действия:
-        buttons:
-            "Открытие брокерского счета" -> /Открытие_счета
-            "Ошибки при открытии счета" -> /Ошибки при открытии
-            "Типы брокерских счетов" -> /Типы счетов
-            "Мой брокерский счет" -> /Мой брокерский счет
-            "Закрытие брокерского счета" -> /Закрытие_счета
-            "Другие счета" -> /Другие счета
-        event: noMatch || toState = "./"
-        q: ошибка при открытии || toState = "/Ошибки при открытии"
-
-    state: Открытие_счета
-        a: Дистанционное открытие первичного счета доступно физическим лицам гражданам РФ и гражданам дружественных государств (Беларуси, Казахстана, Азербайджана, Армении, Молдовы, Таджикистана, Туркменистана, Узбекистана).
-                Новый счет будет доступен для торговли через несколько часов после подписания документов об открытии. 
-                Выберите интересующий вас способ открытия счета:
-        buttons:
-            "В офисе компании лично" -> /Открытие_счета лично
-            "Дистанционно" -> /Открытие_счета дистанционно
-            "Открытие счета до 18 лет" -> /Открытие_счета до 18
-            "Назад" -> /Открытие или закрытие счета
-
-    state: Открытие_счета лично
-        a: Вам понадобится мобильный телефон и документ удостоверяющий личность.
-                Перечень документов для иностранных граждан представлен на сайте: https://www.finam.ru/services/OpenAccount0000A/ 
-                Перед посещением офиса предварительно согласуйте время и цель визита с менеджером. 
-                Время работы и адреса офисов: https://www.finam.ru/about/contacts
-
-    state: Открытие_счета дистанционно
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Открытие_счета для новых клиентов" -> /Открытие_счета для новых клиентов
-            "Открытие_счета для действующих клиентов" -> /Открытие_счета для действующих клиентов
-            "Открытие_счета с ФриТрейд" -> /Открытие_счета с ФриТрейд
-            "Назад" -> /Открытие_счета
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Открытие_счета до 18
-        a: Выберите вариант действия:
-        buttons:
-            "Малолетним лицам до 14 лет" -> /Открытие_счета до 18_до 14
-            "Несовершеннолетним лицам с 14 до 18" -> /Открытие_счета до 18_14-18
-    
-    state: Открытие_счета до 18_до 14
-        a: Открытие брокерских договоров лицам до 14 лет возможно только при вступлении в права наследования.
-                Перечень необходимых документов: https://www.finam.ru/services/OpenAccount0000A/
-
-    state: Открытие_счета до 18_14-18
-        a: Несовершеннолетним гражданам открытие брокерского счета доступно только при личном посещении офиса с официальным представителем (родителем, опекуном). В присутствии сотрудника компании родителем/опекуном должно быть составлено разрешение на открытие брокерского счета и совершение торговых операций.
-                Перечень необходимых документов: https://www.finam.ru/services/OpenAccount0000A/
-
-    state: Открытие_счета с ФриТрейд
-        a: С 16 июня 2023 года вы можете подключить тариф «ФриТрейд 2.0» при открытии своего первого брокерского счета в «Финам».
-                ✅ Срок действия тарифного плана — 30 дней,
-                ✅ 0 ₽ — абонентская плата за месяц,
-                ✅ По истечению 30 дней с момента открытия счета с «ФриТрейд 2.0» предоставляется тариф «Стратег».
-                Открыть счет и узнать подробнее можно по ссылке: https://www.finam.ru/landings/freetrade/ 
-                ❗ Архивный тариф «ФриТрейд» недоступен для подключения. Владельцы такого тарифа сохраняют условия до момента смены тарифного плана. Условия «ФриТрейд» можно изучить в регламенте брокерского обслуживания.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Открытие_счета для новых клиентов
-        a: Дистанционное открытие счета доступно совершеннолетним гражданам Российской Федерации, а также гражданам дружественных государств (Беларуси, Казахстана, Азербайджана, Армении, Молдовы, Таджикистана, Туркменистана, Узбекистана).
-                Открыть счет можно по ссылке: https://account.finam.ru/Registration
-
-    state: Открытие_счета для действующих клиентов
-        a: Вы можете иметь неограниченное количество действующих брокерских счетов.
-                ✅ Открыть дополнительный брокерский счет «Единая денежная позиция» можно дистанционно в личном кабинете по ссылке: https://lk.finam.ru/open/brokerage 
-                ❗ Для открытия моносчетов воспользуйтесь этой ссылкой: https://edox.finam.ru/NewAccount/Product?ContextId=337373a9-7941-42da-98c5-aeed1f208dd6 
-                ✅ Ваши брокерские счета полностью независимы, вы можете использовать по ним разные тарифы и торговые системы.
-
-    state: Ошибки при открытии
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Не загружается паспорт" -> /Не загружается паспорт
-            "Отсутствует выбор адреса" -> /Отсутствует выбор адреса
-            "Клиент с такими данными существует" -> /Клиент с такими данными уже существует
-            "Как указать банк при открытии?" -> /Как указать банк при открытии
-            "Другая ошибка" -> /Другая ошибка
-            "Перевод на оператора" -> /Перевод на оператора
-            "Назад" -> /Открытие или закрытие счета
-
-    state: Не загружается паспорт
-        a: 1. Если вам не удается загрузить паспорт при заполнении анкеты,   пожалуйста, используйте следующие рекомендации:
-                ✅ Использовать режим инкогнито в браузере
-                ✅ Использовать другой браузер
-                ✅ Использовать VPN-сервисы с локацией на РФ (Если вы находитесь за границей РФ)
-                ✅ Удалить кэш в вашем браузере (могут быть потеряны персональные настройки)
-                ✅ Использовать другую версию личного кабинета: https://lk.finam.ru/ или https://edox.finam.ru/ 
-                2. Если рекомендации не помогли, пожалуйста, направьте в чат следующие данные:
-                ✅ ФИО,
-                ✅ адрес электронной почты, используемый для регистрации.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Отсутствует выбор адреса
-        a: 1. Если не удается внести почтовый адрес при заполнении анкеты, пожалуйста, убедитесь, что названия объектов актуальны, вносите адрес до номера квартиры полностью, далее выберите вариант из выпадающего списка.
-                2. Если адрес в анкете указан ошибочно, и нет возможности его изменить в рамках анкеты, то вы сможете изменить его после открытия счета в разделе «Изменение анкетных данных» по ссылке: https://edox.finam.ru/Client/EditInfo 
-                3. Если рекомендации не помогли, пожалуйста, направьте в чат следующие данные:
-                ✅ ФИО,
-                ✅ адрес электронной почты, используемый для регистрации.
-
-    state: Клиент с такими данными уже существует
-        a: 1. Если не удается внести почтовый адрес при заполнении анкеты, пожалуйста, убедитесь, что названия объектов актуальны, вносите адрес до номера квартиры полностью, далее выберите вариант из выпадающего списка.
-                2. Если адрес в анкете указан ошибочно, и нет возможности его изменить в рамках анкеты, то вы сможете изменить его после открытия счета в разделе «Изменение анкетных данных» по ссылке: https://edox.finam.ru/Client/EditInfo 
-                3. Если рекомендации не помогли, пожалуйста, направьте в чат следующие данные:
-                ✅ ФИО,
-                ✅ адрес электронной почты, используемый для регистрации.
-
-    state: Как указать банк при открытии
-        a: Необходимо ввести запрошенную информацию о том банке (российском или зарубежном), через который будет впоследствии совершаться ввод денежных средств на открываемый счет и вывод денежных средств с открываемого счета (см. выделенное на странице предупреждение).
-                ❗ Ввод и вывод денежных средств будет возможен только по реквизитам счета Банка, указанного здесь!
-                ❗ Полные реквизиты банковского счета клиента не нужны, только наименование Банка.
-                После ввода данных на странице нужно нажать на кнопку «Продолжить» и перейти к следующему шагу.
-
-    state: Другая ошибка
-        a: Если рекомендации не помогли, пожалуйста, направьте в чат следующие данные:
-                ✅ ФИО,
-                ✅ адрес электронной почты, используемый для регистрации.
-
-    state: Мой брокерский счет
-        a: ✅ Перечень действующих счетов доступен в личном кабинете: https://lk.finam.ru/
-            После авторизации и выбора счета можно перейти в раздел «детали» и проверить дату открытия брокерского счета, актуальный тариф и тип счёта.
-            ✅   Если счет ИИС переведен от другого брокера, первичную дату открытия можно уточнить у менеджера «Финам».
-            ✅ Историю движения средств на брокерском счете можно посмотреть в справке по счету по ссылке: https://lk.finam.ru/reports/tax
-
-    state: Закрытие_счета
-        a: Поручение на расторжение брокерского договора можно подать только по пустым счетам (на них не должно быть активов и задолженностей).
-            ✅ Сформировать поручение можно самостоятельно в личном кабинете по ссылке: https://edox.finam.ru/orders/contractAbrogation/Default.aspx 
-            Договор будет расторгнут на 5-й рабочий день с момента подписания заявления.
-            ❗ Для счетов ИИС отдельная процедура расторжения, рекомендуем ознакомиться подробнее.
-            ❗ В рамках брокерского договора может быть несколько счетов. При расторжении все они будут закрыты.
-            ❗ Предварительно рекомендуем обсудить причины расторжения договора с менеджером компании в целях улучшения сервиса и возможного решения вашей проблемы.
-        buttons:
-            "Расторжение ИИС" -> /ИИС_Еще_Расторжение ИИС
-            "Налоговый вычет по ИИС" -> /Налоговый вычет по ИИС
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Другие счета
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Открытие счета в банке" -> /Банк_Банковский счет_Как открыть
-            "Открытие счета в Форекс" -> /Финам Форекс
-            "Открытие учебного счета" -> /Открытие учебного счета
-            "Перевод на оператора" -> /Перевод на оператора
-            "Назад" -> /Открытие или закрытие счета
-
-    state: Налоговый вычет по ИИС
-    #??
-    state: Открытие учебного счета
-        a: Выберите интересующую вас торговую систему:
-        buttons:
-            "TRANSAQ" -> /Открытие учебного счета_TRANSAQ
-            "FinamTrade" -> /Открытие учебного счета_TRANSAQ
-            "QUIK" -> /Открытие учебного счета
-            "MetaTrader 5" -> /Перевод на оператора
-            "TRANSAQ Connector" -> /Открытие или закрытие счета
-            "Назад" -> /Открытие или закрытие счета
-    
-    state: Открытие учебного счета_TRANSAQ
-        a: Сформируйте заявку на открытие учебного счета по ссылке: https://www.finam.ru/landings/demoaccount/
-            ✅ Нажмите на кнопку «Открыть демо-счет» и заполните форму заявки.
-            ✅ После подтверждения заявки на вашу электронную почту придет письмо с логином, паролем и ссылкой на загрузку торговой системы.
-
-    state: Открытие учебного счета_QUIK
-        a: Сформируйте заявку на открытие учебного счета по ссылке: https://www.finam.ru/howtotrade/demos00006/
-            ✅ После подтверждения заявки на вашу электронную почту придет письмо с логином, паролем и ссылкой на загрузку торговой системы.
-            ❗ К дистрибутиву «привязан» логин/пароль от учебного счета. Для использования ранее установленной программы необходимо перенести файлы с ключами.
-
-    state: Открытие учебного счета_MT5
-        a: На текущий момент открытие демо-счета в MetaTrader 5 через «Финам» невозможно. Вы можете подключить демо-счет через сайт разработчика.
-
-    state: Открытие учебного счета_TRConnector
-        a: Сформируйте заявку на открытие учебного демо-счета по ссылке: https://www.finam.ru/howtotrade/tconnector00002/?program=Transaq%20Connector
-            ✅ После подтверждения заявки на вашу электронную почту придет письмо с логином и паролем.
-            ❗ Загрузка дистрибутива не требуется. Для подключения к стороннему ПО достаточно указать логин/пароль от сервера.
-
-    state: Выбор_смена тарифа || sessionResult = "Готов, вопрос моему тарифу", sessionResultColor = "#15952F"
-        intent!: /003 Выбор_смена тарифа
-        buttons:
-            "Сравнение тарифов" -> /Выбор_смена тарифа_Сравнение
-            "Как изменить тариф?" -> /Выбор_смена тарифа_Смена
-            "Мой тариф по счету" -> /Выбор_смена тарифа_Мой тариф
-            "Как получить тариф ФриТрейд?" -> /Открытие_счета с ФриТрейд
-            "Описание тарифных планов" -> /Комиссии_За сделку
-            "Перевод на оператора" -> /Перевод на оператора
-
-    state: Выбор_смена тарифа_Сравнение
-        a: Сравнительная таблица пяти наиболее популярных тарифов у клиентов «Финам»: https://www.finam.ru/landings/tariff-learn-more
-            Выбирая тариф, учитывайте количество и объем сделок, которые планируете совершать, а также стоимость обслуживания счета. Подобрать и подключить оптимальный тариф поможет менеджер.
-
-    state: Выбор_смена тарифа_Смена
-        a: Сменить тариф – легко!
-            Подайте поручение в личном кабинете и выберите из списка нужный тариф: https://lk.finam.ru/details  
-            Подключение тарифа «ФриТрейд» доступно только при первичном открытии брокерского счета в «Финам».  
-            ❗ Действие нового тарифа начинается со следующего рабочего дня после подписания заявления на смену тарифа. Количество заявок на смену тарифа неограниченно. Действующим устанавливается тариф из заявки, последней по времени подписания.
-
-    state: Выбор_смена тарифа_Мой тариф
-        a: (Мой тариф)
-
-    state: Типы счетов
-        intent!: /004 Типы счетов || sessionResult = "Готов", sessionResultColor = "#15952F"
-        if: (typeof $parseTree._account_type != "undefined")
-            script:
-                {$session.account_type = $parseTree._account_type; $reactions.transition("/Типы счетов_" + $session.account_type.name)}
-        a: Перечень ваших действующих счетов с наименованием доступен в личном кабинете: https://lk.finam.ru/
-            В «Финам» доступны следующие типы счетов:
-        buttons:
-            "Единый счет (ЕДП)" -> /Типы счетов_Единый счет (ЕДП)
-            "Раздельные моносчета" -> /Типы счетов_Раздельные моносчета
-            "ИИС" -> /Типы счетов_ИИС
-            "Мои счета" -> /Мой брокерский счет
-            "Еще" -> /Типы счетов_еще
-
-    state: Типы счетов_Единый счет (ЕДП)
-        a: «Единая денежная позиция», «Единый счет» — универсальный счет для торговли на российских и иностранных биржах.
-                Предоставляется доступ к:
-                — Московской бирже (фондовый, срочный, валютный рынки)
-                — Бирже СПБ (российские и иностранные ЦБ — США и Гонконг) 
-                — NYSE/NASDAQ (фондовый рынок)
-                — SEHK (Гонконг, фондовый рынок)
-                На ЕДП также доступна торговля опционами на акции РФ через ИТС QUIK. Доступ к американским опционам на СВОЕ (Чикаго) реализован только в рамках открытых договоров до 15.08.2022. 
-                По счетам ЕДП, открытым с 15.08.2022 по 13.02.2023, доступ к иностранным биржам не предоставляется.
-        buttons:
-            "Открыть счет" -> /Открытие_счета
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Типы счетов_Раздельные моносчета
-        a: ✅ В рамках «Моносчета» открывается договор с нижеперечисленными раздельными счетами:
-                — фондовый рынок Московской биржи,
-                — срочный рынок Московской биржи,
-                — валютный рынок Московской биржи,
-                — рынок ценных бумаг СПБ Биржи.
-                ✅ По каждому клиентскому счету проставляется отдельный тарифный план, который клиент может изменять через личный кабинет. Перевод денежных средств между счетами возможен через личный кабинет. Средства одного счета не могут быть обеспечением по другим счетам, что может увеличить затраты за использование заемных средств.
-        buttons:
-            "Перевод на оператора" -> /Перевод на оператора
-
-    state: Типы счетов_ИИС
-        a: ИИС, или индивидуальный инвестиционный счет — это счет для покупки акций, облигаций, валюты и других инструментов на бирже с возможностью ежегодно получать налоговую льготу от государства.
-                ИИС можно открыть в виде:
-                ✅ Единого счета — универсальный счет для торговли на российских биржах. На ЕДП также доступна торговля опционами на акции РФ через ИТС QUIK. В рамках Единого счета на весь договор проставляется один тарифный план.
-                ✅ Моносчетов — в рамках одного договора открываются раздельные счета (фондовой, срочный, валютный рынки Московской биржи и фондовый рынок СПБ Биржи). По каждому счету проставляется отдельный тарифный план. Средства одного счета не могут быть обеспечением по другим счетам, что может увеличить затраты за использование заемных средств.
-        buttons:
-            "Открыть счет" -> /Открытие_счета
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Типы счетов_еще
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Сегрегированный Global" -> /Сегрегированный
-            "US Market Options" -> /Типы счетов_US Market options
-            "Счет Иностранные биржи" -> /Счет Иностранные биржи
-            "Назад" -> /Типы счетов
-
-    state: Типы счетов_US Market options
-        a: Пакет US Market Options — счет для торговли на иностранных биржах, в рамках данного счета доступна торговля акциями и опционами на американские акции на торговых площадках CBOE, NYSE, NASDAQ.
-                ✅ Счет доступен только для квалифицированных инвесторов.
-                ✅ Открыть счет можно в личном кабинете:
-                1. перейти по ссылке: https://edox.finam.ru/NewAccount/Product?ContextId=c67e0f9d-0adf-4ec9-8b1e-4d7dbe8342c3
-                2. выбрать «Брокерская компания» → «Счет Иностранные рынки» → «пакет US Market Options»
-                ✅ Для торговли по счету доступны торговые системы FinamTrade, TRANSAQ US
-                ✅ Тарифный план по счету: «Единый Дневной Options»
-                Подробнее: https://broker.finam.ru/landings/usaoptions/
-
-    state: ИИС || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /005 ИИС
-        a: ИИС — индивидуальный инвестиционный счет с возможностью ежегодно получать налоговую льготу от государства.
-                На ИИС доступны операции с инструментами:
-                ✅ фондового рынка МБ: акции, облигации, паи ПИФов, биржевые еврооблигации (только в рамках Единых счетов), ETF, депозитарные расписки;
-                ✅ срочного рынка МБ: фьючерсы и опционы (опционы только в рамках моносчетов);
-                ✅ валютного рынка МБ;
-                ✅ СПБ-биржи: российские и иностранные ценные бумаги.
-                Выберите вариант действия:
-        buttons:
-            "Открытие ИИС" -> /ИИС_Открытие ИИС
-            "Пополнение ИИС" -> /ИИС_Пополнение ИИС
-            "Мой ИИС" -> /ИИС_Мой ИИС
-            "Налоговый вычет ИИС" -> /ИИС_Налоговый вычет ИИС
-            "Еще" -> /ИИС_Еще
-
-    state: ИИС_Открытие ИИС
-        a: Открытие индивидуального инвестиционного счета доступно новым и действующим клиентам. Выберите нужный вариант:
-        buttons:
-            "Открытие для новых клиентов" -> /ИИС_Открытие ИИС_Открытие для новых клиентов
-            "Открытие для действующих клиентов" -> /ИИС_Открытие ИИС_Открытие для действующих клиентов
-            ""Назад" -> /ИИС
-
-    state: ИИС_Пополнение ИИС
-        a: ❗ При оформлении вычета налоговая имеет право запросить платежное поручение с подтверждением внесения средств на ИИС. Не рекомендуется переводить средства с брокерских счетов, которые были пополнены с банковской карты и со счетов третьих лиц для исключения проблем оформления вычетов.
-                ✅ На ИИС вы можете переводить только рубли. Поручение на перевод можно сформировать в личном кабинете: https://lk.finam.ru/deposit/finam 
-                Максимальная сумма пополнения инвестиционного счета в год составляет 1 000 000 ₽. Минимальный порог пополнения отсутствует. 
-                ✅ ИИС можно пополнить тремя способами:
-        buttons:
-            "Наличными в кассе представительства" -> /ИИС_Пополнение ИИС_Наличными
-            "По реквизитам" -> /ИИС_Пополнение ИИС_По реквизитам
-            "Через СБП (с помощью QR-кода)" -> /Движение ДС_Пополнение_Способы_СБП
-            "Назад"
-
-    state: ИИС_Мой ИИС
-        a: ✅ Перечень действующих счетов доступен в личном кабинете: https://lk.finam.ru/
-            После авторизации и выбора счета с названием КЛФИИС****** можно перейти в раздел «детали» и проверить дату открытия договора ИИС и актуальный тариф.
-            ✅ Если счет ИИС переведен от другого брокера, первичную дату открытия можно уточнить у менеджера «Финам».
-            ✅ Историю пополнения договора ИИС Вы можете посмотреть в справке по счету по ссылке https://lk.finam.ru/reports/tax или уточнить у менеджера «Финам».
-
-    state: ИИС_Налоговый вычет ИИС
-        a: При оформлении вычета налоговая имеет право запросить платежное поручение с подтверждением внесения средств на ИИС.
-                Получателем налогового вычета и отправителем средств на ИИС должен являться владелец этого счета. 
-                Выберите тип налогового вычета, который хотите получить:
-        buttons:
-            "Вычет А" -> /ИИС_Налоговый вычет ИИС_A
-            "Вычет Б" -> /ИИС_Налоговый вычет ИИС_Б
-            "Назад" -> /ИИС
-
-    state: ИИС_Еще
-        a: Выберите вариант действия:
-        buttons:
-            "Комиссии на ИИС" -> /Комиссии
-            "Расторжение ИИС" -> /ИИС_Еще_Расторжение ИИС
-            "Перевод ИИС с сохранением срока" -> /ИИС_Еще_Перевод ИИС
-            "Назад" -> /ИИС
-
-    state: ИИС_Открытие ИИС_Открытие для новых клиентов
-        a: Для дистанционного открытия ИИС понадобится только действующий паспорт совершеннолетнего гражданина РФ: https://www.finam.ru/open/order/iis/
-            ✅ Если вы хотите открыть ИИС с тарифом «ФриТрейд», переходите по ссылке: https://www.finam.ru/landings/freetrade-new  
-            ✅ Также вы можете открыть ИИС лично посетив ближайший офис компании.
-
-    state: ИИС_Открытие ИИС_Открытие для действующих клиентов
-        a: Для действующих клиентов компании открытие ИИС доступно на главной странице личного кабинета: https://lk.finam.ru/open/brokerage
-            ❗ Для работы с опционами необходимо открыть брокерский договор с отдельными счетами (пакет моносчетов).
-
-    state: ИИС_Пополнение ИИС_Наличными
-        a: Для пополнения счета наличными, обратитесь в офис компании и воспользуйтесь услугами кассы.
-                Адреса офисов: https://www.finam.ru/about/contacts
-
-    state: ИИС_Пополнение ИИС_По реквизитам
-        a: Вы можете пополнить ИИС переводом денежных средств по банковским реквизитам счета, указанным в личном кабинете: https://lk.finam.ru/deposit/bank/requisites
-                За данную операцию «Финам» не взимает комиссию, однако возможна комиссия со стороны банка-отправителя. 
-                ❗ Пополнение ИИС с карты недоступно.
-
-    state: ИИС_Налоговый вычет ИИС_A
-        a: Максимальная сумма для вычета по типу «А», за календарный год составляет 400000 ₽. В зависимости от ставки налога на ваш доход, государство вернет вам 13% или 15% от той суммы, которую вы внесли на ИИС в отчетном году. Таким образом, максимальная сумма налога, подлежащая возврату, составит до 52000 ₽ или до 60000 ₽ соответственно.
-                ✅ С 2020 года вычет по типу «А», можно оформлять в упрощенном порядке. Для подачи заявления в упрощенном порядке за 2020 и 2021 года нужно обратиться к менеджеру.
-                ✅ Скачать пакет документов для самостоятельной подачи или подать заявку (предоставить сведения о ИИС) для получения вычета в упрощенном порядке, можно в личном кабинете по ссылке: https://lk.finam.ru/reports/tax 
-                ✅ После принятия заявления на получение вычета в упрощенном порядке ФНС обрабатывает полученные данные и отправляет уведомление в личный кабинет налогоплательщика (от 2-х до 20 дней). ФНС сформирует для вас предварительную декларацию, которую можно подписать также в личном кабинете налогоплательщика. Срок камеральной проверки после подписания декларации - один месяц.
-                ❗ Если в личном кабинете налогоплательщика пришел отказ по упрощенной процедуре, а также при оформлении вычета по стандартной процедуре за более ранние периоды, вам потребуется собрать следующие документы и обратиться в налоговую:
-                ✅ Платежное поручение об отправке денежных средств на ИИС
-                ✅ Пакет документов об открытии счета и брокерский отчет можно скачать в личном кабинете по ссылке: https://lk.finam.ru/reports/tax в разделе «Пакет документов для налогового вычета по ИИС». Для заказа пакета документов в бумажном варианте необходимо обратиться к менеджеру компании.
-    #    buttons:
-    #        "Перевод на оператора" -> /Перевод на оператора
-    state: ИИС_Налоговый вычет ИИС_Б
-        a: Максимальная сумма для вычета по типу «Б» равна доходу, полученному от торговых операций на договоре ИИС. Данная инвестиционная прибыль при вычете по типу «Б» налогом не облагается. Претендовать на вычет можно по истечению 3х лет с открытия ИИС.
-                ✅ Скачать пакет документов для самостоятельной подачи или подать заявку (предоставить сведения о ИИС в ФНС) для получения вычета по типу «Б» в упрощенном порядке, можно в личном кабинете по ссылке: https://lk.finam.ru/reports/tax 
-                ✅ После подачи заявления в течение двух рабочих дней, ожидайте новый статус заявления - «Принято к исполнению».
-                После получение данного статуса, в течение 30 дней нужно вывести средства с ИИС и закрыть его. Доход, полученный на ИИС, не будет облагаться налогом.
-                ✅ Если в течении 30 дней после подтверждения заявления со стороны ФНС счет не будет расторгнут, необходимо подать заявление повторно.
-                ✅ Если на момент оформления вычета счет расторгнут, его можно оформить только после завершения календарного года, обратившись в налоговую. Для этого потребуются:
-                1. Пакет документов об открытии счета и брокерский отчет. В электронном виде их можно заказать в личном кабинете по ссылке: https://lk.finam.ru/reports/tax 
-                Пакет будет подготовлен с заверением и выгружен в личном кабинете в разделе «Журнал поручений» по ссылке: https://lk.finam.ru/reports/documents 
-                Для заказа пакета документов в бумажном варианте необходимо обратиться к менеджеру компании.
-                2. Справка 2-НДФЛ. Заказать ее можно в личном кабинете по ссылке: https://lk.finam.ru/reports/tax в разделе «Налоги».
-                Справка будет подготовлена с заверением и выгружена в личном кабинете в разделе «Журнал поручений» по ссылке https://lk.finam.ru/reports/documents 
-                Способ получения документа можно выбрать при оформлении заявки.
-    #    buttons:
-    #        "Перевод на оператора" -> /Перевод на оператора
-    state: ИИС_Еще_Расторжение ИИС
-        a: Расторжение индивидуальных инвестиционных счетов происходит автоматически после исполнения вывода/перевода активов (средств и ценных бумаг). Счет считается расторгнутым на пятый рабочий день.
-            Выберите интересующее действие:
-        buttons:
-            "Вывод средств" -> /ИИС_Еще_Расторжение ИИС_Вывод средств
-            "Вывод ЦБ" -> /ИИС_Еще_Расторжение ИИС_Вывод ЦБ
-            "Перевод средств" -> /ИИС_Еще_Расторжение ИИС_Перевод средств
-            "Перевод ЦБ" -> /ИИС_Еще_Расторжение ИИС_Вывод ЦБ
-            "Расторжение пустого счета" -> /ИИС_Еще_Расторжение ИИС_Расторжение пустого
-            "Расторжение с целью перевода" -> /ИИС_Еще_Расторжение ИИС_Расторжение перевод
-            "Назад" -> /ИИС_Еще
-
-    state: ИИС_Еще_Перевод ИИС
-        a: Перевод активов в рамках ИИС с сохранением срока действия осуществляется следующим образом:
-                1. Откройте ИИС в «Финам», скачайте уведомление об открытии счета и предоставьте его брокеру, у которого находится ваш действующий ИИС. Скачать документы можно в личном кабинете: https://lk.finam.ru/reports/documents 
-                2. Подайте у вашего прежнего брокера поручения на: 
-                2.1. Вывод ценных бумаг. 
-                2.2. Вывод денежных средств. 
-                3. Перевод денежных средств и ценных бумаг на ИИС в «Финам» осуществляется только напрямую. После вывода активов закройте ИИС у прежнего брокера. 
-                4. Встречное поручение на прием ценных бумаг в «Финам» сформирует менеджер. Для этого вам необходимо через обратную связь в личном кабинете предоставить реквизиты ИИС, который был открыт у прежнего брокера. 
-                ❗ За перевод активов прежний брокер может взимать комиссию. Рекомендуем уточнить эту информацию заранее. 
-                5. После закрытия договора возьмите справку «Сведения о ФЛ и его ИИС» и предоставьте ее оригинал в офис «Финама» в течение 30 дней с момента поступления первого актива на ИИС.
-
-    state: ИИС_Еще_Расторжение ИИС_Вывод средств
-        a: Поручение на вывод денежных средств можно сформировать в личном кабинете: https://edox.finam.ru/orders/MoneyOut/MoneyOut/Default.aspx
-
-    state: ИИС_Еще_Расторжение ИИС_Вывод ЦБ
-        a: Поручение на перевод/вывод ценных бумаг поможет сформировать менеджер компании.
-    #    buttons:
-    #        "Перевод на оператора" -> /Перевод на оператора
-    state: ИИС_Еще_Расторжение ИИС_Перевод средств
-        a: Поручение на перевод денежных средств между брокерскими счетами поможет сформировать менеджер компании.
-    #    buttons:
-    #        "Перевод на оператора" -> /Перевод на оператора
-    state: ИИС_Еще_Расторжение ИИС_Расторжение пустого
-        a: Расторжение пустого счета доступно в личном кабинете: https://edox.finam.ru/orders/contractAbrogation/Default.aspx
-                Пустой счет считается расторгнутым на четвертый рабочий день.
-
-    state: ИИС_Еще_Расторжение ИИС_Расторжение перевод
-        a: Перевод активов в рамках ИИС с сохранением срока действия осуществляется следующим образом:
-                1. Откройте ИИС у нового брокера, скачайте уведомление об открытии счета и предоставьте его в «Финам». 
-                2. Подайте у вашего нового брокера поручения на ввод ценных бумаг. 
-                Реквизиты депозитарного счета для ввода ценных бумаг доступны в личном кабинете: https://edox.finam.ru/global/Requisites/DepoAdmission.aspx
-                3. Встречное поручение на вывод ценных бумаг в «Финаме» сформирует менеджер. Для этого вам необходимо через обратную связь в личном кабинете предоставить реквизиты ИИС, который был открыт у нового брокера.
-                ❗ За вывод ценных бумаг депозитарий «Финам» удерживает 1000 ₽ за каждое поручение. Дополнительные комиссии взимаются вышестоящим депозитарием при переводе активов в депозитарий другого брокера:
-                ✅ 65 ₽ — за поручение при переводе в рамках Мосбиржи;
-                ✅ 75 ₽ — за поручение при переводе в рамках Биржи СПБ.
-                4. Перевод денежных средств и ценных бумаг между ИИС счетами осуществляется только напрямую. После вывода активов автоматически закроется ИИС в «Финам». 
-                Поручение на перевод средств можно сформировать в личном кабинете: https://edox.finam.ru/orders/MoneyOut/MoneyOut/Default.aspx (вывод на счета третьих лиц, обязательно необходимо вложить документы об открытии ИИС у нового брокера).
-                5. После закрытия договора (на пятый рабочий день от даты исполнения поручения на перевод активов) возьмите справку «Сведения о ФЛ и его ИИС» и предоставьте новому брокеру в течение 30 дней с момента поступления первого актива на ИИС.
-
-    state: Налоги || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /006 Налоги
-        # if: (typeof $parseTree._tax_type != "undefined")
-        #     script:
-        #         {$session.tax_type = $parseTree._tax_type; $reactions.transition("/Налоги_" + $session.tax_type.name)}
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Документы для налоговой" -> /Документы и справки
-            "Расчет/списание Ндфл" -> /Налоги_Расчет НДФЛ
-            "Излишне удержанный налог" -> /Налоги_Излишне удержанный налог
-            "Налоговые льготы" -> /Налоги_Налоговые льготы
-            "Статус налогового резидента" -> /Налоги_Статус налогового резидента
-            "Налог при продаже паев PTP" -> /Налоги_Налог при продаже паев PTP
-
-    # state: Налоги_Документы для налоговой
-    #     go!: /Документы и справки
-    state: Налоги_Расчет НДФЛ
-        a: Расчет налога по закрытым позициям доступен в личном кабинете «Расчет налога по эмитентам» по ссылке: https://lk.finam.ru/reports/tax
-                1. Расчет налога по доходу физических лиц, полученного от инвестиций, производится по ставкам: 
-                ✅ 13% — для резидентов (по доходам свыше 5 млн. рублей - 15%);
-                ✅ 30% — для нерезидентов.
-                Налог рассчитывается отдельно за каждый календарный год. 
-                ❗ Исключение составляют индивидуальные инвестиционные счета. По ним нет ежегодной отчетности. Налог рассчитывается и удерживается при расторжении договора. 
-                2. По стандартным брокерским договорам расчет налога и его списание происходит:
-                ✅ При выводе денежных средств и ценных бумаг с брокерского счета (в размере зафиксированного дохода с 1 января текущего года).
-                ✅ При расторжении брокерского договора.
-                ✅ После завершения календарного года.
-
-    state: Налоги_Излишне удержанный налог
-        a: ✅ Заявление на возврат излишне удержанного налога можно сформировать в личном кабинете при наличии актуального уведомления об излишне удержанном налоге по ссылке  https://lk.finam.ru/reports/tax  в разделе «Налоги»
-                Подписать документ можно в течение трех лет с момента завершения отчетного периода. 
-                ✅ Чтобы вернуть налог за счет убытков прошлых лет, необходимо обратиться в налоговую службу. Для этого нужно заказать у брокера справку об убытках и 2-НДФЛ в личном кабинете: https://lk.finam.ru/reports/tax  в разделе «Налоги»
-                Форму предоставления справки можно выбрать при оформлении заявки.
-
-    state: Налоги_Налоговые льготы
-        buttons:
-            "Трехгодичная льгота" -> /Налоги_Трехгодичная льгота
-            "Льгота на бумаги иновационного сектора" -> /Налоги_Льгота на бумаги иновационного сектора
-            "Вычеты по ИИС" -> /ИИС_Налоговый вычет ИИС
-            "Льгота на долгосрочное хранение" -> /Налоги_Льгота на долгосрочное хранение
-
-    state: Налоги_Статус налогового резидента
-        buttons:
-            "Как получить статус налогового резидента" -> /Налоги_Как получить статус налогового резидента
-            "Отказ от статуса налогового резидента" -> /Налоги_Отказ от статуса налогового резидента
-            "Назад" -> /Налоги
-        if: (typeof $parseTree._rezident_type != "undefined")
-
-    state: Налоги_Налог при продаже паев PTP
-        a: С 1 января 2023 года введен новый налог на продажу паев PTP (Publicly Traded Partnerships) в размере 10% для нерезидентов США.
-                ✅ Официальная новость: https://www.irs.gov/individuals/international-taxpayers/partnership-withholding 
-                ✅ Актуальный список паев PTP, по которым введен налог: https://www.finam.ru/documents/commissionrates/marginal/#marj
-
-    state: Налоги_Как получить статус налогового резидента
-        a: Доступно четыре способа получения статуса резидента:
-                1. Граждане РФ получают статус налогового резидента по умолчанию, пока не будет доказано обратное. Для смены статуса нерезидента в Финам, нужно предоставить паспорт с датой прописки более 183 дней. Повторное подтверждение не нужно. 
-                2. Для присвоения статуса по общему порядку нужны следующие документы:
-                ✅ копия паспорта с отметками о пересечении границы РФ
-                ✅ миграционная карта
-                3. Для граждан государств, с которыми у РФ свободное сообщение (нет отметок в паспорте) нужны следующие документы:
-                ✅ копия паспорта
-                ✅ справка с места работы по рекомендованной компанией «Финам» форме 
-                ✅ копию трудовой книжки, заверенной работодателем 
-                ✅ табели учета рабочего времени за год, предшествующий дате подачи заявления на присвоение статуса. 
-                4. Можно обратиться в налоговый орган и получить документ, подтверждающий статус налогового резидента, через ИФНС. Статус предоставляется на один календарный год.
-                ❗ Наличие вида на жительство, временной или постоянной регистрации на территории РФ или наличие договора аренды жилья не является подтверждением факта нахождения на территории РФ.
-                ❗ Предоставлять документы и подписывать заявление для подтверждения статуса налогового резидента необходимо при каждом расчете НДФЛ (до момента вывода средств и активов, или до конца календарного года) лично в офис Финама.
-
-    state: Налоги_Отказ от статуса налогового резидента
-        a: Для отказа от статуса налогового резидента необходимо предоставить подтверждение получения статуса резидента другого государства. Личное присутствие в офисе не требуется, достаточно предоставить скан копию документа.
-
-    state: Налоги_Трехгодичная льгота
-        a: ✅ Если у вас в портфеле (за исключением ИИС) есть бумаги, приобретенные после 01.01.2014, и вы владеете ими непрерывно более трех лет, то можете претендовать на трехгодичную льготу.
-                ✅ Если бумаги были приобретены через другого брокера или получены в дар, и по ним отсутствует возможность подачи заявления в личном кабинете, то для оформления льготы нужно обратиться в налоговую.
-                ✅ Проверить наличие бумаг, попадающих под льготу на счетах в «Финам» можно в личном кабинете по ссылке: https://edox.finam.ru/journals/ThreeYearPrivilegeRestsJournal 
-                ✅ Заявление на получение льготы необходимо подписать до вывода средств от продажи ценных бумаг. Оно действует в течение одного календарного года.
-                ✅ Узнать подробнее о трехгодичной льготе можно по ссылке: https://www.finam.ru/landings/tax-break
-
-    state: Налоги_Льгота на бумаги иновационного сектора
-        a: Инвестор освобождается от уплаты 13% НДФЛ по операциям с ценными бумагами высокотехнологичного (инновационного) сектора, актуальный перечень: https://www.moex.com/ru/markets/rii/rii.aspx
-                Условия получения:
-                ✅ приобретение не ранее включения эмитента в перечень, продажа до исключения из списка,
-                ✅ срок владения: 1 год,
-                ✅ льгота предоставляется брокером по запросу в отдел поддержки.
-
-    state: Налоги_Льгота на долгосрочное хранение
-        a: Инвестор освобождается от уплаты 13% НДФЛ по операциям с акциями российских и иностранных организаций (если активы эмитента состоят из недвижимости на территории РФ не более чем на 50%).
-                Условия получения:
-                ✅ срок владения: 5 лет,
-                ✅ необходима справка от эмитента, что на последний день месяца, предшествующего месяцу продажи ЦБ, активы эмитента состояли из недвижимости на территории РФ не более чем на 50%,
-                ✅ отсутствуют сделки займа/РЕПО.
-                Способы получения:
-                ✅ через «Финам» до 31.01 года, следующего за годом продажи ЦБ (обязательно предоставление справки от эмитента),
-                ✅ через ИФНС - в течение 3-х лет, следующих за отчетным периодом, в котором произошла реализация этих ЦБ.
-
-    state: Выплата дохода || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent: /007 Выплата дохода
-        a: Клиентам «Финам» начисляются дивиденды и купонные выплаты в рублях — по российским ценным бумагам и в валюте — по еврооблигациям, ETF фондам, а также по иностранным ценным бумагам.
-            ✅ Доходы в валюте от СПБ-биржи поступают частично, распределение поступивших сумм происходит пропорционально количеству ценных бумаг на всех владельцев, остальная часть выплаты не поступает из-за блокировки цепочки с Euroclear/Clearstream. Информации о сроках доплаты/снятия ограничений пока не поступало. Подробнее по ссылке: https://spbbank.ru/ru/depobsl/Soobshcheniia_Depozitariia 
-            ✅ Исключением являются дивиденды по китайским бумагам на бирже СПБ (выплаты поступают в HKD).
-            ❗ Денежные средства от участий в выкупах бумаг помтупают на предоставленные в личном кабинете реквизиты по ссылке: https://edox.finam.ru/orders/depoBankAccountDetails.aspx 
-            Выберите нужный вариант:
-        buttons:
-            "Даты фиксации для получения дохода" -> /Выплата дохода_Даты фиксации
-            "Срок выплаты дохода" -> /Выплата дохода_Срок выплаты
-            "Налог на купоны/дивиденды" -> /Выплата дохода_Налог
-            "Вывод купонов/дивидендов" -> /Выплата дохода_Вывод
-            "Еще" -> /Выплата дохода_Дополнительные кнопки
-
-    state: Выплата дохода_Даты фиксации
-        a: 1. Список российских эмитентов с датами проведения собраний акционеров, даты фиксации владельцев ценных бумаг для получения дивидендов доступны по ссылке: https://www.finam.ru/analysis/assembly/
-            2. Дату фиксации, дату выплаты купонов и погашения можно проверить по каждой облигации на сайте https://bonds.finam.ru/issue/info/ (выбрать нужную бумагу и раскрыть меню «Платежи» под ее описанием).
-
-    state: Выплата дохода_Срок выплаты
-        a: ✅ Максимальный срок выплаты дивидендов и купонов со стороны эмитентов составляет 10 рабочих дней.
-            Перечисление средств со стороны брокера может занимать еще до 7 рабочих дней. На практике «Финам» производит выплаты клиентам в течение дня с момента получения средств от эмитента.
-            ❗ Начисление выплат в валюте может занимать больше времени, так как в переводе средств участвуют банки-корреспонденты.
-            ✅ По облигациям, приобретенным через сделку РЕПО, начисление происходит в течение пяти рабочих дней с момента основной выплаты.
-            ✅ Сроки выплат и зачислений после корпоративных действий эмитент указывает в спецификации корпоративного действия (информация публикуется на сайте биржи, а также на сайте брокера в   разделе «Новости депозитария» по ссылке: https://www.finam.ru/publications/section/deponews )
-            ❗ Выплаты и зачисления в валюте по корп. действиям с иностранными бумагами могут занимать от двух недель до нескольких месяцев, в связи с ограничениями внешних депозитариев.
-            ❗ Выплаты от корпоративных действий приходят на банковские реквизиты, которые необходимо предоставить в личном кабинете по ссылке: https://edox.finam.ru/orders/depoBankAccountDetails.aspx
-
-    state: Выплата дохода_Налог
-        a: Выплата дивидендов, купонов и прочих доходов по ценным бумагам по умолчанию предусмотрена на счет учета бумаг.
-            Клиенты «Финам» могут оформить или отменить выплату дохода на другой брокерский или банковский счет.
-            Чтобы выплаты доходов автоматически зачислялись на другой счет, нужно подать заявку в личном кабинете по ссылке: https://edox.finam.ru/List/Extracts 
-            В разделе «Депозитарий» выбрать нужное:
-            ✅ Заявка на выплату доходов по ЦБ на другие счета
-            ✅ Заявка на ОТМЕНУ перечисления дохода по ЦБ на другие счета.
-            ❗ При выборе банковского счета для получения выплаты дохода обязательно нужно заполнить банковские реквизиты, для этого нужно нажать кнопку «Добавить реквизиты».
-            ❗ Чтобы перенаправить зачисление средств от погашений облигаций на другой счет, нужно обратиться к менеджеру.
-        buttons:
-            "Московская биржа" -> /Выплата дохода_Налог_Московская биржа
-            "Биржа СПБ" -> /Выплата дохода_Налог_Биржа СПБ
-            "NYSE/NASDAQ" -> /Выплата дохода_Налог_NYSE и NASDAQ
-            "Гонконг (HKEX)" -> /Выплата дохода_Налог_Гонконг
-            "Перевод на оператора" -> /Перевод на оператора
-            "Назад" -> /Выплата дохода
-
-    state: Выплата дохода_Налог_Московская биржа
-        a: 30% (без подписанной формы W8BEN) или 10% (с формой W8BEN) + 3% (необходимо оплатить самостоятельно).
-            Форму W8BEN можно оформить в личном кабинете: https://lk.finam.ru/reports/tax  
-            Подписанная форма действует три года.
-
-    state: Выплата дохода_Налог_Биржа СПБ
-        a: 30% (без подписанной формы W8BEN) или 10% (с формой W8BEN) + 3% (необходимо оплатить самостоятельно).
-            Форму W8BEN можно оформить в личном кабинете: https://lk.finam.ru/reports/tax  
-            Подписанная форма действует три года.
-
-    state: Выплата дохода_Налог_NYSE и NASDAQ
-        a: 15%
-
-    state: Выплата дохода_Налог_Гонконг
-        a: 0%
-
-    state: Выплата дохода_Вывод
-        a: Выплата дивидендов, купонов и прочих доходов по ценным бумагам по умолчанию предусмотрена на счет учета бумаг.
-            Клиенты «Финам» могут оформить или отменить выплату дохода на другой брокерский или банковский счет.
-            Чтобы выплаты доходов автоматически зачислялись на другой счет, нужно подать заявку в личном кабинете по ссылке: https://edox.finam.ru/List/Extracts 
-            В разделе «Депозитарий» выбрать нужное:
-            ✅ Заявка на выплату доходов по ЦБ на другие счета
-            ✅ Заявка на ОТМЕНУ перечисления дохода по ЦБ на другие счета.
-            ❗ При выборе банковского счета для получения выплаты дохода обязательно нужно заполнить банковские реквизиты, для этого нужно нажать кнопку «Добавить реквизиты».
-            ❗ Чтобы перенаправить зачисление средств от погашений облигаций на другой счет, нужно обратиться к менеджеру.
-
-    state: Выплата дохода_Ещё
-        a: Выберите нужный вариант
-        buttons:
-            "Как проверить начисление" -> /Выплата дохода_Ещё_Ппроверить начисление
-            "Документы для отчетности по дивидендам" -> /Выплата дохода_Ещё_Документы для отчетности
-            "Комиссии за начисление дохода" -> /Выплата дохода_Ещё_Комиссии за начисление
-            "Назад" -> /Выплата дохода
-
-    state: Выплата дохода_Ещё_Проверить начисление
-        a: Сумма начисленных дивидендов и купонов отображается в виде свободного остатка или уменьшает сумму займа по счету в соответствующей валюте.
-            Сумму начислений также можно проверить в личном кабинете:
-            ✅ в истории операций https://lk.finam.ru/history 
-            ✅ в справке по счету с детальным описанием операций и сделок: https://lk.finam.ru/reports/tax (можно загрузить только за закрытый торговый период).
-
-    state: Выплата дохода_Ещё_Документы для отчетности
-        a: ✅ Дивиденды в рублях поступают на счет уже очищенными от налога. В этом случае вам не нужно подавать документы в налоговую.
-            ✅ По дивидендам, полученным в валюте, вам необходимо самостоятельно отчитаться перед налоговой. Вам нужно подготовить пакет документов в зависимости от площадки, на которой вы покупали ценные бумаги.
-        buttons:
-            "Московская биржа" -> /Выплата дохода_Документы_Московская биржа
-            "Биржа СПБ" -> /Выплата дохода_Документы_Биржа СПБ
-            "Иностранные биржи" -> /Выплата дохода_Документы_Иностранные биржи
-            "Перевод на оператора" -> /Перевод на оператора
-            "Назад" -> /Выплата дохода_Ещё
-
-    state: Выплата дохода_Документы_Московская биржа
-        a: Для отчетности в налоговую по валютным дивидендам от иностранных компаний загрузите справку 1042S в личном кабинете по ссылке: https://lk.finam.ru/reports/tax в разделе «Налоги».
-            ✅ Справка предоставляется депозитарием за завершенный отчетный период (календарный год).
-            ✅ По депозитарным распискам детальная информация о зачислениях отображается в уведомлениях о выплате дохода (по данному инструменту форма 1042S не предоставляется).
-            ✅ Уведомления доступны в личном кабинете по ссылке: https://lk.finam.ru/reports/documents
-
-    state: Выплата дохода_Документы_Биржа СПБ
-        a: Для отчетности в налоговую по валютным дивидендам от иностранных компаний загрузите в личном кабинете справку 1042S в личном кабинете по ссылке: https://lk.finam.ru/reports/tax  в разделе «Налоги».
-            ✅ Справка предоставляется депозитарием за завершенный отчетный период (календарный год).
-            ✅ Детальная информация по каждому зачислению отображается в уведомлениях о выплате дохода в личном кабинете по ссылке: https://lk.finam.ru/reports/documents
-
-    state: Выплата дохода_Документы_Иностранные биржи
-        a: Для отчетности в налоговую по валютным дивидендам от иностранных компаний, запросите Уведомление от вышестоящего брокера у менеджера «Финам».
-                ✅ Уведомление предоставляется вышестоящим брокером за завершенный отчетный период (календарный год).
-                ✅ Дополнительно в ваш личный кабинет будет выгружено Уведомление о присвоении торгового кода по ссылке: https://lk.finam.ru/reports/documents 
-                Документ содержит информацию о соответствии зарубежного торгового кода и ваших паспортных данных.
-        script:
-            $reactions.transition("/Перевод на оператора")
-
-    state: Выплата дохода_Ещё_Комиссии за начисление
-        a: ✅ По «старым» счетам комиссия за начисление дивидендов в рублях составляет 1,18%, за начисление купонов - 0,236%.
-            ✅ По счетам, открытым после 26.11.2020, а также по счетам с самостоятельно измененным тарифом позже указанной даты, комиссия не взимается.
-            ✅ За начисление дивидендов и купонов в валюте комиссия не удерживается.
-
-    state: Срочный рынок || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /008 Срочный рынок
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Как купить/продать фьючерс" -> /Купить фьючерс
-            "Гарантийное обеспечение" -> /Срочный рынок_Обеспечение
-            "Вариационная маржа" -> /Срочный рынок_Маржа
-            "Доступ к опционам" -> /Срочный рынок_Опционы
-            "Ещё" -> /Срочный рынок_Ещё
-
-    state: Срочный рынок_Купить фьючерс
-        a: Выставить заявку на покупку и продажу фьючерса вы можете через любую торговую систему или с помощью голосового поручения.
-            ✅ Рекомендуем обращать внимание на время проведения торгов для корректного выставления заявки.
-            ✅ Торговая сессия начинается вечером и длится с 19:05 до 23:50, продолжается на следующий день — с 10:00 до 14:00 и с 14:05 до 18:50 МСК.
-
-    state: Срочный рынок_Обеспечение
-        a: При покупке или продаже фьючерса на вашем счете блокируется гарантийное обеспечение (ГО).
-            ✅ Сумма ГО по каждому инструменту формируется на основании ставок риска. Стандартное гарантийное обеспечение по каждому фьючерсу публикуется на сайте биржи. 
-            ✅ По счетам единой денежной позиции со статусом риска КСУР гарантийное обеспечение увеличено в связи с действующими требованиями к риск-менеджменту. 
-            Проверить актуальное ГО по Вашему счету можно в системе Transaq в информации по инструменту, либо уточнить у менеджера.
-            ❗ В момент выставления рыночной заявки гарантийное обеспечение увеличивается в 1,5 раза. 
-            Уменьшить гарантийное обеспечение можно одним из способов:
-        buttons:
-            "Отключения фондового и валютного рынков по счетам со статусом КСУР по счетам ЕДП" -> /Срочный рынок_Обеспечение_Отключение
-            "Услуга «Пониженное ГО» (ПГО)" -> /Срочный рынок_Обеспечение_ПГО
-            "Использование брокерского договора с отдельными счетами" -> /Срочный рынок_Обеспечение_Отдельные счета
-            "Назад" -> /Срочный рынок
-
-    state: Срочный рынок_Обеспечение_Отключение
-        a: Отключить секцию можно, обратившись к менеджеру.
-            ❗ Предварительно необходимо заполнить раздел «Инвестиционный профиль» в личном кабинете: https://lk.finam.ru/user/invest-profile 
-            А также нужно проверить счет на соответствие требованиям:
-            ✅ сумма средств по счету больше 10000₽;
-            ✅ отсутствуют сделки с ценными бумагами и валютой по счету.
-        script:
-            $reactions.transition("/Перевод на оператора")
-
-    state: Срочный рынок_Обеспечение_ПГО || sessionResult = "Orange", sessionResultColor = "#B65A1E"
-        a: Услуга пониженного гарантийного обеспечения (ПГО) предоставляется клиентам «Финам», удовлетворяющим одновременно нескольким требованиям.
-            ✅ Подробнее с условиями подключения можно ознакомиться по ссылке: https://www.finam.ru/landings/services-pgo-forts 
-            ✅ Подключить или отключить услугу можно в личном кабинете edox.finam.ru в разделе «Услуги» → «Прочие операции» → услуга «Пониженное ГО» либо по ссылке: https://edox.finam.ru/orders/ReducedGuarantee.aspx 
-            ❗ Услуга «Пониженное ГО» действует в будние дни с 7:00 до 19:30 МСК, предоставляется по ограниченному перечню инструментов.
-            ❗ Услуга недоступна при торговле через терминал MetaTrader 5.
-        a: Услуга пониженного гарантийного обеспечения (ПГО) может быть недоступна в ближайшие дни в связи с возможной повышенной волатильностью курса рубля. Просим учитывать данную информацию при планировании торговых операций.
-
-    state: Срочный рынок_Обеспечение_Отдельные счета
-        a: По договорам с раздельными счетами (моносчетами) размер ГО равен указанному на бирже.
-            ✅ Открыть новый счет можно в личном кабинете по ссылке: https://edox.finam.ru/NewAccount/Product?ContextId=fff807f6-7837-4bff-9484-014dc3c5f94c
-
-    state: Срочный рынок_Маржа
-        a: Прибыль (убыток) по фьючерсам и опционам зачисляется (списывается) в виде вариационной маржи.
-            ✅ Позиционная вариационная маржа начисляется на контракты, которые есть в портфеле на утро. 
-            ✅ Посделочная вариационная маржа начисляется в день открытия позиции по фьючерсу или опциону. На следующий день и до момента закрытия позиции начисляется позиционная вариационная маржа. Если позиция открыта и закрыта внутри торговой сессии, то будет зачислена посделочная маржа.
-            ✅ Фактическое зачисление вариационной маржи на счет происходит в основной клиринг (в 19:05 по МСК). 
-            Движение позиционной вариационной маржи отображается в справке по счету ( https://lk.finam.ru/reports/tax ), а также в истории операций ( https://lk.finam.ru/history ). 
-            ✅ Параметры инструментов для расчета вариационной маржи доступны на сайте биржи: https://www.moex.com/ru/derivatives/  
-            Расчет можно произвести по формуле:
-            ВМ = (PS - PB)*W/R, где: 
-            PS – цена продажи,
-            PB – цена покупки,
-            W – стоимость шага цены,
-            R – шаг цены.
-
-    state: Срочный рынок_Опционы
-        a: 1. Опционы на Московской бирже:
-            ✅ Доступ к поставочным опционам (на фьючерсы) предоставляется только в рамках договоров с раздельными брокерскими счетами.
-            ✅ Доступ к опционам на российские ценные бумаги предоставляется по «Единым счетам» (доступны только в системе Quik) и по договорам с раздельными брокерскими счетами.
-            ✅ Для оценки доходности, определения размера гарантийного обеспечения и биржевой комиссии при торговле опционами на ММВБ вы можете использовать опционный калькулятор по ссылке https://www.moex.com/msn/ru-options-calc 
-            {{ a }}
-            2.  Доступ к американским опционам (США) предоставляется по:
-            ✅ «Единым счетам» (для получения доступа обратитесь к менеджеру)
-            ✅ по счетам «US Market Options»
-            ✅ по счетам «Сегрегированный Global»
-            ✅ счетам «Иностранные биржи»
-            ❗ Для работы с данными инструментами требуется статус квалифицированного инвестора.
-            ❗ Все расчеты производятся в долларах США, автоконвертация валюты при покупке не осуществляется.
-        buttons:
-            "Доска опционов" -> /Срочный рынок_Опционы_Доска
-
-    state: Срочный рынок_Опционы_Доска
-        a: Доска опционов доступна в торговых системах: TRANSAQ, TRANSAQ US, QUIK, FinamTrade (web).
-            1. QUIK:
-            — на панели инструментов нужно нажать «Создать окно» → «Все типы окон» → «Доска опционов».
-            2. TRANSAQ/TRANSAQ US:
-            — на панели инструментов нажать «Таблицы» → «Финансовые инструменты»,
-            — нажать правой кнопкой мыши по таблице и с помощью выбора/поиска инструмента добавить необходимый базовый актив (фьючерс),
-            — нажать правой кнопкой мыши по добавленному инструменту и выбрать меню «Доска опционов».
-            3. FinamTrade:
-            — слева на панели инструментов нужно перейти в категорию «Рынки» и выбрать необходимый фьючерс,
-            — справа от кнопки «Заявка» будет доступна кнопка «Опционы».
-
-    state: Срочный рынок_Ещё
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Комиссия на срочном рынке" -> /Срочный рынок_Ещё_Комиссия
-            "Ошибки при выставлении заявок" -> /Срочный рынок_Ещё_Ошибки
-            "Тестирование для работы на срочном рынке" -> /Срочный рынок_Ещё_Тестирование
-            "Исполнение фьючерсов/опционов" -> /Срочный рынок_Ещё_Исполнение
-            "Назад" -> /Срочный рынок
-
-    state: Срочный рынок_Ещё_Комиссия || sessionResult = "Готов", sessionResultColor = "#15952F"
-        a: При торговле на срочном рынке FORTS возникает два вида комиссий — биржевая и брокерская.
-                Биржевая комиссия:
-                ✅ За исполнение лимитных заявок, создающих ликвидность рынка (формирующих стакан спроса/предложения), комиссия со стороны биржи не удерживается. 
-                ✅ За исполнение рыночных заявок, а также лимитных ордеров с мгновенным исполнением, комиссии взимаются согласно тарифам, указанным в спецификации каждого срочного контракта: https://www.moex.com/ru/derivatives/ 
-                ✅ Комиссия брокера зависит от тарифного плана. 
-                ✅ Полное описание тарифных планов с учетом всех торговых инструментов доступно в регламенте брокерского обслуживания: http://zaoik.finam.ru/broker/regulations 
-                ✅ Выберите свой тариф:
-        buttons:
-            "ФриТрейд/Единый Тест-Драйв" -> /Срочный рынок_Ещё_Комиссия_ФриТрейд
-            "Стратег" -> /Срочный рынок_Ещё_Комиссия_Стратег
-            "Инвестор" -> /Срочный рынок_Ещё_Комиссия_ФриТрейд
-            "Единый дневной" -> /Срочный рынок_Ещё_Комиссия_ФриТрейд
-            "Единый Дневной Options" -> /Срочный рынок_Ещё_Комиссия_Единый Options
-            "Другие тарифы" -> /Срочный рынок_Ещё_Комиссия_Другие тарифы
-            "Назад" -> /Срочный рынок_Ещё
-
-    state: Срочный рынок_Ещё_Комиссия_ФриТрейд
-        a: 1. Московская биржа:
-            ✅ Заявка через ИТС:
-            – фьючерсы и опционы – 0,45 ₽ за контракт 
-            ✅ Заявка с голоса (или закрытие брокером):
-            – фьючерсы – 0,0354% от стоимости контракта
-            – опционы - 2 ₽ за контракт
-            2. Биржи США:
-            ✅ Заявка через ИТС:
-            – стандартные фьючерсы — 10 $ за контракт 
-            – микро и мини-фьючерсы — 5 $ за контракт
-            – опционы – 3$ за контракт
-            ✅ Заявка с голоса (или закрытие брокером):
-            – фьючерсы и опционы – 0,1% от стоимости контракта.
-            ❗ Открытие новых позиций с иностранными фьючерсами временно недоступно.
-
-    state: Срочный рынок_Ещё_Комиссия_Стратег
-        a: 1. Московская биржа:
-            ✅ Заявка через ИТС:
-            – фьючерсы и опционы – 0,9 ₽ за контракт 
-            ✅ Заявка с голоса (или закрытие брокером):
-            – фьючерсы – 0,0354% от стоимости контракта
-            – опционы - 2 ₽ за контракт
-            2. Биржи США:
-            ✅ Заявка через ИТС:
-            – стандартные фьючерсы — 10 $ за контракт
-            – микро и мини-фьючерсы — 5 $ за контракт
-            – опционы – 3$ за контракт
-            ✅ Заявка с голоса (или закрытие брокером):
-            – фьючерсы и опционы – 0,1% от стоимости контракта.
-            ❗ Открытие новых позиций с иностранными фьючерсами временно недоступно.
-
-    state: Срочный рынок_Ещё_Комиссия_Единый Options
-        a: 1. Московская биржа:
-            ✅ Заявка через ИТС:
-            – фьючерсы и опционы – 0,45 ₽ за контракт
-            ✅ Заявка с голоса (или закрытие брокером):
-            – фьючерсы – 0,0354% от стоимости контракта
-            – опционы - 2 ₽ за контракт
-            2. Биржи США:
-            ✅ Заявка через ИТС:
-            – стандартные фьючерсы — 10 $ за контракт
-            – микро и мини-фьючерсы — 5 $ за контракт
-            – опционы – 0,65 $ за контракт
-            ✅ Заявка с голоса (или закрытие брокером):
-            – фьючерсы и опционы – 0,1% от стоимости контракта.
-
-    state: Срочный рынок_Ещё_Комиссия_Другие тарифы
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Тест - Драйв" -> /Срочный рынок_Ещё_Комиссия_Тест-драйв
-            "Стандартный ФОРТС" -> /Срочный рынок_Ещё_Комиссия_Тест-драйв
-            "Консультационный ФОРТС" -> /Срочный рынок_Ещё_Комиссия_Консультационный ФОРТС
-            "Единый Фиксированный" -> /Срочный рынок_Ещё_Комиссия_Тест-драйв
-            "Единый Консультационный" -> /Срочный рынок_Ещё_Комиссия_Единый Консультационный
-            "Назад" -> /Срочный рынок_Ещё_Комиссия
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Срочный рынок_Ещё_Комиссия_Тест-драйв
-        a: ✅ Заявка через ИТС:
-            – фьючерсы и опционы – 0,45 ₽ за контракт 
-            ✅ Заявка с голоса (или закрытие брокером):
-            – фьючерсы – 0,0354% от стоимости контракта
-            – опционы - 2 ₽ за контракт
-
-    state: Срочный рынок_Ещё_Комиссия_Консультационный ФОРТС
-        a: ✅ Заявка через ИТС:
-            – фьючерсы и опционы – 4,65 ₽ за контракт 
-            ✅ Заявка с голоса (или закрытие брокером):
-            – фьючерсы – 0,03611% от стоимости контракта
-            – опционы - 4,65 ₽ за контракт
-
-    state: Срочный рынок_Ещё_Комиссия_Единый Консультационный
-        a: 1. Московская биржа:
-            ✅ Заявка через ИТС:
-            – фьючерсы и опционы – 4,65 ₽ за контракт
-            ✅ Заявка с голоса (или закрытие брокером):
-            – фьючерсы – 0,03611% от стоимости контракта
-            – опционы - 4,65 ₽ за контракт
-            2. Биржи США:
-            ✅ Заявка через ИТС:
-            – фьючерсы — 10 $ за контракт
-            – опционы – 3$ за контракт
-            ✅ Заявка с голоса (или закрытие брокером):
-            – фьючерсы и опционы – 0,1% от стоимости контракта.
-
-    state: Срочный рынок_Ещё_Ошибки || sessionResult = "Jump", sessionResultColor = "#BC3737"
-        a: При торговле на срочном рынке нужно знать ряд моментов:
-            1. Нужно пройти тестирование «Производные финансовые инструменты».
-            Сдать тест, чтобы получить доступ к срочному рынку, можно в личном кабинете: https://lk.finam.ru/user/invest-status/qual-exam/tests  
-            2. При выставлении «рыночной заявки» размер ГО будет в 1,5 раза выше стандартного. Из-за этого у вас может не хватать средств на открытие новых позиций. Рекомендуем использовать «лимитные» заявки.
-            3. Под активные ордера блокируется ГО, что может помешать открытию новых позиций.
-            4. Торговая сессия на срочной секции ММВБ начинается вечером и длится с 19:05 до 23:50, продолжается на следующий день — с 10:00 до 14:00 и с 14:05 до 18:50 (по московскому времени). 
-            Популярные ошибки и их решение:
-
-    state: Срочный рынок_Ещё_Тестирование
-        a: Для того, чтобы начать торговать на срочном рынке, пройдите тестирование «Производные финансовые инструменты» в личном кабинете: https://lk.finam.ru/user/invest-status/qual-exam/tests
-
-    state: Срочный рынок_Ещё_Исполнение
-        a: ✅ Расчетные фьючерсы не предполагают поставки базового актива, исполняются биржей автоматически в день исполнения (дата указана в спецификации инструментов на бирже и торговых системах), дополнительные заявки не требуются.
-            ✅ Опционы на акции - расчетные, они не предполагают поставки базового актива, исполняются биржей автоматически в день исполнения.
-        a: ✅ Поставочные фьючерсы на ценные бумаги закрываются брокером, начиная с вечерней сессии за день до последнего дня обращения.
-            ❗ Для выхода на поставку необходимо подписать Уведомление о поставке за два рабочих дня до исполнения контракта, обратившись к менеджеру компании.
-            ✅ Результатом исполнения фьючерсов на драгоценные металлы является поставка контрактов GLDRUB_TOM или SLVRUB_TOM (Физическая поставка металлов по данным контрактам невозможна).
-            ❗ Для выхода на поставку контракта необходимо подписать Уведомление о поставке за 6 дней до экспирации фьючерса, обратившись к менеджеру компании. Подробнее о поставочных фьючерсах на драгоценные металлы: https://www.moex.com/a4421 
-            ✅ Заявку на поставку вечных фьючерсов можно подать через отдел голосового трейдинга. Подача поручений на исполнение происходит 4 раза в год за три дня до исполнения квартального фьючерса на соответствующие базовые активы в течение одного торгового дня.
-            ❗ При исполнении такой заявки биржа удерживает дополнительную комиссию 1%. 
-            ✅ Опционы на фьючерсы исполняются автоматически в день исполнения контракта, дополнительные заявки не требуются. 
-            ❗ Досрочное исполнение и отказ от исполнения опционов возможен через отдел голосового трейдинга.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Валютный рынок || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /009 Валютный рынок
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Как купить/продать валюту?" -> /Валютный рынок_Как купить
-            "Комиссия за сделки с валютой" -> /Валютный рынок_Комиссия
-            "Ввод/вывод/хранение" -> /Валютный рынок_Ввод и вывод
-            "Доступные инструменты" -> /Валютный рынок_Инструменты
-            "Ошибки при выставлении заявок" -> /Валютный рынок_Ошибки
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Валютный рынок_Как купить
-        a: Валютные пары торгуются на валютной секции Мосбиржи.
-            1. Полные лоты доступны в виде контрактов _TOD (расчеты в текущий рабочий день после 23:50 МСК) и _TOM (расчеты на следующий рабочий день после 23:50 МСК). Размер 1 лота равен:
-            ✅ USDRUB, USDCNY, EURRUB, EURUSD, CNYRUB, HKDRUB, BYNRUB, TRYRUB – 1000 ед. валюты.
-            ✅ KZTRUB, AMDRUB – 10000 ед. валюты.
-            ✅ UZSRUB – 1000000 ед. валюты.
-            2. Неполные лоты валют доступны в виде контрактов _TMS (торгуются кратно 0,01 ед. валюты, минимальная заявка от 1 ед. валюты, расчеты на следующий рабочий день после 23:50 МСК).
-            3. В режиме _ТОМ доступны контракты на золото (1 лот = 1 грамм) и серебро (1 лот = 100 грамм).
-            4. Сделки с валютными парами доступны как в рамках стандартных брокерских договоров, так и договоров ИИС.
-            Для открытия позиции можно воспользоваться поиском в торговой системе, или выбрать инструмент из раздела «Валюты». Далее будет доступна опция «Заявка».
-            ❗ В терминале Finam Trade в разделе «Мировые валюты» транслируются индикативные форекс-котировки, торги такими валютными парами недоступны.
-
-    state: Валютный рынок_Комиссия
-        a: При торговле на валютном рынке возникает два вида комиссии: биржевая и брокерская.
-            Дополнительно может возникать перенос необеспеченных позиций (сделки СВОП), при наличии чистого минуса в рублях/валюте.
-        buttons:
-            "Комиссия брокера" -> /Валютный рынок_Комиссия брокера
-            "Комиссия биржи" -> /Валютный рынок_Комиссия биржи
-            "Комиссия за перенос займа (СВОП)" -> /Валютный рынок_Комиссия СВОП
-            "Назад" -> /Валютный рынок
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Валютный рынок_Комиссия брокера
-        a: Комиссия брокера зависит от выбранного тарифа.
-            Выберите тариф:
-        buttons:
-            "ФриТрейд" -> /Валютный рынок_Комиссия брокера_ФриТрейд
-            "Стратег" -> /Валютный рынок_Комиссия брокера_ФриТрейд
-            "Инвестор" -> /Валютный рынок_Комиссия брокера_ФриТрейд
-            "Единый Дневной" -> /Валютный рынок_Комиссия брокера_ФриТрейд
-            "Единый Консультационный" -> /Валютный рынок_Комиссия_Другие тарифы
-            "Другие тарифы" -> /Валютный рынок_Комиссия_Другие тарифы
-            "Назад" -> /Валютный рынок_Комиссия
-    
-    state: Валютный рынок_Комиссия брокера_ФриТрейд
-        a: ✅ За торговлю полными лотами валюты (контракты _TOD и _TOM) комиссия - 0,03682%, мин 41.30 ₽ при обороте до 1000000 ₽ за торговую сессию.
-            ✅ За торговлю мелкими лотами валюты (контракты _TMS) комиссия - 0,03682%.
-            ✅ За торговлю металлами (контракты _TOM) комиссия - 0,05% от оборота.
-
-    state: Валютный рынок_Комиссия_Другие тарифы
-        a: Другие тарифы
-        buttons:
-            "Единый Фиксированный" -> /Валютный рынок_Комиссия_Единый Фиксированный
-            "Единый Оптимум" -> /Валютный рынок_Комиссия_Единый Оптимум
-            "Назад" -> /Валютный рынок_Комиссия брокера
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Валютный рынок_Комиссия_Единый Фиксированный
-        a: ✅ За торговлю полными лотами (контракты _TOD и _TOM) комиссия - 0,03682%, при обороте до 1000000 ₽ за торговую сессию.
-            ✅ За торговлю мелкими лотами (контракты _TMS) комиссия - 0,03682%.
-            ✅ За торговлю металлами (контракты _TOM) комиссия - 0,05% от оборота.
-
-    state: Валютный рынок_Комиссия_Единый Оптимум
-        a: ✅ За торговлю полными лотами (контракты _TOD и _TOM) комиссия - 0,03386%, мин 41.30 ₽ при обороте до 1000000 ₽ за торговую сессию.
-            ✅ За торговлю мелкими лотами (контракты _TMS) комиссия - 0,03386%.
-            ✅ За торговлю металлами (контракты _TOM) комиссия - 0,05% от оборота.
-
-    state: Валютный рынок_Комиссия биржи
-        a: С 01.08 на бирже вступило в силу изменение правил удержания комиссии по валютным парам:
-            ✅ За торговлю полными лотами (контракты TOD и TOM) — 0% для мейкеров и 0,0045% от оборота для тейкеров, при этом минимальная комиссия за сделку 50 ₽ (исключение USDRUB, EURRUB – 100 ₽), если заявка на совершение сделки подана объемом менее 50 лотов;
-            если более 50 лотов – минимальная комиссия 0,02 ₽ для мейкеров и 1 ₽ для тейкеров. 
-            Комиссия за сделки СВОП составляет 0,0006% от суммы первой части сделки СВОП, но не менее 1 ₽ за сделку.
-            ✅ За торговлю мелкими лотами (контракты _TMS) — 0% для мейкеров и 0,075% от оборота для тейкеров, при этом минимальная комиссия за сделку 1 ₽.
-            ✅ За торговлю драгоценными металлами комиссия биржи:
-            — золото - при покупке - 1 ₽, при продаже - 0,02%, но не менее 1 ₽, 
-            — серебро - при покупке - 0,006375%, но не менее 1 ₽, при продаже - 0,017875%, но не менее 1 ₽.
-
-    state: Валютный рынок_Комиссия СВОП
-        a: Сделки СВОП – сделки переноса необеспеченных валютных позиций.
-            Брокер осуществляет перенос позиций в том случае, если по счету клиента не могут пройти расчеты. 
-            Такая ситуация может сложиться, если на дату расчетов у клиента по счету отрицательная чистая позиция по рублям или валюте (фактически, одна валюта выступает обеспечением для другой).
-            1. Комиссия СВОП за перенос длинных позиций - не более максимальной из следующих величин: 
-            ✅ КС/365 + 0,02192 
-            и 
-            ✅ максимальное значение величины MaxSwap/t/БК, рассчитываемой по данным ПАО Московская Биржа за 7 (семь) торговых дней, предшествующих дню заключения сделки своп по переносу чистой открытой позиции.
-            2. Комиссия СВОП за перенос коротких позиций - не менее минимальной из следующих величин (с учетом знака): 
-            ✅ (- 1) × (КС/365 + 0,0137) 
-            и 
-            ✅ минимальное значение величины MinSwap/t/БК, рассчитываемой по данным ПАО Московская Биржа за 7 (семь) торговых дней на валютном рынке, предшествующих дню заключения сделки своп по переносу чистой открытой позиции.
-            Детальнее на сайте: https://www.finam.ru/landings/tariff-learn-more/
-
-    state: Валютный рынок_Ввод и вывод
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Хранение валюты" -> /Валютный рынок_Ввод и вывод_Хранение валюты
-            "Ввод валюты" -> /Движение ДС_Пополнение_Реквизиты
-            "Вывод валюты" -> /Движение ДС_Вывод_Реквизиты
-            "Назад" -> /Валютный рынок
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Валютный рынок_Ввод и вывод_Хранение валюты
-        a: 1. Комиссии за хранение долларов США и фунтов на брокерских счетах «Финам»:
-            ✅ если сумма до 10000 единиц валюты – комиссия не списывается. 
-            ✅ если сумма свыше 10000 до 100000 единиц валюты – 5% годовых.
-            ✅ если свыше 100000 единиц валюты – 3% годовых. 
-            2. Комиссия удерживается в рублях по курсу Банка России на дату списания, расчет осуществляется исходя из количества валюты на счете по состоянию на конец календарного дня. Списание происходит не позднее окончания соответствующего дня. 
-            3. Комиссия не взимается по счетам «Сегрегированный Global».
-            Также не взимается за хранение долларов США по счетам «Иностранные биржи» в период действия акции. Условия бесплатного хранения долларов США можно уточнить у менеджера.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Валютный рынок_Инструменты
-        a: ✅ Сделки с валютными парами доступны как в рамках стандартных брокерских договоров, так и договоров ИИС.
-            ✅ В рамках счетов АО Финам предоставляется доступ к валютным парам: доллар США/российский рубль, евро/российский рубль, китайский юань/российский рубль, гонконгский доллар/российский рубль, турецкая лира/российский рубль, белорусский рубль/российский рубль, казахстанский тенге/российский рубль.
-            Также доступны валютные пары евро/доллар США и доллар США/китайский юань. 
-            ❗ Торги швейцарским франком и британским фунтом временно приостановлены по инициативе биржи. 
-            ✅ Дополнительно в режиме _ТОМ доступны контракты на  золото (1 лот = 1 грамм) и серебро (1 лот = 100 грамм).
-
-    state: Валютный рынок_Ошибки || sessionResult = "Jump", sessionResultColor = "#BC3737"
-        a: Для совершения сделок с валютными парами/драг. металлами нужно знать ряд моментов:
-                1. Использовать счет ЕДП (Единая денежная позиция) с подключенной валютной секцией, или счет валютного рынка в рамках договора с раздельными счетами. 
-                Наименование и вид счета можно проверить в личном кабинете https://lk.finam.ru/ 
-                2. Выставление «рыночных» и «лимитных» ордеров доступно только в рабочие дни в торговое время биржи.
-                Популярные ошибки и их решение:
-
-    state: Драгметаллы || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /010 Драгметаллы
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Как купить/продать металлы?" -> /Драгметаллы_Как купить
-            "Комиссии при торговле металлами" -> /Драгметаллы_Комиссии
-            "Вывод и поставка металлов" -> /Драгметаллы_Ввод
-            "Доступные инструменты" -> /Драгметаллы_Доступные
-            "Ошибки при выставлении заявок" -> /Ошибки заявок
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Драгметаллы_Как купить
-        a: В рамках валютного рынка доступны контракты на золото GLDRUB_TOM (1 лот = 1 грамм) и серебро SLVRUB_TOM (1 лот = 100 грамм).
-            ✅ Для открытия позиции можно воспользоваться поиском в торговой системе, или выбрать инструмент из раздела «Валюты». Далее будет доступна опция «Заявка». 
-            ✅ Торги проводятся с 6:50 до 19:00 МСК.
-            ✅ Статус квал не требуется.
-
-    state: Драгметаллы_Комиссии
-        a: При торговле контрактами на металлы возникает два вида комиссий: биржевая и брокерская.
-            1. Комиссия биржи:
-            ✅ золото — при покупке — 1 ₽, при продаже — 0,02%, но не менее 1 ₽, 
-            ✅ серебро — при покупке — 0,006375%, но не менее 1 ₽, при продаже — 0,017875%, но не менее 1 ₽.
-            2. Комиссия брокера: 
-            ✅ по тарифам «Единый дневной» и «Дневной валютный» — 0,05% при обороте до 1 000 000 ₽ за торговую сессию,
-            ✅ по тарифу «Инвестор»  — 0,05% при обороте до 1 000 000 ₽ за торговую сессию,
-            ✅ по иным тарифам — 0,3% от оборота.
-            ✅ маржинальная торговля (доступны только длинные позиции):
-            Комиссия за займ — КС+8%
-        buttons:
-            "Купить физическое золото" -> /Драгметаллы_Комиссии_Купить золото
-            "Назад" -> /Драгметаллы
-
-    state: Драгметаллы_Комиссии_Купить золото
-        a: Клиенты «Финам» могут купить запатентованные золотые слитки и монеты 999,9 пробы и любого веса по индивидуальной цене.
-            ✅ Подробная информация в презентации по ссылке: https://www.finam.ru/dicwords/file/files_chatbot_zolotopresentation 
-            ✅ Чтобы получить консультацию и приобрести физическое золото:
-            1. Оставьте заявку по ссылке https://www.finam.ru/landings/golden-house-by-shakhovskaya-and-finam/
-            2. Менеджер свяжется с вами и поможет оформить сделку.
-            3. После завершения сделки вам вручат сертификат о владении золотым слитком или золотой монетой.
-            4. Купленные слитки можно передать в специализированное хранилище или оставить себе.
-
-    state: Драгметаллы_Ввод
-        a: 1. Результатом исполнения фьючерсов на драгоценные металлы является поставка контрактов GLDRUB_TOM или SLVRUB_TOM (Физическая поставка металлов по данным контрактам невозможна).
-            ✅ Для выхода на поставку контракта необходимо подписать Уведомление о поставке за 6 дней до экспирации фьючерса, обратившись к менеджеру компании.
-            ✅ Подробнее о поставочных фьючерсах на драгоценные металлы: https://www.moex.com/a4421 
-            2. Перевод контрактов на металлы между брокерскими счетами недоступен.
-            3. Физический ввод и вывод металлов не осуществляется по счетам «Финам», но клиенты компаниимогут купить запатентованные золотые слитки и монеты 999,9 пробы и любого веса по индивидуальной цене.
-
-    state: Драгметаллы_Доступные
-        a: В режиме _ТОМ доступны контракты на золото GLDRUB_TOM (1 лот = 1 грамм) и серебро SLVRUB_TOM (1 лот = 100 грамм).
-                Торги другими драгоценными металлами (платина и палладий) биржа не проводит.
-
-    state: Маржа || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /011 Маржа
-        a: Маржинальная торговля — операции с использованием заемных средств брокера. Подробнее о маржинальной торговле на сайте: https://www.finam.ru/landings/attestation-margin-trading/
-            ❗ Важно:
-            ✅ Использовать маржинальную торговлю можно на фондовом, срочном, валютном рынках и рынке драгоценных металлов. 
-            ✅ Информация о доступной сумме займа и инструментам, по которым разрешено открывать короткие позиции находится на сайте: https://www.finam.ru/documents/commissionrates/marginal/ 
-            ✅ На Бирже HKEX маржинальная торговля недоступна.
-            ✅ На Бирже СПБ маржинальная торговля доступна с ограниченным рядом инструментов, открытие коротких позиций доступно только через терминалы TRANSAQ и FinamTrade. 
-            ✅ На срочном рынке для открытия позиций необходимо иметь на счете сумму средств, равную гарантийному обеспечению. 
-            Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Уровни риска (КСУР/КПУР)" -> /Маржа_Уровни риска
-            "Ставки риска по инструментам" -> /Маржа_Ставки риска
-            "Подключить/отключить маржинальную" -> /Маржа_Подключить отключить
-            "Комиссия за маржинальную" -> /Комиссии_Другие_Маржинальная
-            "Уровень маржи по счету" -> /Маржа_Уровень маржи
-            "Принудительное закрытие" -> /Маржа_Принудительное закрытие
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Маржа_Уровни риска || sessionResult = "Orange", sessionResultColor = "#B65A1E"
-        a: В «Финам» две группы (два уровня) риска.
-            ✅ При открытии брокерского счета инвестору по умолчанию присваивается стандартный уровень риска (КСУР). 
-            ✅ При соблюдении одного из условий, инвестор может получить категорию повышенного уровня риска (КПУР):
-            1. Иметь активы стоимостью от 600000 ₽, быть клиентом брокера в течение последних 180 дней и заключать сделки с ценными бумагами или производными финансовыми инструментами на протяжении пяти и более дней.  
-            2. Иметь активы стоимостью от 3000000 ₽. 
-            Инвесторы с уровнями риска КСУР и КПУР имеют разные ставки маржинального обеспечения, для КПУР применяются ставки ниже, чем для КСУР.  
-            Уровень КПУР дает больше возможностей для наращивания маржинальных позиций (размера плеча), но повышает финансовые риски.
-
-    state: Маржа_Ставки риска || sessionResult = "Orange", sessionResultColor = "#B65A1E"
-        a: Ставка риска — это показатель, который используется для расчета маржинального обеспечения по конкретному активу. С помощью ставки риска брокер рассчитывает обеспечение позиции — то есть сумму, которую инвестору нужно иметь на счете, чтобы открыть или удерживать непокрытую позицию.
-            Ставки риска по финансовым инструментам можно посмотреть на сайте:
-            ✅ для КСУР https://zaoik.finam.ru/documents/commissionrates/marginal/ksur/ 
-            ✅ для КПУР https://zaoik.finam.ru/documents/commissionrates/marginal/kpur/ 
-            ❗ Ставки риска могут отличаться на сайте и в торговых системах в зависимости от рыночной ситуации. Самую актуальную информацию по ставкам можно узнать в торговой системе TRANSAQ в «описании инструмента», а также у менеджера «Финам».
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Маржа_Подключить отключить
-        a: ✅ Для подключения достаточно пройти тестирование по категории «Необеспеченные сделки» по ссылке: https://lk.finam.ru/user/invest-status/qual-exam/tests
-            В течение дня функция активируется автоматически.
-            ✅ Для отключения нужно обратиться к менеджеру компании. Самостоятельно отключить маржинальную торговлю через личный кабинет и торговый терминал нельзя.  
-            При отключении маржинальной торговли будет заблокирована возможность использования заемных средств брокера, а также доступ к коротким позициям (шортам).
-            ❗ По счетам с услугой «Финам Автоследование» невозможно отключить маржинальную торговлю.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Маржа_Уровень маржи
-        a: 1. Информацию о состоянии портфеля, значениях маржи и запас портфеля до принудительного закрытия можно посмотреть в личном кабинете https://lk.finam.ru/details — выбрать раздел «Детали» — раскрыть строку «Показатели риска»
-            2. В терминале FinamTrade начальные требования, суммарную оценку денежных средств, ценных бумаг и обязательств клиента можно посмотреть в разделе «Аналитика» по счету (прокрутить ниже), в мобильном приложении FinamTrade – в разделе «Детали» по счету. 
-            3. В терминале QUIK следить за маржинальными требованиями можно с помощью таблицы «Клиентский портфель»: «Создать окно» → «Все типы окон» → «Клиентский портфель».  Чтобы добавить необходимые графы, нажмите правой кнопкой мыши по таблице и выберите «Редактировать таблицу».
-            4. В терминале MetaTrader 5 в строке «Баланс» показатели «Активы, Маржа, Уровень маржи, Первоначальная маржа, Поддерж. маржи» будут отображаться только при открытых позициях на фондовой и валютной секциях. В случае, если торговля ведется только по фьючерсным контрактам, то за показателями риска можно следить через личный кабинет.
-
-    state: Маржа_Принудительное закрытие
-        a: ❗ Использование заёмных средств (плеча) ведёт к увеличению доходности и риска по сравнению с торговлей на собственные средства.
-            1. Чтобы избежать получение маржин-колла, важно следовать следующим рекомендациям:
-            ✅ не заходите в позиции с максимальным плечом;
-            ✅ регулярно отслеживайте состояние своих маржинальных позиций и не допускайте снижение оценки счета ниже уровня Минимальных требований;
-            ✅ сокращайте позиции и/или вовремя пополняйте счет.
-            2. Принудительное закрытие производится согласно регламенту брокерского обслуживания http://zaoik.finam.ru/broker/regulations  
-            3. Возможные причины принудительного закрытия позиций:
-            ✅ Резкие колебания рыночных цен, которые
-            повлекли уменьшение стоимости вашего портфеля ниже уровня Минимальных требований (Минимальной маржи).
-            ✅ Отсутствие подписанного заявления на поставку базового актива по фьючерсу на ценные бумаги перед экспирацией поставочных фьючерсов на Московкой бирже (FORTS).
-            ✅ По ряду ценных бумаг брокер закрывает короткие позиции на дату дивидендной отсечки.
-            За короткие позиции по российским ЦБ, не закрытым на дату отсечки, оплачивается штраф в размере дивидендов.
-            ✅ Принудительное закрытие позиции может быть вызвано требованиями нормативных актов (например, перед корпоративным действием эмитента).
-            ✅ Принудительное закрытие может быть вызвано изменением значений ставок риска, рассчитываемых
-            клиринговой организацией.
-
-    state: КВАЛ || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent: /012 КВАЛ
-        a: Проверить ваш инвестиционный статус (квал/неквал инвестор) можно в личном кабинете по ссылке: https://lk.finam.ru/user/invest-status
-        a: Статус квалифицированного инвестора открывает доступ к большему количеству финансовых инструментов: 
-            ✅ арубежные ценные бумаги; 
-            ✅ инструменты срочного рынка на биржах США; 
-            ✅ расширенный список инструментов на российских биржах. 
-            ❗ Проверить необходимость статуса для торговли определенным инструментом можно с помощью кнопки меню «Проверка инструмента на КВАЛ». 
-            ❗ Для работы с опционами на Мосбирже статус квалифицированного инвестора не требуется. 
-            ❗ С 01.01.2023 вступил в силу запрет Банка России на покупку «неквалами» акций компаний из недружественных стран, доступно только закрытие позиций. Пожалуйста, выберите один из предложенных вариантов: || htmlEnabled = true, html = "Статус квалифицированного инвестора открывает доступ к большему количеству финансовых инструментов:&nbsp;<br>✅ зарубежные ценные бумаги;&nbsp;<br>✅ инструменты срочного рынка на биржах США;&nbsp;<br>✅ расширенный список инструментов на российских биржах.&nbsp;<br><br>❗ Проверить необходимость статуса для торговли определенным инструментом можно с помощью кнопки меню «Проверка инструмента на КВАЛ».&nbsp;<br>❗ Для работы с опционами на Мосбирже статус квалифицированного инвестора не требуется.&nbsp;<br>❗ С 01.01.2023 вступил в силу запрет Банка России на покупку «неквалами» акций компаний из недружественных стран, доступно только закрытие позиций.\nПожалуйста, выберите один из предложенных вариантов:"
-        buttons:
-            "Как получить статус КВАЛ" -> /КВАЛ_Статус
-            "Заказ выписки из реестра КВАЛ" -> /КВАЛ_Документы
-            "Тестирование для неквалифицированных инвесторов" -> /КВАЛ_Тестирование
-            "Смена инвестционного профиля" -> /КВАЛ_Смена профиля
-            "Проверка инструмента на КВАЛ" -> /КВАЛ_Проверка инструмента
-    #    "Оператор" -> /Перевод на оператора
-    state: КВАЛ_Статус
-        a: Cтатус квалифицированного инвестора можно получить при соответствии одному из условий:
-            ✅ владение активами и средствами на сумму от 6000000 ₽,
-            ✅ торговый оборот от 6000000 ₽ и наличие сделок за последние 4 квартала: не реже 10 сделок в квартал и не менее 1 сделки в месяц, 
-            ✅ диплом об образовании от организации, аккредитованной цб рф, 
-            ✅ квалификация в сфере экономики и финансов, 
-            ✅ опыт работы в организации, связанный с совершением сделок с финансовыми инструментами,
-            ✅ наличие статуса у другого брокера
-            Пожалуйста, выберите подходящий вариант: || htmlEnabled = true, html = "Cтатус квалифицированного инвестора можно получить при соответствии одному из условий: <br>✅ владение активами и средствами на сумму от 6000000 ₽, <br>✅ торговый оборот от 6000000 ₽ и наличие сделок за последние 4 квартала: не реже 10 сделок в квартал и не менее 1 сделки в месяц,&nbsp;<br>✅ диплом об образовании от организации, аккредитованной цб рф,&nbsp;<br>✅ квалификация в сфере экономики и финансов,&nbsp;<br>✅ опыт работы в организации, связанный с совершением сделок с финансовыми инструментами, <br>✅ наличие статуса у другого брокера<br><br>Пожалуйста, выберите подходящий вариант:<br>"
-        buttons:
-            "Активы и средства во владении" -> /КВАЛ_Статус_Активы
-            "Оборот по брокерским счетам" -> /КВАЛ_Статус_Оборот
-            "Опыт работы" -> /КВАЛ_Статус_Опыт работы
-            "Образование" -> /КВАЛ_Статус_Образование
-            "Статус от другого брокера" -> /КВАЛ_Статус_Другой брокер
-            "Назад" -> /КВАЛ
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: КВАЛ_Статус_Активы
-        a: Владеете активами или денежными средствами на брокерских и банковских счетах на общую сумму от 6000000 ₽. При определении общей стоимости активов также учитываются финансовые инструменты, переданные в доверительное управление.
-            1. Чтобы получить статус квал по количеству активов на сумму от 6000000 ₽, необходимо предоставить следующие документы по типу активов:
-            → Если хотите заявить актив Ценные бумаги – нужна  Выписка по счету ДЕПО (там указаны затраты на приобретенные Ценные бумаги) либо Выписка по лицевому счету в реестре,
-            → Деньги на банковских счетах – Выписка с банковского счета с паспортными данными,
-            → Деньги на брокерских счетах – брокерский отчет или справка об активах + дополнительный документ, в котором будут номер брокерского счета и паспортные данные. (Как правило, это справка об открытии счета).
-            2. Общие требования к документам:
-            → Документы в электронном нередактируемом виде с печатью и подписью.
-            → Все документы на одну дату, не старше 5 рабочих дней.
-            → В документах обязательно указаны паспортные данные, вместо них допустимо указание адреса регистрации или ИНН. 
-            3. Направить документы можно в этом чате либо на электронную почту service@corp.finam.ru
-        buttons:
-            "Назад" -> /КВАЛ_Статус
-
-    state: КВАЛ_Статус_Оборот
-        a: 1. Критерии присвоения статуса Квалифицированный инвестор по обороту:
-            ✅ За последние 4 квартала торговый оборот не менее 6000000 ₽, в каждом квартале не менее 10 сделок. В каждом месяце не менее 1 сделки. 
-            ✅ Можно заявить суммарный оборот у нескольких брокеров.
-            ✅ Нужно предоставить скан брокерского отчета с подписью и печатью брокера + дополнительный документ с паспортными данными и номером брокерского счета из отчета.
-            2. Общие требования к документам:
-            ✅ Документы в электронном нередактируемом виде с печатью и подписью.
-            ✅ Все документы на одну дату, не старше 5 рабочих дней.
-            ✅ В документах обязательно указаны паспортные данные, вместо них допустимо указание адреса регистрации или ИНН. 
-            3. Направить документы можно в этом чате либо на электронную почту service@corp.finam.ru
-        buttons:
-            "Назад" -> /КВАЛ_Статус
-
-    state: КВАЛ_Статус_Опыт работы
-        a: 1. Имеете опыт работы от двух лет, непосредственно связанный с совершением сделок с финансовыми инструментами, подготовкой индивидуальных инвестиционных рекомендаций, управления рисками, связанными с совершением указанных сделок, в российской и (или) иностранной организации.
-            2. Имеете опыт работы от трех лет в должности, при назначении (избрании) на которую в соответствии с федеральными законами требовалось согласование с Банком России. 
-            3. Чтобы подтвердить опыт работы, предоставьте скан документа:
-            → Трудовой книжки;
-            → Трудовой договор (если в документах отсутствует описание деятельности, нужно приложить должностную инструкцию);
-            → Уведомление о согласовании Банком России кандидата на должность, которая требовала согласования по действующему законодательству.
-            4. Направить документы можно в этом чате либо на электронную почту service@corp.finam.ru
-        buttons:
-            "Назад" -> /КВАЛ_Статус
-
-    state: КВАЛ_Статус_Образование
-        a: 1. У Вас есть диплом о высшем экономическом образовании государственного образца РФ, выданный организацией, которая на момент выдачи диплома осуществляла аттестацию граждан в сфере профессиональной деятельности на рынке ценных бумаг. Проверить аккредитацию ВУЗа можно на сайте ЦБ РФ: https://www.cbr.ru/vfs/finmarkets/files/supervision/list_Accred_org.xlsx
-            2. Вы имеете квалификацию в сфере финансовых рынков, подтвержденную свидетельством.
-                3. У Вас есть международный сертификат: 
-            → Chartered Financial Analyst (CFA).
-            → Certified International Investment Analyst (CIIA).
-            → Financial Risk Manager (FRM).
-            Важно! Сертификаты ФСФР не принимаются для присвоения статуса Квалифицированный инвестор, в связи с изменением законодательства с 01.10.2021 года.
-            4. Чтобы подтвердить наличие образования или квалификации, необходимо предоставить сканы документов: 
-            → Диплом государственного образца РФ о высшем экономическом образовании;
-            → Свидетельство о квалификации;
-            → Международный сертификат.
-            5. Направить документы можно в этом чате либо на электронную почту service@corp.finam.ru
-        buttons:
-            "Назад" -> /КВАЛ_Статус
-
-    state: КВАЛ_Статус_Другой брокер
-        a: Если у вас уже есть статус квалифицированного инвестора у другого брокера, то можно подтвердить его, предоставив выписку из реестра квалифицированных инвесторов.
-            ✅ Требования к выписке:
-            1. не старше 5 рабочих дней,
-            2. указаны паспортные данные,
-            3. указание на совершение всех видов сделок со всеми финансовыми инструментами для квалифицированного инвестора,
-            4. наличие незаполненного поля «Исключен из реестра»,
-            5. подпись/печать уполномоченного лица.
-            ✅ Направить документы можно в этом чате либо на электронную почту service@corp.finam.ru 
-            ❗ Выписки от «Тинькофф Инвестиций» не принимаются по причине отсутствия указания на виды услуг (совершение всех типов сделок и операций), в отношении которых лицо признано квалифицированным инвестором. Рекомендуется подтвердить инвестиционный статус другим способом.
-        buttons:
-            "Назад" -> /КВАЛ_Статус
-
-    state: КВАЛ_Документы
-        a: Заказ выписки из реестра квалифицированных лиц «Финам» доступен в личном кабинете по ссылке: https://edox.finam.ru/orders/QualifiedInvestorRequestStatementStatus || htmlEnabled = true, html = "Заказ выписки из реестра квалифицированных лиц «Финам» доступен в личном кабинете по ссылке:&nbsp;<a href="https://edox.finam.ru/orders/QualifiedInvestorRequestStatementStatus " target="_blank">https://edox.finam.ru/orders/QualifiedInvestorRequestStatementStatus </a><br><br>"
-        buttons:
-            "Назад" -> /КВАЛ
-
-    state: КВАЛ_Тестирование
-        a: ✅ Тестирование для неквалифицированных инвесторов можно пройти в личном кабинете: https://lk.finam.ru/user/invest-status/qual-exam/tests
-            Прохождение всех тестов не подразумевает присвоение статуса «квала», но открывает доступ ко многим категориям инструментов. 
-            ✅ Доступ к инструментам и сделкам предоставляется сразу после прохождения тестирования, для этого необходимо подписать результат прохождения тестирования в личном кабинете: https://lk.finam.ru/user/invest-status/qual-exam/tests в разделе «Результаты».
-            ✅ Чтобы вам было проще подготовиться к тестированию, воспользуйтесь учебными материалами: https://www.finam.ru/landings/attestation-main/
-        buttons:
-            "Назад" -> /КВАЛ
-
-    state: КВАЛ_Смена профиля || sessionResult = "Orange", sessionResultColor = "#B65A1E"
-        a: Инвестиционный профиль (риск-профиль) – характеристика инвестора, его своеобразный портрет, описывающий поведение на финансовом рынке, готовность принимать риски.
-            ✅ Смена инвестиционного или риск-профиля доступна в личном кабинете по ссылке: https://lk.finam.ru/user/invest-profile
-        buttons:
-            "Назад" -> /КВАЛ
-
-    state: КВАЛ_Проверка инструмента
-        a: Укажите тикер инструмента
-        InputText: 
-            prompt = Краткое название финансового инструмента на бирже, например: SBER.
-            varName = tiker
-            then = /КВАЛ_Проверка инструмента_Выбор биржи
-            html = 
-            htmlEnabled = false
-            actions = 
-        buttons:
-            "Назад" -> /КВАЛ
-
-    state: КВАЛ_Проверка инструмента_Выбор биржи
-        a: Выберите биржу
-        buttons:
-            "Московская биржа" -> /КВАЛ_Проверка инструмента_Определение биржи
-            "Биржа СПБ" -> /КВАЛ_Проверка инструмента_Определение биржи
-            "Гонкогская биржа HKEX" -> /КВАЛ_Проверка инструмента_Определение биржи
-            "Биржи США" -> /КВАЛ_Проверка инструмента_Биржи США
-            "Назад" -> /КВАЛ_Проверка инструмента
-
-    state: КВАЛ_Проверка инструмента_Биржи США
-        a: Выберите биржу США
-        buttons:
-            "NYSE" -> /КВАЛ_Проверка инструмента_Определение биржи
-            "NASDAQ" -> /КВАЛ_Проверка инструмента_Определение биржи
-            "USA OTC" -> /КВАЛ_Проверка инструмента_Определение биржи
-            "Назад" -> /КВАЛ_Проверка инструмента_Выбор биржи
-
-    state: КВАЛ_Проверка инструмента_Определение биржи
-        script:
-            $session.exchange = getExchangeVariable($request.query);
-            $session.exchangeText = getExchangeName($request.query);
-            $reactions.transition("/КВАЛ_Проверка инструмента_Запрос на получение квала")
-
-    state: КВАЛ_Проверка инструмента_Запрос на получение квала
-        HttpRequest: 
-            url = https://cbdev.finam.ru/grpc-json/txscreener/v1/qualifiedInvestor
-            method = PUT
-            body = {"id": {"tickerMic": {"ticker": "{{$session.tiker}}","mic": "{{$session.exchange}}"}}}
-            timeout = 100
-            headers = [{"name":"Authorization","value": "{{$injector.api_key}}"},{"name":"x-shard","value":"ftrr01-dev"},{"name":"Content-Type","value":"application\/json"}]
-            vars = [{"name":"isQualifiedInvestor","value":"$httpResponse.isQualifiedInvestor"}]
-            okState = /КВАЛ_Проверка инструмента_Определение КВАЛА
-            errorState = /КВАЛ_Проверка инструмента_Неверный тип инструмента
-            dataType = 
-
-    state: КВАЛ_Проверка инструмента_Определение КВАЛА
-        if: $session.isQualifiedInvestor == true
-            a: Для открытия позиций по данному инструменту на {{$session.exchangeText}} требуется статус квалифицированного инвестора.
-        else: 
-            a: Для открытия позиций по данному инструменту на {{$session.exchangeText}} статус квалифицированного инвестора не нужен.
-        buttons:
-            "Проверить другой инструмент" -> /КВАЛ_Проверка инструмента
-            "Назад" -> /КВАЛ_Проверка инструмента_Выбор биржи
-        script:
-            $session.exchange = {}
-            $session.exchangeText = {}
-
-    state: КВАЛ_Проверка инструмента_Неверный тип инструмента
-        a: Вы ввели неверный тип инструмента
-        buttons:
-            "Проверить другой инструмент" -> /КВАЛ_Проверка инструмента
-            "Назад" -> /КВАЛ_Проверка инструмента_Выбор биржи
-
-    state: Депозитарное поручение || sessionResult = "Важно", sessionResultColor = "#D93275"
-        intent!: /013 Депозитарное поручение
-        a: ❗ СПБ биржа с 28 ноября 2023 перевела иностранные ценные бумаги на неторговый раздел счета. Подробнее: https://spbexchange.ru/ru/about/news.aspx?bid=25&news=45530
-            ❗ После перевода на неторговый раздел – бумаги исключены из торговых лимитов биржи, поэтому не отображаются в терминале, но их наличие отражено во вкладке «Портфель» в личном кабинете https://lk.finam.ru/
-        buttons:
-            "Перевод бумаг от другого брокера" -> /Депозитарное поручение_Перевод другой брокер
-            "Перевод бумаг между счетами" -> /Депозитарное поручение_Перевод между счетами
-            "Перевод бумаг между разделами ДЕПО" -> /Депозитарное поручение_Перевод ДЕПО
-            "Предоставить затратные документы" -> /Депозитарное поручение_Предоставить документы
-            "Комиссии за депозитарные операции" -> /Депозитарное поручение_Комиссии
-            "Ещё" -> /Депозитарное поручение_Ещё
-
-    state: Депозитарное поручение_Перевод другой брокер || sessionResult = "Jump", sessionResultColor = "#BC3737"
-        a: ✅ Как перевести бумаги от другого брокера в «Финам»?
-            Шаг 1: в личном кабинете https://lk.finam.ru нужно взять   депозитарные реквизиты в разделе «Детали» по счету.
-            Шаг 2: по данным реквизитам подать поручение на вывод активов у другого брокера.
-            Шаг 3: подать поручение на ввод ценных бумаг в личном кабинете по ссылке: https://edox.finam.ru/orders/capitalIssuesTransfer/selectAccount.aspx  
-            ❗ Если в поручении на вывод есть референс, то в поручении на ввод должен быть идентичный референс.
-            Шаг 4: после успешного перевода бумаг нужно предоставить документы в «Финам», подтверждающие стоимость активов (выписка об операциях по счету ДЕПО с момента приобретения и брокерский отчет с ценой приобретения).
-            ✅ «Финам» не взимает комиссию за ввод ценных бумаг, комиссия может взиматься со стороны брокера-отправителя.
-            ❗ Для успешного перевода необходимо обеспечить на счетах сумму, нужную для оплаты комиссий.
-            ✅ Статус перевода ЦБ можно отслеживать в «Журнале поручений» по ссылке: https://lk.finam.ru/reports/documents 
-            ✅ Сроки перевода в среднем до 7 рабочих дней. Перевод может проходить дольше по причине задержки поручения от брокера-отправителя. Если встречное поручение не поступило в течение 10 дней, либо были допущены ошибки, то поручение будет отменено.
-            ✅ Перевести можно акции, купленные на Российских биржах. ПФИ (фьючерсы и опционы) перевести невозможно. Перевести можно только поставленные активы (позиции с займом не переводятся).
-            ✅ Вы можете перевести заблокированные ценные бумаги. Продать на бирже их возможности не будет, так как они   останутся заблокированными. Но у вас будет возможность продать их на   внебиржевом рынке с дисконтом.
-            ✅ Чтобы перевести бумаги для «квалов» предварительно необходимо получить статус квалифицированного инвестора в «Финам».
-        buttons:
-            "Как получить статус КВАЛ" -> /КВАЛ_Статус
-
-    state: Депозитарное поручение_Перевод между счетами
-        a: 1. Поручение на перевод ценных бумаг между своими счетами можно подать в личном кабинете по ссылке: https://edox.finam.ru/orders/AccountSecurityTransfer/Index  Выберите счет списания, затем счет зачисления и ценные бумаги с указанием их количества, которые хотите перевести.
-            ✅ Перевод ценных бумаг между своими счетами осуществляется без комиссии.
-            ❗ Для подачи поручения на перевод активов со счета ИИС нужно обратиться к менеджеру. После исполнения поручения счет ИИС будет расторгнут.
-            ✅ Статус перевода ЦБ можно отслеживать в «Журнале поручений»: https://lk.finam.ru/reports/documents 
-            2. Для перевода бумаг между разными клиентами «Финам» с передающей стороны нужно подать поручение на вывод ЦБ, а с принимающей стороны — на ввод ЦБ, депозитарная комиссия 150 ₽ за поручение с каждой стороны.
-            ✅ Подача поручения на прием/снятие ценных бумаг со сменой прав собственности по ссылке: https://edox.finam.ru/orders/capitalIssuesTransfer/selectAccount.aspx 
-            Выберите счет списания, прием/снятие из/в депозитарий другого брокера, следуйте инструкции в личном кабинете, далее вы сможете приложить документы-основания для перевода со сменой владельца ЦБ.
-            ✅ Статус перевода ЦБ можно отслеживать в «Журнале поручений»: https://lk.finam.ru/reports/documents
-
-    state: Депозитарное поручение_Перевод ДЕПО
-        a: Подать поручение на перемещение ценных бумаг между торговыми разделами или площадками (биржами) можно через личный кабинет по ссылке: https://edox.finam.ru/Orders/ChangeSecurityPlace
-
-    state: Депозитарное поручение_Предоставить документы
-        a: Важно предоставить затратные документы по введенным ценным бумагам до конца года, в котором они были проданы.
-            ✅ Уведомление с перечнем необходимых документов будет отображено в личном кабинете после ввода ценных бумаг по ссылке: https://edox.finam.ru/info/debts.aspx 
-            Стандартный перечень документов:
-            1. Справка по счету (с отображением даты и цены покупки).
-            2. Выписка об операциях по счету депо/в регистраторе (с момента покупки и до момента вывода).
-            3. Договор купли-продажи/дарения/обмена (если был факт передачи прав собственности).
-            ❗ Могут быть запрошены дополнительные документы для подтверждения факта затрат на введенные ценные бумаги.
-
-    state: Депозитарное поручение_Комиссии
-        a: Пожалуйста, выберите вид операции:
-        buttons:
-            "Перевод бумаг между счетами" -> /Депозитарное поручение_Комиссии_Перевод
-            "Ввод ценных бумаг" -> /Депозитарное поручение_Комиссии_Ввод
-            "Вывод ценных бумаг" -> /Депозитарное поручение_Комиссии_Вывод
-            "Назад" -> /Депозитарное поручение
-    #   "Перевод на оператора" -> /Перевод на оператора
-    state: Депозитарное поручение_Комиссии_Перевод
-        a: ✅ Перевод ценных бумаг между своими счетами осуществляется без комиссии.
-            ✅ При переводе ценных бумаг между разными клиентами «Финам» взымается комиссия 150 ₽ за каждое поручение с каждой стороны.
-
-    state: Депозитарное поручение_Комиссии_Ввод
-        a: ✅ За прием ценных бумаг на брокерские счета в «Финам» комиссия не удерживается. Однако другие брокеры могут взимать комиссию за вывод активов. Рекомендуем уточнять эту информацию заранее.
-            ✅ При переводе ценных бумаг между разными клиентами «Финам» взымается комиссия 150 ₽ за каждое поручение с каждой стороны.
-
-    state: Депозитарное поручение_Комиссии_Вывод
-        a: 1. За вывод ценных бумаг депозитарий «Финам» удерживает 1000 ₽ за каждое поручение. Дополнительные комиссии взимаются вышестоящим депозитарием при переводе активов в депозитарий другого брокера:
-            ✅ 65 ₽ — за поручение при переводе в рамках Мосбиржи;
-            ✅ 75 ₽ — за поручение при переводе в рамках Биржи СПБ;
-            ✅ 500 ₽ — при переводе ценных бумаг в регистратор. 
-            2. При переводе ценных бумаг между разными клиентами «Финам» взымается комиссия 150 ₽ за каждое поручение с каждой стороны.
-
-    state: Депозитарное поручение_Ещё
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Перевод активов из Банка в АО Финам" -> /Депозитарное поручение_Ещё_Перевод активов
-            "Разблокировка ЦБ после конвертации ДР" -> /Депозитарное поручение_Ещё_Разблокировка ЦБ
-            "Назад" -> /Депозитарное поручение
-
-    state: Депозитарное поручение_Ещё_Перевод активов || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: «Финам» перешел к завершающему этапу перевода брокерских счетов из Банка «Финам» в инвестиционную компанию АО «Финам».
-            1. Общие технические моменты необходимые для успешного перевода:
-            ✅ если по счету имеются заемные позиции (плечи) – их необходимо закрыть,
-            ✅ если по счету открыты позиции срочного рынка (Фьючерсы) – их также необходимо закрыть,
-            ✅ если брокерский счет подключен к стратегии сервиса Comon – ее необходимо отключить, после перевода счета услугу можно будет подключить вновь.
-            2. Перевод брокерского счета в АО «Финам» для клиентов банка осуществляется дистанционно и без комиссий.
-            Сроки перевода активов: денежные средства, ценные бумаги (ММВБ) переводятся в течение 2-3 рабочих дней, иностранные ценные бумаги - в течение: 2-2,5 недель.
-            ❗ При переводе активов будет произведен расчет актуальной налоговой базы и списание НДФЛ за текущий налоговый период.
-            Для получения дополнительной информации и выгрузки поручений обратитесь к менеджеру «Финам».
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Депозитарное поручение_Ещё_Разблокировка ЦБ
-        a: Чтобы снять ограничения с акций, полученных после расконвертации депозитарных расписок, нужно подать поручение на перемещение этих акций на торговый раздел через менеджера «Финам».
-            ❗ Если расписки приобретены не через «Финам», то к поручению необходимо приложить документы, подтверждающие факт приобретения расписок.
-            В связи с новым предписанием ЦБ РФ и Указом Президента про обособление ценных бумаг после конвертации АДР/ГДР на российские акции, введено ограничение в отношении акций, полученных после конвертации АДР, которые были приобретены после 01.03.2022 у недружественных нерезидентов. Сделки с такими акциями допускаются при наличии разрешений, выдаваемых Центральным банком или Правительственной комиссией.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Депозитарии || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /014 Депозитарии
-        a: На депозитарных счетах (счетах депо) учитываются только ценные бумаги: акции, облигации, депозитарные расписки, паи и ETF.
-            Производные финансовые инструменты (фьючерсы, опционы, свопы) и валюта не подлежат депозитарному учету, т.к. не являются ценными бумагами.
-            ✅ Место хранения ценной бумаги определяется биржей, на которой она приобреталась.
-            ✅ Для подтверждения наличия ценных бумаг на депозитарном счете можно заказать выписку по счету депо. 
-            Выберите рынок, чтобы узнать подробнее:
-        buttons:
-            "Московская биржа" -> /Депозитарии_Московская биржа
-            "Биржа СПБ" -> /Депозитарии_Биржа СПБ
-            "Американский фондовый рынок NYSE/NASDAQ" -> /Депозитарии_Американский фондовый рынок
-            "Гонконгская биржа HKEX" -> /Депозитарии_Гонконгская биржа
-            "Депозитарные документы" -> /Документы_Депозитарные
-
-    state: Депозитарии_Московская биржа
-        a: Расчетным депозитарием Московской биржи является центральный депозитарий НРД – Национальный Расчетный Депозитарий.
-            ✅ Для учета российских ЦБ у НРД открыты счета номинального держателя напрямую у Реестродержателей.
-            ✅ Для учета ИЦБ, в том числе АДР, у НРД открыты счета в номинальном держании Euroclear и Clearstream. Это международные депозитарно-клиринговые компании, сайты депозитариев https://www.clearstream.com/clearstream-en/ и https://www.euroclear.com/en.html
-            ❗ НРД не раскрывает конечного номинального держателя в данной цепочке, поэтому депозитарий не располагает информацией о внешнем депозитарии - Euroclear это или Clearstream.
-            Актуальную информацию о местах расчетов по ЦБ можно посмотреть на сайте НРД: https://www.nsd.ru/services/depozitariy/operatsii-s-tsennymi-bumagami/vnebirzhevye-raschety/mesta-raschetov-po-tsennym-bumagam/
-
-    state: Депозитарии_Биржа СПБ
-        a: ✅﻿﻿﻿﻿ Для учета российских ЦБ в НРД счета номинального держателя открыты напрямую у Реестродержателей: ЦБ учитываются на счете депо клиента в номинальном держании АО «Финам». Клиринг по данному счету осуществляется через НКО-ЦК «СПБ Клиринг» (АО).
-            Наименование счета в личном кабинете «Торговый, СПБ КЛИРИНГ НКО-ЦК АО».
-            ✅﻿﻿﻿﻿ Для учета ИЦБ у расчетного депозитария СПБ Биржи ПАО «СПБ Банк» (до 2 июня 2022 г.  ПАО «Бест Эффортс Банк») открыт счет в международном центральном депозитарии (Euroclear/Clearstream) через номинального держателя НРД.
-            В ПАО «СПБ Банк» внутри клирингового счета открыт субсчет номинального держателя АО «ФИНАМ», и внутри АО «ФИНАМ» открываются счета депо владельца ЦБ. 
-            Наименование счета в личном кабинете «Торговый, СПБ КЛИРИНГ НКО-ЦК АО».
-            ❗ НРД не раскрывает конечного номинального держателя в данной цепочке, поэтому депозитарий не располагает информацией о внешнем депозитарии - Euroclear это или Clearstream.
-
-    state: Депозитарии_Американский фондовый рынок
-        a: Ценные бумаги, приобретенные на американском фондовом рынке NYSE/NASDAQ, имеют место хранения DTCС (Depository Trust and Clearing Corporation).
-            Подробнее: https://www.dtcc.com/about/businesses-and-subsidiaries/dtc
-
-    state: Депозитарии_Гонконгская биржа
-        a: Ценные бумаги, приобретенные на Гонконгской бирже HKEX имеют место хранения Hong Kong Exchanges and Clearing Limited
-            Подробнее: https://www.hkex.com.hk/?sc_lang=en
-
-    state: Движение ДС || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /015 Движение ДС
-        a: ❗ СПБ биржа с 28 ноября 2023 перевела иностранные ценные бумаги на неторговый раздел счета. Подробнее: https://spbexchange.ru/ru/about/news.aspx?bid=25&news=45530
-            ❗ После перевода на неторговый раздел – бумаги исключены из торговых лимитов биржи, поэтому не отображаются в терминале, но их наличие отражено во вкладке «Портфель» в личном кабинете https://lk.finam.ru/
-        buttons:
-            "Пополнение счета" -> /Движение ДС_Пополнение
-            "Перевод между счетами в «Финам»" -> /Движение ДС_Перевод
-            "Вывод средств" -> /Движение ДС_Вывод
-            "Когда пройдут расчеты по сделкам?" -> /Режим расчетов
-            #"Перевод на оператора" -> /Перевод на оператора
-    state: Движение ДС_Пополнение
-        a: Пополнение доступно в рублях РФ, долларах США, китайских юанях, белорусских рублях, казахстанских тенге.
-            ✅ При пополнении счетов нужно учитывать сроки зачисления средств в зависимости от способа пополнения. В выходные дни сроки зачисления могут быть увеличены.
-            ✅ Перечень ваших действующих счетов с наименованием доступен в личном кабинете: https://lk.finam.ru/ 
-            ✅ В торговых системах баланс обновляется в рабочее время бирж.
-        a: Выберите способ пополнения:
-        buttons:
-            "СБП" -> /Движение ДС_Пополнение_СПБ
-            "Банковской картой" -> /Движение ДС_Пополнение_Карта
-            "По реквизитам" -> /Движение ДС_Пополнение_Реквизиты
-            "Наличными в офисе финам" -> /Движение ДС_Пополнение_Средства не поступили
-            "Назад" -> /Движение ДС
-    #   "Перевод на оператора" -> /Перевод на оператора
-    state: Движение ДС_Пополнение_СПБ
-        a:Пополнить брокерский счет через систему быстрых платежей можно по ссылке: https://lk.finam.ru/deposit/bank/quick
-            ❗ Для успешного пополнения данные отправителя и получателя должны совпадать (ФИО, номер телефона). Если у вас изменились ФИО или номер телефона, их можно изменить в личном кабинете по ссылке: https://edox.finam.ru/Client/EditInfo
-            ❗ Пополнение со счетов третьих лиц недоступно
-            ✅ Моментальное зачисление средств в течение рабочего дня (с 10:00 до 19:00 МСК). При пополнении после 18:30 МСК, в выходные или праздничные дни деньги поступят в ближайший рабочий день
-            ✅ «Финам» не удерживает комиссию за данную операцию, но ее может удерживать банк-отправитель
-        buttons:
-            "Назад" -> /Движение ДС_Пополнение
-            #   "Перевод на оператора" -> /Перевод на оператора
-    state: Движение ДС_Пополнение_Карта
-        a: Пополнить брокерский счет с помощью банковской карты можно по ссылке: https://lk.finam.ru/deposit/card/new
-            Комиссия за пополнение — 1%, но не менее 50 ₽. При первичном пополнении счета комиссия не взимается.
-    
-    state: Движение ДС_Пополнение_Реквизиты
-        a:Пополнить брокерский счет по реквизитам можно по ссылке: https://lk.finam.ru/deposit/1528731/bank/requisites 
-                ✅ Зачисление денежных средств в течение 3 рабочих дней, в выходные и праздничные дни зачисления не совершаются.
-                ❗ Срок зачисления может быть увеличен при переводе иностранной валюты из-за проверки корректности платежа со стороны банков-корреспондентов.
-                ✅ «Финам» не удерживает комиссию за ввод рублей РФ с банковских счетов физических лиц.
-                ✅ Комиссия за ввод долларов США/евро со счетов Банка «Финам» не удерживается. При пополнении со счетов стороннего банка – 0,6%, но не менее 25 $/€ и не более 4000 $/€ (по счетам «Сегрегированный Global» не взымается). За ввод средств в других валютах комиссия не удерживается.
-                ❗ При пополнении с банков Казахстана может понадобиться дополнительное соглашение.
-                ✅ Прямые переводы с брокерских счетов в других организациях также производятся по реквизитам. Рекомендуем заранее уточнить у брокера-отправителя информацию об ограничениях и комиссиях за отправку средств.
-        buttons:
-            "Доп. соглашение для банков Казахстана" -> /Документы_Общие_Соглашение Казахстан
-            "Назад" -> /Движение ДС_Пополнение
-            
-    state: Движение ДС_Пополнение_Наличными
-        a:Пополнить брокерский счет наличными рублями РФ можно в кассах офисов Финам.
-                Для этого понадобится действующий паспорт гражданина РФ.
-                ✅ Адрес ближайшего офиса можно найти по ссылке: https://www.finam.ru/about/contacts 
-                ✅ Зачисление в течение 1 часа
-                ✅ Комиссия – 0 ₽
-        buttons:
-            "Назад" -> /Движение ДС_Пополнение_Способы
-    #   "Перевод на оператора" -> /Перевод на оператора
-
-    state: Движение ДС_Перевод
-        a: Выберите необходимый тип перевода:
-        buttons:
-            "Перевод денежных средств между счетами" -> /Движение ДС_Перевод_Средств
-            "Перевод бумаг между счетами" -> /Депозитарное поручение_Перевод между счетами
-            "Назад" -> /Движение ДС
-    #   "Перевод на оператора" -> /Перевод на оператора
-    state: Движение ДС_Перевод_Средств
-        a: Поручение на перевод денежных средств нужно подать в личном кабинете: https://lk.finam.ru/deposit/finam
-            Выберите счет списания, затем счет зачисления и сумму, которую хотите перевести.
-            ✅ Поручения исполняются в течение дня, на практике, до получаса. 
-            ✅ Перевод денежных средств между своими счетами осуществляется без комиссии.
-            ❗ Для подачи поручения на перевод активов со счета ИИС нужно обратиться к менеджеру. После исполнения поручения счет ИИС будет расторгнут.
-            ❗ Перевод денежных средств между счетами разных клиентов не осуществляется.
-
-
-    state: Движение ДС_Вывод || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: Подать поручение на вывод денежных средств можно в личном кабинете по ссылке: https://lk.finam.ru/withdraw
-            ✅ После исполнения вывода вам поступит уведомление от брокера с указанием фактической суммы вывода и удержанной суммы налога
-            ✅ На банковские счета сторонних банков доступны выводы в рублях РФ, долларах США, китайских юанях и казахстанских тенге
-            ❗ Валютные резиденты РФ могут выводить валюту с брокерского счета только в банки на территории РФ
-        a: Выберите способ вывода средств:
-        buttons:
-            "СБП" -> /Движение ДС_Вывод_СБП
-            "По реквизитам" -> /Движение ДС_Вывод_Реквизиты
-            "Наличными в офисе Финам" -> /Движение ДС_Вывод_Наличными
-            "Вывод онлайн 24/7" -> /Движение ДС_Вывод_24-7
-            "Отменить вывод" -> /Перевод на оператора
-            "Назад" -> /Движение ДС
-    #   "Перевод на оператора" -> /Перевод на оператора
-    state: Движение ДС_Вывод_СБП
-        a: Подать поручение на вывод денежных средств по СБП можно в личном кабинете по ссылке: https://lk.finam.ru/withdraw/bank/quick 
-                ✅ Для успешного вывода через СБП действует ряд правил:
-                — услуга доступна только для граждан РФ
-                — данная услуга недоступна для счетов ИИС
-                — сумма поручения в пределах от 1000 до 1000000 ₽
-                — сумма поручения не может превышать 80% от активов, с учётом удерживаемого НДФЛ
-                — не более одного вывода через СБП в день
-                — комиссия — 100 ₽ за операцию
-                ✅ Сроки зачисления средств:
-                — если поручение подано до 17:00 МСК, то зачисление в течение одного рабочего дня
-                — если поручение подано после 17:00 МСК, то зачисление на следующий рабочий день
-        buttons:
-            "Назад" -> /Движение ДС_Вывод
-    #   "Перевод на оператора" -> /Перевод на оператора
-    state: Движение ДС_Вывод_Реквизиты
-        a:Вывести средства безналичным платежом можно в рублях, долларах США, китайских юанях, гонконгских долларах.
-                ✅ При выводе средств в иностранной валюте на счета в сторонних банках удерживается комиссия.
-                ✅ При выводе валюты на счета в «Банке Финам» комиссия отсутствует. Но есть комиссия со стороны банка за зачисление и хранение долларов и евро.
-                ✅ Сформировать поручение можно в личном кабинете: https://lk.finam.ru/withdraw/bank
-                ❗ Вывод валюты на банковские счета за пределы РФ недоступен.
-                ✅ Дополнительно можно воспользоваться опцией «Срочный вывод» рублей РФ (вывод происходит на 1 день раньше), стоимость 300 ₽ (по тарифам «Дневной СПБ», «Консультационный СПБ», «Cтратег US» комиссия 7,5 $).
-                Ограничение по сумме вывода: от 1000 ₽ до 5000000 ₽ (но не более 80% от счета).
-                ❗ Вывод происходит не ранее проведения биржевых расчётов по сделкам в соответствии с режимом Т+1/Т+2.
-        buttons:
-            "Комиссии" -> /Движение ДС_Вывод_Реквизиты_Комиссии
-            "Сроки зачисления" -> /Движение ДС_Вывод_Реквизиты_Сроки
-            "Назад" -> /Движение ДС_Вывод
+                $analytics.setSessionResult("Плохая связь, диалог не состоялся");
+                $dialer.hangUp();
+        else:
+            random:
+                a: Пожалуйста, опишите коротко суть вопроса.
+                a: Позвольте мне вам помочь. Какой у вас вопрос?
+                a: Повторите пожалуйста!
                 
-    state: Движение ДС_Вывод_Реквизиты_Комиссии
-        a: ✅ За вывод рублей РФ комиссия не взимается
-                ✅ За вывод иностранной валюты физическим лицом на счета по реквизитам в сторонние банки взимаются комиссии:
-                Доллары — 0,3% от суммы вывода, но не менее 30 $ и не более 150 $,
-                Китайские юани — 0,07% от суммы вывода, но не менее 25 € и не более 100 €.
-                Дополнительно удерживается комиссия за обработку поручений на вывод долларов:
-                0,4% от суммы вывода, но не менее 1500 ₽ и не более 250000 ₽.
-                Комиссии удерживается в рублях по курсу ЦБ РФ на дату исполнения вывода (по тарифам «Дневной СПБ», «Консультационный СПБ», «Cтратег US» комиссия удерживается в долларах). Комиссии не взимаются по счетам «Сегрегированный Global».
-                ✅ За вывод иностранной валюты на счета в «Банке Финам» комиссия не взимается, но введена комиссия со стороны банка за зачисление долларов: 3% от суммы операции, но не менее 300 $/€ и не более суммы операции, по счетам в иных валютах – не взимается.
-                ✅ Опция «срочный вывод» рублей (вывод происходит на 1 день раньше) стоит 300 ₽ (по тарифам «Дневной СПБ», «Консультационный СПБ», «Cтратег US» комиссия 7,5 $).
-        buttons:
-            "Назад" -> /Движение ДС_Вывод_Реквизиты
-            
-    state: Движение ДС_Вывод_Реквизиты_Сроки
-        a: 1. Рубли:
-                ✅ если поручение подано до 17:00 МСК, зачисление на следующий рабочий день
-                ✅ если поручение подано после 17:00 МСК, зачисление через один рабочий день
-                ✅ возможно досрочное исполнение вывода, если на счете завершены все расчеты по позициям
-                2. Валюта:
-                ✅ если поручение подано до 13:00 МСК, зачисление на следующий рабочий день
-                ✅ если поручение подано после 13:00 МСК, зачисление через один рабочий день
-                ✅ срочного вывода нет
-        buttons:
-            "Назад" -> /Движение ДС_Вывод_Реквизиты
-    
-    state: Движение ДС_Вывод_Наличными
-        a: Оформлять и получать вывод средств наличными с брокерского счета можно только при условии, что вы уже подтверждали ранее свою личность при личном визите в офисе компании.
-                ✅ Вывести наличными можно только рубли РФ
-                ✅ Подать поручение можно в личном кабинете по ссылке: https://lk.finam.ru/withdraw/cash
-                ✅ Если поручение подано до 14:00 МСК, получить средства в кассе можно на следующий рабочий день
-                ✅ Если поручение подано после 14:00 МСК, получить средства можно через один рабочий день
-                ✅ Прийти в кассу можно после 13:30 МСК, в центральном офисе в Москве — после 11:00 МСК
-                ✅ Комиссия за вывод наличными не удерживается
-        buttons:
-            "Назад" -> /Движение ДС_Вывод
-
-    state: Движение ДС_Вывод_24-7
-        a:Чтобы не ожидать расчеты по сделкам и выводить деньги с брокерского счета в удобное для вас время, даже в выходные и праздничные дни, можно подключить услугу «Вывод 24/7». Денежные средства после продажи ценных бумаг можно мгновенно выводить на карту в Банке «Финам».
-                ✅ Условия подключения и использования услуги:
-                1. чтобы подключить услугу, нужно иметь действующую карту Банка «Финам»
-                2. чтобы пользоваться услугой, нужно иметь на своих брокерских счетах сумму не менее 5000 ₽
-                3. выводить можно только рубли РФ
-                4. максимальная сумма вывода за один раз 100000 ₽
-                5. услуга предоставляется бесплатно
-                ✅ Алгоритм подключения и услуги:
-                1. подключить услугу можно в рабочий день с 10:00 до 18:00 МСК в личном кабинете по ссылке: https://lk.finam.ru/withdraw/overdraft
-                2. подписать заявление на подключение услуги и индивидуальные условия для открытия специального счета с подключённым овердрафтом
-                3. по факту подключения услуги поступает уведомление по SMS, с этого момента можно использовать данную услугу в личном кабинете в разделе «Вывод» по ссылке: https://lk.finam.ru/withdraw
-                4. после исполнения такого вывода, в ближайший рабочий день, либо, когда происходит полный расчёт по сделке (в период Т, Т+1), брокер исполняет поручение на вывод денежных средств и таким образом погашается сумма овердрафта
-        buttons:
-            "Открыть карту Банка Финам" -> /Банк_Банковская карта
-            "Назад" -> /Движение ДС_Вывод
-
-    state: Займ ЦБ || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /016 Займ ЦБ
-        a: Согласно п. 17.12 регламента брокер имеет право брать бумаги клиентов для внутреннего учета. Это не приводит к потере права реализации данной ценной бумаги. Вы в любой момент можете ее продать.
-            Данная операция в обязательном порядке фиксируется в справке по счету, в разделе «Сделки РЕПО, сделки СВОП, сделки займа ЦБ». 
-            За предоставление бумаг для внутреннего учета вы получаете дополнительное вознаграждение — 0,05% годовых от стоимости ценных бумаг.
-            Если ценные бумаги находились на внутреннем учете компании в момент дивидендной отсечки, брокер возместит вам сумму дивидендов, увеличенную в 1,15 раза. 
-            Если вы планируете участвовать в собрании акционеров, обратитесь к менеджеру «Финам» за несколько дней до даты фиксации и установите запрет на использование ваших ценных бумаг на период корпоративного события.
-        buttons:
-            "Перевод на оператора"
-
-    state: Документы и справки || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /017 Документы и справки
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Общие документы" -> /Документы_Общие
-            "Налоговые документы" -> /Документы_Налоговые
-            "Депозитарные документы" -> /Документы_Депозитарные
-    #   "Перевод на оператора" -> /Перевод на оператора
-    state: Документы_Общие
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Регламент брокерского обслуживанияу" -> /Документы_Общие_Регламент
-            "Документы об открытии счета" -> /Документы_Общие_Открытие счета
-            "Справка по счету" -> /Справка по счету
-            "Справка об активах" -> /Документы_Депозитарные_Справка об активах
-            "Реквизиты счетов" -> /Документы_Общие_Реквизиты
-            "Доп. соглашение для банков Казахстана" -> /Документы_Общие_Соглашение Казахстан
-            "Согл. для торговли с иностранными ЦБ на СПБ" -> /Документы_Общие_Торговля ЦБ на СПБ
-            "Назад" -> /Документы
-
-    state: Документы_Общие_Регламент
-        a: ✅ Регламент «Финам» представлен в открытом доступе на сайте компании: https://www.finam.ru/services/OpenAccount0000A/
-            ✅ Обновления регламента можно отслеживать на сайте компании https://www.finam.ru/ на главной странице в разделе «Анонсы». Страница сайта разделена на блоки, для вашего удобства вы можете заменить любой блок на нужный новостной раздел нажатием на стрелку в верхнем правом углу блока. Чтобы найти раздел «Анонсы», пролистните страницу сайта вниз либо настройте удобный блок на отображение раздела «Анонсы».
-            Наиболее популярные пункты регламента:
-        buttons:
-            "п. 6.1.6 регламента" -> /Движение ДС_Вывод_Причины отказа_Отказ по регламенту
-            "п. 17.12 регламента" -> /Займ ЦБ
-            "п. 16 регламента" -> /Комиссии_Другие_Автоследование
-            "п. 14.4 регламента" -> /Документы_Общие_Регламент_П 14.4
-            "п. 4.4 регламента" -> /Документы_Общие_Регламент_П 4.4
-
-    state: Документы_Общие_Регламент_П 14.4
-        a: Выплата процентов на остаток по договорам ИИС, заключенным до 08.07.2021, производится согласно п. 14.4 Регламента брокерского обслуживания.
-            ✅ Начисление  процентов осуществляется за каждый календарный день на сумму свободного остатка средств в рублях РФ по ставке (%, годовых), равной ½ (одна вторая) ключевой ставки Банка
-            России.
-            ✅ Выплата производится ежемесячно не позднее 3 (трех) первых рабочих дней месяца, следующего за расчетным.
-
-    state: Документы_Общие_Регламент_П 4.4
-        a: На основании п.4.4 регламента брокерского обслуживания брокер вправе отказать в принятии заявлений о присоединении/о выборе условий обслуживания и не заключить договор присоединения как по причине не предоставления/не соответствия представленных документов требованиям брокера, не выполнения потенциальным клиентом каких-либо действий, так и по своему усмотрению без объяснения причин.
-            ✅ Ссылка на регламент брокерского обслуживания: http://zaoik.finam.ru/broker/regulations
-
-    state: Документы_Общие_Открытие счета || sessionResult = "Orange", sessionResultColor = "#B65A1E"
-        a: Документы, подтверждающие открытие брокерского счета, находятся в личном кабинете: https://edox.finam.ru/catalog/documents.aspx
-            Основными документами являются: 
-            — «Заявление о выборе условий обслуживания», 
-            — «Уведомление о заключении договора присоединения», 
-            — «Заявление о присоединении к регламенту», 
-            — «Уведомление для ИФНС» (документ находится в «Журнале уведомлений» и не является обязательным).
-
-    state: Документы_Общие_Реквизиты
-        a: Реквизиты для ввода денежных средств и ценных бумаг доступны в личном кабинете https://lk.finam.ru в разделе «Детали» по счету.
-
-    state: Документы_Общие_Соглашение Казахстан
-        a: «Дополнительное соглашение об ограничении суммы инвестирования» для банков Казахстана можно получить в личном кабинете в разделе «Отчетность» → «Основные документы» либо по ссылке: https://edox.finam.ru/catalog/documents.aspx
-            ❗ Если вы не нашли данный документ, обратитесь к менеджеру.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Документы_Общие_Торговля ЦБ на СПБ
-        a: ✅ Согласно предписанию ЦБ РФ от 01.04.2023, для неквалифицированных инвесторов для совершения торговых операций с иностранными бумагами на ПАО «СПБ Биржа» нужно подписывать «Согласие на торговые операции с иностранными бумагами с местом хранения недруж. инфраструктура».
-            Документ доступен в личном кабинете по ссылке: https://edox.finam.ru/ForeignSecurities/UnfriendlyDepoConsent 
-            ✅ «Согласие на торговые операции с заблокированными иностранными ценными бумагами» для торговли на внебирже доступно по ссылке: https://edox.finam.ru/ForeignSecurities/BlockedSecuritiesConsent
-        buttons:
-            "Торговля заблокированными ЦБ" -> /Как закрыть позиции_Продажа БлокЦБ
-
-    state: Документы_Налоговые
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Справка 2-НДФЛ" -> /Документы_Налоговые_2-НДФЛ
-            "Справка об убытках" -> /Документы_Налоговые_Справка об убытках
-            "Справка 1042S" -> /Документы_Налоговые_Справка 1042S
-            "Форма W-8BEN" -> /Форма W8BEN_Заполнение
-            "Справка для госслужащего" -> /Документы_Налоговые_Справка госслужащего
-            "Документы для отчетности по дивидендам" -> /Выплата дохода_Ещё_Документы для отчетности
-            "Назад" -> /Документы
-    #   "Перевод на оператора" -> /Перевод на оператора
-    state: Документы_Налоговые_2-НДФЛ
-        a: 1. Справка 2-НДФЛ — официальный документ по форме ИФНС РФ о рассчитанных доходах и удержанных с них налогах за отчетный период (календарный год).
-            ✅ Заказ справки 2-НДФЛ доступен в личном кабинете в разделе «Налоги» по ссылке: https://lk.finam.ru/reports/tax 
-            ✅ Электронный формат справки будет доступен в личном кабинете в течение 3-х рабочих дней.
-            Изготовление справки на бумажном носителе в течение одной рабочей недели.
-            2. Содержание справки:
-            ✅ Доход — общая стоимость сделок продажи за отчетный период.
-            ✅ Вычет — общая стоимость сделок покупки за отчетный период, а также комиссии, соответствующие коду дохода.
-            ✅ Налогооблагаемая база — итоговая прибыль, рассчитывается как разница дохода и вычета. Если в данной графе указан «0», за текущий отчетный период отсутствуют доходы и необходимо проверить справку об убытках.
-    
-    state: Документы_Налоговые_Справка об убытках
-        a: Справка об убытках — официальный документ по форме ИФНС РФ о рассчитанных убытках за отчетный период (календарный год), доступна для формирования за последние 10 лет (за каждый убыточный период заказывается отдельная справка).
-            ✅ Заказ справки об убытках доступен в личном кабинете в разделе «Налоги» по ссылке: https://lk.finam.ru/reports/tax 
-            ✅ Электронный формат справки будет доступен в личном кабинете в течение 3-х рабочих дней.
-            Изготовление справки на бумажном носителе в течение одной рабочей недели.
-
-    state: Документы_Налоговые_Справка 1042S || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: Справку формы 1042s формируют НРД и СПБ-биржа и направляют брокеру. Готовые формы 1042S загружаются автоматически в личный кабинет в разделе «Налоги» по ссылке: https://lk.finam.ru/reports/tax
-            ✅ Справка выдается только за календарный год.
-            Изготовление справки на бумажном носителе занимает до 3-х рабочих дней. Электронный формат доступен на следующий рабочий день.
-            ✅ В справке представлены сводные данные без разбивки по эмитентам.
-            Во втором пункте указана сумма причитающегося инвестору дохода. Необходимо ожидать перечисление всех валютных доходов за прошлый год от СПБ-биржи.
-            Сумма дохода и сумма налога в справке округлены до целого числа по правилам математического округления.
-            ❗ Доходы в валюте от СПБ-биржи поступают частично, распределение поступивших сумм происходит пропорционально количеству ценных бумаг на всех владельцев, остальная часть выплаты не поступает из-за блокировки цепочки с Euroclear/Clearstream. Информации о сроках доплаты/снятия ограничений пока не поступало.
-            Подробнее по ссылке: https://spbbank.ru/ru/depobsl/Soobshcheniia_Depozitariia
-
-    state: Документы_Налоговые_Справка госслужащего || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: Справку для госслужащего (по форме 5798-У) вы можете запросить в личном кабинете по ссылке: https://lk.finam.ru/reports/tax
-            Изготовление справки занимает до пяти рабочих дней.
-            Содержание справки:
-            ✅ В первом разделе указаны сведения по банковским счетам, соответственно при получении данной справки от АО «Финам» раздел не заполняется.
-            Для получения сведений об остатках средств на брокерских счетах можно получить справку по счету по ссылке: https://lk.finam.ru/reports/tax 
-            ✅ Во втором разделе указана информация о поставленных ценных бумагах, а также сведения о доходах (налоги, дивиденды, купоны).
-            ❗ ПФИ (фьючерсы, опционы) не являются ценными бумагами.
-            ✅ В третьем разделе указана информация об иных доходах (проценты на остаток, доходы от продажи валюты, доходы по драгоценным металлам и прочее).
-            ✅ В четвертом разделе указана информация о займах, сделках РЕПО и иных обязательствах клиента и брокера перед клиентом, если они превышали сумму 500000 ₽.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Документы_Депозитарные
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Справка об активах" -> /Документы_Депозитарные_Справка об активах
-            "Выписки из депозитария" -> /Документы_Депозитарные_Выписки из депозитария
-            "Назад" -> /Документы
-    #   "Перевод на оператора" -> /Перевод на оператора
-    state: Документы_Депозитарные_Справка об активах
-        a: Справку об активах за закрытую торговую сессию можно запросить в личном кабинете: https://lk.finam.ru/reports/tax
-            Изготовление справки занимает до двух рабочих дней.
-            
-    state: Документы_Депозитарные_Выписки из депозитария
-        a: Заказать депозитарные документы вы можете в личном кабинете: https://lk.finam.ru/reports/tax
-            Заказ документов является платным: 
-            ✅ 200 ₽ — «Выписка по счету ДЕПО» и «Выписка об операциях по счету ДЕПО».
-            Изготовление справки в течение 3-х рабочих дней.
-            ✅ 500 ₽ — «Выписки из НРД».
-            Изготовление справки в течение месяца.
-
-    state: Справка по счету || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /018 Справка по счету
-        a: ❗ СПБ биржа с 28 ноября 2023 перевела иностранные ценные бумаги на неторговый раздел счета. Подробнее: https://spbexchange.ru/ru/about/news.aspx?bid=25&news=45530
-            ❗ После перевода на неторговый раздел – бумаги исключены из торговых лимитов биржи, поэтому не отображаются в терминале, но их наличие отражено во вкладке «Портфель» в личном кабинете https://lk.finam.ru/
-        buttons:
-            "Торговый оборот" -> /Справка_Торговый оборот
-            "Начисление пени" -> /Справка_Начисление пени
-            "Сделки СВОП" -> /Валютный рынок_Комиссия СВОП
-            "Сделки РЕПО" -> /Справка_Сделки РЕПО
-            "Займ ЦБ" -> /Займ ЦБ
-            "Другие документы" -> /Документы и справки
-    #   "Перевод на оператора" -> /Перевод на оператора
-    state: Справка_Торговый оборот
-        a: ✅ Оборот можно изучить в справке по счету в разделе «Виды движений денежных средств». Загрузить справку за закрытый торговый период можно в личном кабинете: https://lk.finam.ru/reports/tax
-            ✅ Торговый оборот за последние 4 завершенных квартала с целью получения статуса квалифицированного инвестора вы можете уточнить в личном кабинете по ссылке: https://lk.finam.ru/user/invest-status 
-            ❗ Согласно требованиям ЦБ валютные операции не учитываются при подсчете оборота для присвоения статуса.
-    
-    state: Справка_Начисление пени || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: Клиент уплачивает Брокеру за каждый день займа пеню на сумму неисполненных обязательств.
-            ✅ Для того чтобы пеня не списывалась — нужно иметь свободные денежные средства на удержание сопутствующих торговле комиссий.
-            ✅ Пеня — это не штраф, это «процент за использование заемных средств». Иначе говоря, пеня — это комиссия за займ денежных средств, которая образовалась в результате списаний по тарифам, а не открытия позиции. 
-            ✅ В базу немаржинальной задолженности попадают все списания в минус (на практике, — это начисленные комиссии за сделки и переносы займа). С этой базы берется пеня по единой ставке (ставка соответствует комиссии за заем по тарифу).
-
-    state: Справка_Сделки РЕПО || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: Сделки РЕПО - являются сделками переноса ваших необеспеченных позиций. В отчете отображаются две сделки:
-            ✅ сделка предоставления займа (продажа, либо покупка ценных бумаг),
-            ✅ сделка возврата займа (сделка обратного откупа, либо продажи).
-             С помощью данных сделок вы получаете возможность взять в займ ценные бумаги у брокера, либо денежные средства под покупку ценных бумаг. Сделки РЕПО проводятся брокером автоматически и фактически в них заложена комиссия по тарифу за займ денежных средств и ценных бумаг. 
-            Важно понимать, с помощью сделок РЕПО брокер не берет ваши ценные бумаги в займ.
-
-    state: Форма W8BEN || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /019 Форма W8BEN
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Заполнение формы W-8BEN" -> /Форма W8BEN_Заполнение
-            "Статус формы W-8BEN" -> /Форма W8BEN_Статус
-    #   "Перевод на оператора" -> /Перевод на оператора
-    state: Форма W8BEN_Заполнение || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: Подписать форму W-8BEN можно в личном кабинете по ссылке: https://lk.finam.ru/reports/tax
-            Выберите биржу, в рамках которой хотите подписать форму (АО «НРД» — это Московская биржа, АО «КЦ МФБ» — Биржа СПБ). Далее сформируйте заявление, распечатайте, поставьте подпись, отсканируйте документ и вложите скан в сформированный вами   документ в личном кабинете. Сформировать документ, распечатать, подписать и прикрепить заявление необходимо в течение одного дня.
-            Форма рассматривается 30 календарных дней.
-            Результат рассмотрения можно уточнить в личном кабинете в «Журнале   поручений» по ссылке: https://lk.finam.ru/reports/documents 
-            либо уточнить у сотрудника «Финам».
-            
-    state: Форма W8BEN_Статус
-        a: Результат рассмотрения можно уточнить в личном кабинете по ссылке: https://edox.finam.ru/Journals/UnionDocumentJournal
-            либо уточнить у сотрудника «Финам».
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Личный кабинет || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /020 Личный кабинет
-        a: Личный кабинет доступен по ссылке: https://lk.finam.ru/
-            Старая версия: https://edox.finam.ru/
-            Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Восстановить доступ от Личного кабинета" -> /Личный кабинет_Восстановить доступ
-            "Торговый код по счету" -> /Личный кабинет_Торговый код
-            "Удаление аккаунта/Отключение рассылок" -> /Личный кабинет_Торговый код
-            "Ещё" -> /Личный кабинет_Ещё
-
-    state: Личный кабинет_Восстановить доступ
-        a: ✅ По умолчанию логином от личного кабинета является номер телефона в международном формате (например: начиная с «7…» - Россия, «375…» - Беларусь, «997…» - Казахстан).
-            ✅ Пароль вы задавали самостоятельно.
-            ✅ Для восстановления доступа к личному кабинету:
-            1. перейдите по ссылке → https://lk.finam.ru/
-            2. нажмите на кнопку «Забыли логин или пароль?»
-            3. введите ФИО, паспортные данные и подтвердите восстановление,
-            4. На вашу электронную почту придет письмо с логином и ссылкой на создание нового пароля.
-
-    state: Личный кабинет_Торговый код
-        a: Торговый код присваивается к каждому брокерскому счету. Узнать свой торговый код можно в личном кабинете: https://lk.finam.ru/details
-            Код понадобится вам при обращении в техническую поддержку, а также при выставлении голосовых заявок. Не сообщайте его третьим лицам.
-
-    state: Личный кабинет_Удаление аккаунта
-        a: ✅ Чтобы отключиться от рассылок компании на вашу электронную почту, нужно обратиться к менеджеру «Финам» и сообщить:
-            1. адрес вашей электронной почты,
-            2. название нежелательной рассылки.
-            ✅ Чтобы заблокировать доступ в личный кабинет и удалить аккаунт, нужно:
-            1. вывести все активы с брокерских счетов,
-            2. расторгнуть все действующие договоры,
-            3. обратиться к менеджеру «Финам».
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Личный кабинет_Ещё
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Отключение двухфакторной авторизации" -> /Личный кабинет_Ещё_Отключение двухфакторной авторизации
-            "Открытие счетов" -> /Открытие_счета
-            "Закрытие счетов" -> /Закрытие_счета
-            "Сообщить о проблеме" -> /Личный кабинет_Ещё_Сообщить о проблеме
-            "Назад" -> /Личный кабинет
-
-    state: Личный кабинет_Ещё_Отключение двухфакторной авторизации
-        a: Запрос ввода кода из СМС при входе в личный кабинет отключить нельзя.
-
-    state: Личный кабинет_Ещё_Сообщить о проблеме
-        a: Чтобы сообщить о проблеме в личном кабинете нажмите кнопку «Перевод на оператора», либо напишите «оператор». Просьба детально описать ситуацию, а также предоставить скриншот с воспроизведенной ошибкой для быстрого решения проблемы.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Замена персональных данных || sessionResult = "Green", sessionResultColor = "#418614"
-        intent!: /021 Замена персональных данных
-        a: ✅ Подать поручение на смену паспортных данных, номера телефона, электронной почты можно в личном кабинете: https://edox.finam.ru/Client/EditInfo
-            ❗ Для замены паспортных данных вложите копии полных страниц документа, подтверждающих смену данных. Копии должны хорошо читаться, не иметь бликов, посторонних надписей или рисунков.
-
-    state: Авторизация || sessionResult = "Green", sessionResultColor = "#418614"
-        intent!: /022 Авторизация
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Личный кабинет" -> /Личный кабинет_Восстановить доступ
-            "FinamTrade" -> /ИТС_FinamTrade_Авторизация
-            "TRANSAQ/TRANSAQ Connector" -> /ИТС_TRANSAQ_Авторизация
-            "QUIK" -> /ИТС_QUIK_Авторизация
-            "MetaTrader 5" -> /ИТС_MetaTrader 5_Авторизация
-            "Сайт Comon.ru" -> /Comon_Авторизация
-            "Сайт Finam.ru" -> /Авторизация_Сайт Finam.ru
-    #   "Перевод на оператора" -> /Перевод на оператора
-    state: Авторизация_Сайт Finam.ru
-        a: После регистрации на сайте Finam.ru вам придет письмо со сгенерированными никнеймом и паролем. В качестве логина для авторизации на сайте можно использовать:
-            — никнейм, 
-            — номер телефона в формате (7***/8***/375***), 
-            — электронную почту. 
-            Также вы можете использоваться для авторизации данные от личного кабинета брокера. На странице авторизации необходимо выбрать «ЛК Финам». 
-            Восстановить пароль можно по номеру телефона, либо по электронной почте на странице авторизации.
-    
-    state: Подпись || sessionResult = "Green", sessionResultColor = "#418614"
-        intent!: /023 Подпись
-        a: Для подписания документа зайдите:
-            ✅ в личный кабинет: https://lk.finam.ru/ раздел «Отчеты» → «Документы» либо по ссылке https://lk.finam.ru/reports/documents
-            или
-            ✅ в личный кабинет (старый вид):
-            https://edox.finam.ru/ раздел «Отчетность» → «История операций» либо по ссылке https://edox.finam.ru/Journals/UnionDocumentJournal 
-            ❗ Чтобы подписать «Согласие на торговые операции с иностранными бумагами с местом хранения недруж. инфраструктура» после 01.04.2023, перейдите по ссылке https://edox.finam.ru/ForeignSecurities/UnfriendlyDepoConsent 
-            Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Электронная подпись" -> /Подпись_Электронная
-            "SMS-подпись" -> /Подпись_SMS
-            "Не приходит СМС/письмо" -> /Ошибки СМС_Почта
-            "Ошибки при подписании" -> /Подпись_Ошибки
-    #   "Перевод на оператора" -> /Перевод на оператора
-    state: Подпись_Электронная
-        a: Перед созданием ключа ЭП перейдите в личном кабинете https://edox.finam.ru/ в раздел «Помощь» → «Инструкции, шаблоны, ПО» или по ссылке https://edox.finam.ru/global/software.aspx , скачайте и установите «Плагин для генерации электронной подписи», он доступен на устройствах с системой Windows, необходимо использовать браузер Google Chrome.
-            Далее следуйте по пунктам:
-            1. В личном кабинете, перейти в раздел «Сервис» → «Электронная подпись» → «Создание ключей» или перейти по ссылке https://edox.finam.ru/Sign/CreateCertificate → нажать «Создать сертификат».
-            2. В открывшемся диалоговом окне выбрать пустую папку для хранения нового ключа и нажать «Старт». Шевелите мышкой до заполнения индикатора.
-            3. После успешного создания ключа «Активировать» новый сертификат ключа ЭП, а затем его «Сохранить». Плагин должен быть включен в настройках, три точки справа вверху «Дополнительные инструменты» - «Расширения».
-            Расширение плагина для работы с электронной подписью через браузер Google Chrome: https://chrome.google.com/webstore/detail/signal-com-signature-plug/ceifjolbdjihdddppedlcocpgckafcak
-    
-    state: Подпись_SMS
-        a: Чтобы подписывать электронные документы в личном кабинете, подключите SMS-подпись по ссылке: https://edox.finam.ru/info/ApplicationSms/ApplicationSmsOn.aspx
-            Также в данном меню можно выбрать активный номер телефона для получения SMS (если Вы добавили несколько номеров).
-
-    state: Подпись_Ошибки
-        a: Если вам не удается подписать документ или не удалось найти необходимый, пожалуйста, обратитесь к менеджеру.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Ошибки СМС_Почта
-        intent!: /024 Ошибки смс_почта
-        a: Рекомендации при возникновении проблем с доставкой
-            ✅  СМС-сообщений:
-            1. проверить свой аппарат на наличие сбоев, перезагрузить аппарат;
-            2. очистить память аппарата от устаревших сообщений;
-            3. проверить черные списки и спам-фильтры аппарата;
-            4. проверить услугу черный список у оператора;
-            5. удалить стороннее ПО для работы с sms, установленное на аппарате;
-            6. в случае Multi-SIM аппарата убедиться в том, что активна данная sim-карта;
-            7. при необходимости провести обновление системного ПО, или сброс настроек аппарата к заводским,
-            8. протестировать прием данных сообщений, переставив sim-карту в другой, заведомо исправный аппарат.
-            ✅ Сообщений на электронную почту:
-            1. проверить папку «спам»;
-            2. убедиться, что в личном кабинете указан предпочтительный адрес электронной почты в разделе «информация о клиенте» по ссылке https://edox.finam.ru/client/info 
-            3. изменить еmail можно в разделе «изменение анкетных данных» по ссылке https://edox.finam.ru/Client/EditInfo 
-            ❗ Если после выполнения рекомендаций проблема сохраняется, просьба обратиться к менеджеру.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Банк || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /025 Банк
-        a: В АО «Банк ФИНАМ» вас ждут низкие тарифы на все финансовые операции и квалифицированный сервис.
-                ✅ Информация по тарифам и услугам банка на сайте: https://www.finambank.ru/person/rates/
-                ✅ Для консультации вы можете обратиться к сотрудникам Банка:
-                — по телефонам +7(495) 796-90-23 и +7 (800) 200-44-00 (бесплатно по России)
-                — по электронной почте support@finambank.ru
-                — посетив офис компании «Финам», адреса и контактная информация по ссылке: https://www.finambank.ru/about/offices 
-                ✅ Режим работы Банка:
-                понедельник–пятница – с 09:00 до 21:00,
-                суббота, воскресенье – выходной день.
-                Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Банковский счет" -> /Банк_Банковский счет
-            "Банковская карта" -> /Банк_Банковская карта
-            "Конвертация валюты" -> /Банк_Конвертация валюты
-            "Переводы за границу/SWIFT/МИР" -> /Банк_Переводы загран
-            "Платежи по СБП" -> /Банк_Платежи по СБП
-
-    state: Банк_Банковский счет
-        a: ✅ Счета в Банке «Финам» открываются в рублях РФ, долларах США, евро, китайских юанях, казахстанских тенге, турецких лирах (нерезидентам РФ открытие счетов в турецких лирах недоступно).
-                Открытие бесплатное, ведение счета по условиям тарифов.
-                ✅ Актуальные тарифы представлены на сайте Банка, в разделе «Рассчетно-кассовое обслуживание» или по ссылке https://www.finambank.ru/person/rates
-                Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Как открыть банковский счет" -> /Банк_Банковский счет_Как открыть
-            "Получение наличных в кассе" -> /Банк_Банковский счет_Получение наличных
-            "Зачисление|хранение валюты" -> /Банк_Банковский счет_ЗачислениеХранение Валюты
-            "Вклады" -> /Банк_Банковский счет_Вклады
-            "Назад" -> /Банк
-
-    state: Банк_Банковская карта
-        a: «Банк Финам» выпускает банковские карты платежной системы МИР по пакетам услуг «Комфорт», «Премиум», «Корпоративный».
-            ✅ Данные пакеты услуг принимают участие в Программе лояльности «CASHBACK», действующей в Банке.
-            Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Как открыть банковскую карту" -> /Банк_Банковская карта_Как открыть
-            "Тарифы на обслуживание карт" -> /Банк_Банковская карта_Тарифы
-            "Банкоматы|Снятие наличных" -> /Банк_Банковская карта_Банкоматы
-            "Назад" -> /Банк
-
-    state: Банк_Конвертация валюты
-        a: ✅ На данный момент конвертация валюты в рамках банковского обслуживания возможна только в личном кабинете «Банка Финам» по ссылке https://ibank.finam.ru
-            ✅ Если у вас есть брокерский счет, вы можете приобретать необходимую валюту на Московской бирже. 
-            ❗ При планировании операций в иностранной валюте, просим учесть, что на сегодняшний день в кредитных организациях РФ действуют ограничения по выдаче наличной иностранной валюты со счетов физических лиц, открытых в иностранной валюте. Выплаты осуществляются в рублях в наличной форме без ограничений по курсу, определяемому АО «Банк Финам».
-            *Банки могут продавать гражданам доллары США и евро, поступившие в их кассы с 9 апреля 2022 года.
-            Предварительно необходимо уточнять наличие средств в кассе Банка.
-
-    state: Банк_Переводы загран
-        a: 1. Через «Банк Финам» доступны переводы по реквизитам заграницу следующих валют:
-            ✅ рубли РФ
-            ✅ турецкие лиры
-            ✅ китайские юани (кроме банков Еврозоны, банков Швейцарии, банков Великобритании, банков США, как банков посредников, так и банков получателей)
-            ✅ казахстанские тенге
-            Ознакомиться с тарифами можно по ссылке: https://www.finambank.ru/person/rates в разделе «Рассчетно-кассовое обслуживание»
-            2. В интернет-банке «Финам» реализована возможность перевода с карты платежной системы МИР на карты следующих стран: Таджикистан (ПС Корти Милли), Киргизия (ПС Элкарт), Абхазия (ПС Апра), Армения (ПС АрКа, ПС Мир), Беларусь (ПС Мир, ПС Белкарт), Казахстан (ПС Мир), Осетия (ПС Мир).*
-            * ПС – платёжная система.
-            ✅ Чтобы осуществить перевод нужно:
-            1. перейти по ссылке: https://ibank.finam.ru/Operations/Card2Card/Init и авторизоваться в личном кабинете интернет-банка
-            2. в открывшейся форме переводов «С карты на карту» выбрать карту МИР, с которой будет произведено списание
-            3. указать карту получателя перевода, на которую будет проведено зачисление
-            4. указать фамилию и имя получателя перевода на латинице
-            5. подтвердить операцию кодом из СМС
-            ✅ Комиссия за перевод взимается в соответствии с действующими тарифами банка «Финам»:
-            1. Тариф «Корпоративный»
-            До 30000 ₽ в месяц – без комиссии. Свыше 30000 ₽ в месяц – 1,5% от суммы перевода, но не менее 50 ₽
-            2. Тариф «Комфорт»:
-            До 20000 ₽ в месяц – без комиссии. Свыше 20000 ₽ в месяц – 1,5% от суммы перевода, но не менее 50 ₽
-            3. Тариф «Премиум»:
-            До 100000 ₽ в месяц – без комиссии. Свыше 100000 ₽ в месяц – 1,5% от суммы перевода, но не менее 50 ₽
-            ❗ Если карта открыта в местной валюте, курс пересчета осуществляется по курсу банка эмитента.
-
-    state: Банк_Платежи по СБП
-        a: ❗ Максимальная сумма одного перевода/платежа с использованием Системы быстрых платежей (СБП) составляет 1000000 ₽.
-            ✅ Лимиты и комиссии на исходящие переводы через Систему быстрых платежей (СБП) по тарифам:
-            1. Комфорт — до 200000 ₽ в месяц — без комиссии,
-            свыше 200000 ₽ в месяц — 0,5% от суммы перевода, не более 1500 ₽;
-            максимальная сумма переводов в месяц - 1500000 ₽.
-            2. Премиум — максимальная сумма переводов в месяц - 5000000 ₽, без комиссий.
-            3. Корпоративный — до 300000 ₽ в месяц - без комиссии, свыше 300000 ₽ в месяц - 0,5% от суммы перевода, не более 1500 ₽;
-            максимальная сумма переводов в календарный месяц - 3000000 ₽.
-            ✅ При расчете максимальной суммы переводов, совершенных в течение календарного месяца, а также при расчете комиссии за исходящий перевод, учитывается совокупный объем денежных средств по исходящим переводам с использованием СБП за текущий календарный месяц по всем счетам клиента, открытым в Банке.
-            ✅ Актуальные тарифы на сайте Банка: https://www.finambank.ru/person/rates в разделах «Пакет услуг Корпоративный» и «Пакеты услуг Комфорт и Премиум».
-            ❗ Переводы СБП на счета по вкладам не осуществляются.
-
-    state: Банк_Банковский счет_Как открыть
-        a: Если вы ранее открывали брокерский счет в «Финам» при личном визите в офисе компании, то для вас доступно открытие банковского счета дистанционно в личном кабинете по ссылке https://lk.finam.ru/open/bank/savings
-            ❗ Если вы не открывали ранее брокерский счет или открывали его дистанционно, то открыть банковский счет можно только при личном посещении офиса.
-
-    state: Банк_Банковский счет_Получение наличных
-        a: ✅ Получение наличных рублей со счетов/вкладов, открытых в рублях на сумму более 100000 ₽ осуществляется Банком при условии их предварительного заказа клиентом до 12.30 МСК рабочего дня, предшествующего дню получения.
-            ✅ Получение наличных рублей со счетов/вкладов, открытых в иностранной валюте на сумму более 100000 ₽ осуществляется Банком при условии их предварительного заказа клиентом не менее, чем за 5 рабочих дней до даты их получения (день приема заявки не учитывается).﻿
-            ✅ Получение наличной иностранной валюты (доллары США, евро) возможно только в объеме, находящемся на счетах клиента в Банке (брокерские счета сюда не входят!) до 09.03.2022 (00:00), но не более 10000 $.
-            ✅ Если валюта находится на брокерском счете (в АО или в Банке), при переводе на счета в Банке (после: 09.09.2022) получение валюты наличными доступно в рублях по курсу Банка. 
-            ✅ Средства, размещенные на банковских валютных счетах (в евро и долларах США) до: 09.09.2022 включительно, можно получить в рублях (ограничений нет) по курсу ЦБ на дату выплаты.
-            ✅ Получение наличной иностранной валюты в китайских юанях возможно в отделениях банка «Финам» в г. Москва на Настасьинском пер. дом 7, стр.2, в г. Благовещенск и г. Владивосток.
-            ❗ Предварительно необходимо уточнять наличие средств в кассе Банка: https://www.finambank.ru/about/offices
-
-    state: Банк_Банковский счет_ЗачислениеХранение Валюты
-        a: 1. Комиссия за зачисление долларов США и евро на банковские счета Банка «Финам»:
-            ✅ По счетам в USD/EUR – 3% от суммы операции, но не менее 300 USD/EUR и не более суммы операции.
-            ✅ По счетам в иных валютах – не взимается.
-            2. Комиссия за обслуживание банковских счетов в долларах США и евро:
-            ✅ Если совокупный остаток не превышает 3000 единиц валюты – комиссия не списывается. 
-            ✅ Если совокупный остаток равен либо превышает 3000 единиц валюты – 0,013 % в день от остатка.
-            ❗ Комиссия удерживается ежедневно на сумму остатка на начало дня: учитывается совокупный (суммарный) остаток денежных средств по всем валютным текущим счетам/карточным счетам, открытым после 15.08.2022  включительно в долларах США/евро.
-            ❗ Комиссия взимается в валюте Счета отдельно с каждого счета (счетов) в долларах США/евро.
-
-    state: Банк_Банковский счет_Вклады
-        a: С информацией о вкладах и накопительных счетах можно ознакомиться по ссылке: https://www.finambank.ru/person/deposits/
-
-    state: Банк_Банковская карта_Как открыть
-        a: Если вы ранее открывали брокерский счет в «Финам» при личном визите в офисе компании, то для вас доступно открытие банковской карты дистанционно в личном кабинете по ссылке https://lk.finam.ru/open/bank/card
-            ❗ Если вы не открывали ранее брокерский счет или открывали его дистанционно, то оформить банковскую карту
-            можно только при личном посещении офиса.
-
-    state: Банк_Банковская карта_Тарифы
-        a: ✅ Актуальные тарифы «Корпоративный», «Комфорт» и «Премиум» представлены по ссылке: https://www.finambank.ru/person/cards/
-            ❗ Информация по обслуживанию архивных пакетов услуг по банковским картам доступна на сайте Банка по ссылке https://www.finambank.ru/person/rates - в разделе «Банковские карты».
-
-    state: Банк_Банковская карта_Банкоматы
-        a: ✅ Снять денежные средства можно в кассе офиса «Финам»: https://www.finambank.ru/about/offices
-            ✅ А также в пунктах выдачи наличных/банкоматах сторонних банков.
-            ✅ Актуальные тарифы на снятие наличных представлены на сайте Банка https://www.finambank.ru/person/rates в разделах «Пакет услуг Корпоративный» и «Пакеты услуг Комфорт и Премиум».
-            ❗ Информация по обслуживанию архивных пакетов услуг по банковским картам - в разделе «Банковские карты».
-
-    state: Финам Форекс || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /026 Финам Форекс
-        a: ✅ По счетам «Финам Форекс» предоставляется отдельный личный кабинет. Авторизация доступна по ссылке: https://forexcabinet.finam.ru/
-            ✅ Чтобы активировать счет, необходимо пополнить его на сумму от 15000 ₽ и пройти тестирование для допуска к торгам. 
-            ✅ Размер стандартного плеча по счетам «Финам Форекс» составляет максимум 1:35.
-            ✅ Если у вас есть статус квалифицированного инвестора, плечо можно увеличить до 1:40.
-            Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Как открыть счет в Финам Форекс?" -> /Финам Форекс_Как открыть
-            "Условия обслуживания счетов Финам Форекс" -> /Финам Форекс_Условия обслуживания
-            "Ввод|вывод средств" -> /Финам Форекс_Ввод_вывод средств
-            "Программы для торговли" -> /Финам Форекс_Программы для торговли
-            "Налог на доходы" -> /Финам Форекс_Налог на доходы
-            "Учебный счет" -> /Финам Форекс_Учебный счет
-
-    state: Финам Форекс_Как открыть
-        a: ✅ Если вы впервые открываете счет в «Финам», то для этого достаточно подать заявку на сайте: https://forex.finam.ru/
-            ✅ Дополнительные счета «Финам Форекс» можно открыть в личном кабинете: https://forexcabinet.finam.ru/
-            ✅ Также вы можете открыть счет в офисе «Финам». Не забудьте взять с собой паспорт. 
-            Адреса и контакты офисов доступны по ссылке: https://finamfx.ru/about/contacts
-            ❗ На текущий момент дистанционный договор «Финам Форекс» заключается только с гражданами РФ. Код номера телефона автоматически проставлен на «(+7)» и не может быть изменен.
-
-    state: Финам Форекс_Условия обслуживания
-        a: ✅ По счетам «Финам Форекс» доступно 26 валютных пар: https://finamfx.ru/Solutions/TradingConditions/
-            ✅ Минимальный объем торговли — 0,01 лота. 
-            ✅ Счета номинированы в рублях. 
-            ✅ Чтобы активировать счет, необходимо пополнить его на сумму от 15000 ₽ и пройти тестирование для допуска к торгам. 
-            ✅ Конвертация валюты происходит по текущему курсу на рынке Forex.
-
-    state: Финам Форекс_Ввод_вывод средств
-        a: Пополнять и выводить денежные средства по счетам «Финам Форекс» можно только в виде банковских переводов по реквизитам.
-            Срок зачисления — до 2 рабочих дней.
-
-    state: Финам Форекс_Программы для торговли
-        a: Для торговли на Forex предоставляется торговая система MetaTrader 4.
-            Терминал доступен в виде программы для ПК, мобильного приложения, а также в веб-версии.
-
-    state: Финам Форекс_Налог на доходы
-        a: Компания «Финам Форекс» является налоговым агентом и самостоятельно отчитывается о доходах по счетам своих клиентов.
-
-    state: Финам Форекс_Учебный счет
-        a: Открыть учебный счет для торговли на рынке Forex можно по ссылке https://forex.finam.ru/ через кнопку «Демосчет».
-            Доступ предоставляется на 14 дней, в рамках демо-счета предоставляется плечо до 1/40.
-            Разницы в размерах спредов на демо и реальном счете нет.
-
-    state: О компании || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /027 О компании
-        a: «Финам» работает на рынке с 1994 года. Мы успешно сотрудничаем с крупнейшими российскими и зарубежными биржами и предлагаем широкий спектр возможностей для тех, кто действительно хочет зарабатывать на бирже — качественная аналитика, актуальные прогнозы, своевременные инвестидеи, обучение, большой выбор готовых решений, современные торговые системы, для комфортной и быстрой торговли и многое другое. Подробности по ссылке: https://www.finam.ru/landings/reasons/
-        buttons:
-            "О компании" -> /О компании_О компании
-            "Лицензии компании" -> /О компании_Лицензии
-            "Отчетность компании" -> /О компании_Отчетность
-
-    state: О компании_О компании
-        a: Познакомиться с историей «Финама», а также узнать о наших наградах вы можете по ссылке: https://www.finam.ru/about/history/
-
-    state: О компании_Лицензии
-        a: Действующий перечень лицензий компании доступен на сайте: https://www.finam.ru/about/license/
-
-    state: О компании_Отчетность
-        a: С отчетностью компании «Финам» можно ознакомиться на сайте: https://www.finam.ru/about/annualreport/
-
-    state: Контакты || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /028 Контакты
-        a: ❗ Cлужба технической поддержки работает в режиме 24/7.
-            Связаться с менеджером «Финам» можно:
-            ✅ в чате
-            ✅ по телефону по одному из указанных номеров (набрать доб. 2222)
-            +7 (495) 796-93-88 
-            +7 (495) 1-346-346 
-            *1945 (Бесплатно по РФ для МТС, Билайн, МегаФон и Tele2)
-            ✅ по электронной почте service@corp.finam.ru
-            ✅ звонок с сайта и контакты представительств: https://www.finam.ru/about/contacts 
-            ✅ перед визитом в центральный офис «Финам» на Настасьинском пер. дом 7, стр.2 можно заказать парковочное место, обратившись к менеджеру компании.
-    #buttons:
-    #    "Оператор" -> /Перевод на оператора
-    state: Соцсети || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /029 Соцсети
-        a: Будьте в курсе с «Финам» в социальных сетях:
-            ✅ Я. Дзен https://dzen.ru/finam.ru?utm_referer=www.finam.ru 
-            ✅ VK «Finam: главные новости фондового рынка» https://vk.com/finam_ru 
-            Список официальных TG-каналов:
-            ✅ @finam_invest – официальный канал для публикации корпоративных новостей и анонсов мероприятий «Финам».
-            ✅ @finamalert – канал о рыночных сигналах, аналитике, торговых идеях и прогнозах.
-            ✅ @FinamInvestLAB – канал персональных консультантов о торговых идеях.
-            ✅ @FinamPrem – канал для VIP-клиентов с премиальными аналитикой и инвестиционными стратегиями.
-            ✅ @EducationFinam_bot – обучение трейдингу.
-        
-    state: Вакансии || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /030 Вакансии
-        a: Если вас интересует работа в «Финам», получить подробную информацию вы можете на сайте: https://job.finam.ru/
-
-    state: Отзыв || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /031 Отзыв
-        a: Мы стараемся всесторонне развивать наши продукты и сервисы, прислушиваясь к вашим комментариям и отзывам.
-            ✅ Если у вас есть какие-либо пожелания или предложения по работе сервисов «Финам» — вы можете оставить их, перейдя по ссылке: https://www.finam.ru/landings/finam-invest-feedback/ 
-            ✅ Также в Лаборатории клиентского опыта «Финам» у клиентов компании есть возможность записаться на участие в интервью, поделиться опытом использования наших продуктов, показать с какими сложностями сталкиваются, получить приятные подарки от «Финам». Подробнее об интервью: https://www.finam.ru/landings/client-experience/ 
-            Будем признательны за обратную связь!
-
-    # state: Приветствие || sessionResult = "Orange", sessionResultColor = "#B65A1E"
-    #    intent!: /033 Приветствие
-    #    a: Я – виртуальный консультант «Финам».
-    #        Быстро помогу в любое время. Какой у вас вопрос?
-    #        Обычно меня спрашивают:
-    #    buttons:
-    #        "Как открыть счет?" -> /Приветствие_Как открыть
-    #        "Как пополнить счет?" -> /Приветствие_Как пополнить
-    #        "Как вывести деньги?" -> /Приветствие_Как вывести
-    #        "Как начать инвестировать?" -> /Приветствие_Как начать
-    #        "Заказ справки 2НДФЛ" -> /Приветствие_2НДФЛ
-    #        "Торговля заблокированными ЦБ" -> /Как закрыть позиции_Продажа БлокЦБ
-    #state: Приветствие_Как открыть
-    #state: Приветствие_Как пополнить
-    #state: Приветствие_Как вывести
-    #state: Приветствие_Как начать
-    #state: Приветствие_2НДФЛ
-    #state: Приветствие_БлокЦБ
-    #state: Благодарность
-    #    intent!: /034 Благодарность
-    #    a: Рады были помочь вам! 
-    #        Если понадобится помощь, пожалуйста, напишите снова.
-    #state: Прощание || sessionResult = "Orange", sessionResultColor = "#B65A1E"
-    #    intent!: /035 Прощание
-    #    a: Благодарим за обращение! 
-    #        Если понадобится помощь, пожалуйста, напишите снова.
-    #state: Оценки || sessionResult = "Orange", sessionResultColor = "#B65A1E"
-    #    intent!: /036 Оценки
-    #    a: Рады были помочь вам! 
-    #        Если понадобится помощь, пожалуйста, напишите снова.
-    state: Есть вопрос? || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /038 Есть вопрос
-        a: Просьба уточнить ваш вопрос.
-
-    state: Претензия || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /039 Претензия
-        a: Приносим извинения за доставленные неудобства. По данному вопросу вам поможет менеджер. Пожалуйста, ожидайте перевод на оператора.
-
-    state: Редкие вопросы || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /041 Редкие вопросы
-        a: Информацию по данному вопросу можно уточнить у менеджера «Финам».
-    #buttons:
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Доверенности || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /042 Доверенность
-        a: Шаблон доверенности для физических лиц доступен в личном кабинете https://edox.finam.ru/ в разделе «Помощь» → «Инструкции, шаблоны, ПО» или по ссылке: https://edox.finam.ru/global/Requisites/Warrant.aspx
-            Доверенность должна быть предоставлена в офис компании лично доверенным лицом.
-            Если у вас есть вопросы, информацию можно уточнить у менеджера «Финам».
-    #buttons:
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Наследство || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /043 Наследство
-        a: ✅ Информация об остатках на счетах «Финам» предоставляется только в ответ на официальный запрос от нотариуса на розыск имущества. ﻿﻿
-            ✅ Официальный адрес компании АО «Инвестиционная компания ФИНАМ»: 127006 г. Москва, пер. Настасьинский, д.7, стр.2. ﻿ 
-            ✅ После получения документов, подтверждающих вступление в права наследования, необходимо обратится к менеджеру компании для дальнейшего подписания поручений на перевод активов. 
-            ❗ Если зачисление активов планируется на счета сторонних организаций, необходимо предоставить полные реквизиты компании-получателя для формирования поручений.
-
-    state: Доступные биржи || sessionResult = "Важно + Готов", sessionResultColor = "#418614"
-        intent!: /044 Доступные биржи
-        a: ❗ СПБ биржа с 28 ноября 2023 перевела иностранные ценные бумаги на неторговый раздел счета. Подробнее: https://spbexchange.ru/ru/about/news.aspx?bid=25&news=45530
-            ❗ После перевода на неторговый раздел – бумаги исключены из торговых лимитов биржи, поэтому не отображаются в терминале, но их наличие отражено во вкладке «Портфель» в личном кабинете https://lk.finam.ru/
-        a: Клиентам «Финам» доступны следующие биржи:
-            ✅ Московская биржа
-            ✅ Биржа СПБ
-            ✅ Американский фондовый рынок NYSE/NASDAQ
-            ✅ Иностранные опционы США
-            ✅ Гонконгская биржа HKEX
-            ✅ Внебиржевой рынок
-            ✅ Иностранные облигации (Турция, Оман, США, Китай)
-            Пожалуйста, выберите интересующую биржу или инструмент:
-        buttons:
-            "Московская биржа" -> /Доступные биржи_Московская
-            "Биржа СПБ" -> /Доступные биржи_СПБ
-            "NYSE/NASDAQ" -> /Доступные биржи_NYSE и NASDAQ
-            "Иностранные опционы США" -> /Доступные биржи_Опционы США
-            "Ещё" -> /Доступные биржи_Ещё
-
-    state: Доступные биржи_Московская
-        a: На Московской бирже предоставляется доступ к:
-            ✅ Фондовому рынку — российские ценные бумаги (акции, облигации, фонды, еврооблигации, депозитарные расписки) и иностранные.
-            ✅ Срочному рынку — фьючерсы и опционы (опционы доступны только в рамках договора с отдельными брокерскими счетами). 
-            ✅ Валютному рынку — валютные пары (доллар США, евро,  турецкая лира, китайский юань, гонконгский доллар, белорусский рубль, казахстанский тенге). Все валюты торгуются в паре с российским рублем, за исключением пар евро/доллар США, доллар США/китайский юань.
-            В рамках валютного рынка дополнительно доступны контракты на золото и серебро в режиме _TOM (поставка металлов не предоставляется).
-            ✅ Внебиржевому рынку  — ценные бумаги (поручение на сделку подается через менеджера «Финам»).
-
-    state: Доступные биржи_СПБ
-        a: На Бирже СПБ предоставляется доступ только к фондовому рынку (американские, российские, гонконгские бумаги). Обращаем Ваше внимание, бумаги, обращающиеся в евро, не предоставляются в рамках счетов в АО Финам.
-            ✅ Маржинальная торговля доступна с ограниченным рядом инструментов, открытие коротких позиций доступно только через терминалы TRANSAQ и FinamTrade. 
-            ✅ Торговля акциями дружественных стран, хранящихся в депозитариях недружественных юрисдикций, без статуса квал доступна через терминалы TRANSAQ и FinamTrade. 
-            Дополнительно нужно:
-            1. Подписать «Согласие на торговые операции с иностранными бумагами с местом хранения недруж. инфраструктура» по ссылке https://edox.finam.ru/ForeignSecurities/UnfriendlyDepoConsent 
-            2. Пройти тестирование в личном кабинете «ИЦБ, требующие тестирования»: https://lk.finam.ru/user/invest-status/qual-exam/tests 
-            ❗ С 24.04.2023 СПБ биржа возобновляет торги несколькими российскими акциями с иностранной пропиской: Cian, Fix Price, hh, Ozon, X5, TCS, Yandex, VK, Etalon, Globaltrans.
-            ❗ «Финам» предоставляет сервис по продаже и покупке иностранных ценных бумаг на СПБ Бирже, ранее заблокированных европейскими депозитариями Euroclear и Clearstream. Торги доступны в дни работы бирж 11:00–15:00 по МСК через ИТС TRANSAQ или отдел голосового трейдинга. Подробнее: https://www.finam.ru/landings/blocked-securities/?key=2e6d8aef-4940-4105-aee4-d0b892894664
-
-    state: Доступные биржи_NYSE и NASDAQ
-        a: В рамках биржи NYSE/NASDAQ предоставляется доступ к иностранным акциям и фондам.
-            Доступ предоставляется по:
-            ✅ «Единым счетам» (кроме счетов, открытых в период с 15.08.2022 по 13.02.2023)
-            ✅ по счетам «US Market Options»
-            ✅ по счетам «Сегрегированный Global»
-            ✅ счетам «Иностранные биржи»
-            ❗ Для работы с данными инструментами требуется статус квалифицированного инвестора.
-            ❗ Все расчеты производятся в долларах США, автоконвертация валюты при покупке не осуществляется.
-        buttons:
-            "Типы счетов" -> /Типы счетов
-
-    state: Доступные биржи_Опционы США
-        a: «Финам» предоставляет доступ к американским опционам на иностранные акции.
-            Доступ предоставляется по:
-            ✅ «Единым счетам» (для получения доступа обратитесь к менеджеру)
-            ✅ по счетам «US Market Options»
-            ✅ по счетам «Сегрегированный Global»
-            ✅ счетам «Иностранные биржи»
-            ❗ Для работы с данными инструментами требуется статус квалифицированного инвестора.
-            ❗ Все расчеты производятся в долларах США, автоконвертация валюты при покупке не осуществляется.
-        buttons:
-            "Типы счетов" -> /Типы счетов
-
-    state: Доступные биржи_Ещё
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Гонконгская биржа HKEX" -> /Доступные биржи_Ещё_Гонконгская
-            "Внебиржевой рынок" -> /Доступные биржи_Ещё_Внебиржа
-            "Иностранные облигации" -> /Иностранные облигации
-            "Время торгов на биржах" -> /Время торгов
-            "Назад" -> /Доступные биржи
-
-    state: Доступные биржи_Ещё_Гонконгская
-        a: Ценные бумаги Гонконга, листингованные на СПБ бирже, доступны без статуса квал при наличии подписанного «Уведомления о рисках» (подписать можно по ссылке https://edox.finam.ru/ForeignSecurities/UnfriendlyDepoConsent ) и пройденного теста «ИЦБ, требующие тестирования» https://lk.finam.ru/user/invest-status/qual-exam/tests (для части бумаг).
-            ✅ Минимальный объем заявки — 8000 HKD. Все активы торгуются в гонконгских долларах, автоконвертация валюты при покупке не происходит.
-            ✅ Маржинальная торговля недоступна. 
-            ❗ Нерезидентам (кроме граждан Республики Беларусь) торговля недоступна.
-            ❗ По счетам ЕДП, открытым с 15.08.2022 по 13.02.2023, доступ не предоставляется.
-
-    state: Доступные биржи_Ещё_Внебиржа
-        a: Для клиентов «Финам» доступно совершение внебиржевых сделок:
-            1. Внебиржевые сделки (кроме указанных ниже) — выставление заявок доступно через подписание поручения в личном кабинете: https://edox.finam.ru/Journals/UnionDocumentJournal 
-            ❗ Предварительно нужно обратится к менеджеру и согласовать параметры заявки (количество, цену, найти покупателя/продавца).
-            2. Московская и СПБ Биржа — по ограниченному списку инструментов, ранее заблокированных европейскими депозитариями Euroclear и Clearstream, доступны сделки купли/продажи через систему TRANSAQ и FinamTrade. Для приобретения ЦБ требуется статус квалифицированного инвестора (квал), продажа доступна без статуса. 
-            ❗ Перед выставлением заявок обязательно ознакомьтесь с условиями совершения сделок. 
-            3. Московская биржа — по ограниченному списку инструментов можно будет выставлять заявки через торговые системы TRANSAQ и QUIK, а также через звонок в отдел голосового трейдинга (доб. 2200). Для приобретения ЦБ требуется статус квалифицированного инвестора, продажа доступна без статуса. Актуальный список ЦБ и подробности сделок доступны по ссылке: https://www.moex.com/a8428
-        buttons:
-            "Торговля заблокированными ЦБ" -> /Как закрыть позиции_Продажа БлокЦБ
-            "Назад" -> /Доступные биржи_Ещё
-
-    state: Время торгов || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent: /045 Время торгов
-        a: ❗ СПБ биржа с 28 ноября 2023 перевела иностранные ценные бумаги на неторговый раздел счета. Подробнее: https://spbexchange.ru/ru/about/news.aspx?bid=25&news=45530
-            ❗ После перевода на неторговый раздел – бумаги исключены из торговых лимитов биржи, поэтому не отображаются в терминале, но их наличие отражено во вкладке «Портфель» в личном кабинете https://lk.finam.ru/
-        a: ✅ Для уточнения штатного времени работы биржи, выберите соответствующую секцию:
-        buttons:
-            "Московская биржа" -> /Время торгов_Московская биржа
-            "Биржа СПБ" -> /Время торгов_Биржа СПБ
-            "Биржи США" -> /Время торгов_Биржи США
-            "Гонконг (HKEX)" -> /Время торгов_Гонконг
-            "Европейские биржи" -> /Время торгов_Европейские биржи
-            "Внебиржевые торги" -> /Время торгов_Внебиржевые торг
-            "Демо-счета" -> /Демо-счет
-
-    state: Время торгов_Московская биржа
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Фондовый рынок" -> /Время торгов_Московская биржа_Фондовый рынок
-            "Срочный рынок" -> /Время торгов_Московская биржа_Срочный рынок
-            "Валютный рынок" -> /Время торгов_Московская биржа_Валютный рынок
-            "Назад" -> /Время торгов
-
-    state: Время торгов_Московская биржа_Фондовый рынок
-        a: ✅ Премаркет основной сессии — с 9:50 до 10:00 МСК,
-            ✅ основная сессия — с 10:00 до 18:40 МСК, 
-            ✅ постмаркет основной сессии — с 18:40 до 18:50 МСК, 
-            ✅ премаркет вечерней сессии — с 19:00 до 19:05 МСК,
-            ✅ вечерняя сессия — с 19:05 до 23:50 МСК.   
-            В выходные дни торги не проводятся. 
-            Торговый календарь: https://www.moex.com/ru/tradingcalendar/
-
-    state: Время торгов_Московская биржа_Срочный рынок
-        a: Торговая сессия начинается вечером и длится с 19:05 до 23:50, продолжается на следующий день — с 9:00 до 14:00 и с 14:05 до 18:50 МСК.
-            Торговый календарь: https://www.moex.com/ru/tradingcalendar/
-
-    state: Время торгов_Московская биржа_Валютный рынок
-        a: Торги драгоценными металлами в режиме _TOM проводятся с 6:50 до 19:00 МСК.
-            Торги валютными парами в режиме _SPT, _TOM, _TMS проводятся с 6:50 до 19:00 МСК. 
-            Торги по валютным парам в режиме _TOD и СВОП проводятся согласно регламенту брокерского обслуживания (Приложение 24.1) с 6:50 до:
-            ✅ USDRUB – 17:25
-            ✅ EURRUB, EURUSD – 14:45
-            ✅ USDCNY, CNYRUB – 11:50
-            ✅ BYNRUB, TRYRUB, KZTRUB – 11:45
-            ✅ HKDRUB – 10:25.
-            Торговый календарь: https://www.moex.com/ru/tradingcalendar/
-
-    state: Время торгов_Биржа СПБ
-        a: 1. Российские ценные бумаги:
-            ✅ Основная сессия — с 10:00 до 18:50 МСК.
-            2. Американские бумаги:
-            ✅ Основная сессия — с 8:00 до 19:00 МСК, (по разным категориям инструментов время начала торгов отличается: https://spbexchange.ru/ru/stocks/master-release.aspx ),
-            ✅ Вечерняя сессия — с 19:00 до 1:45 МСК (по ETF фондам доступ только до 00:00 МСК)
-            3. Гонконгские бумаги:
-            ✅ Основная сессия — с 8:00 до 00:00 МСК, (по ETF время начала торгов отличается: https://spbexchange.ru/ru/listing/etf/ ).
-            ❗ В выходные дни торги не проводятся.
-            Торговый календарь: https://spbexchange.ru/ru/about/torg_calendar/
-
-    state: Время торгов_Биржи США
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "NYSE/NASDAQ" -> /Время торгов_Биржи США_NYSE и NASDAQ
-            "Опционы США" -> /Время торгов_Биржи США_Опционы США
-            "Назад" -> /Время торгов
-
-    state: Время торгов_Биржи США_NYSE и NASDAQ
-        a: Летнее время:
-            ✅ премаркет — с 11:00 до 16:29 МСК,
-            ✅ основная сессия — с 16:30 до 23:00 МСК,
-            ✅ постмаркет — с 23:00 до 00:00 МСК (по сегрегированным счетам доступа нет).
-            Зимнее время:
-            ✅ премаркет — с 12:00 до 17:29 МСК,
-            ✅ основная сессия — с 17:30 до 00:00 МСК,
-            ✅ постмаркет — с 00:00 до 01:00 МСК (по сегрегированным счетам доступа нет).
-            В выходные дни торги не проводятся.
-            ❗ Во время премаркета рыночные заявки не принимаются.
-
-    state: Время торгов_Биржи США_Опционы США
-        a: ✅ Летнее время: с 16:30 до 23:00 МСК.
-            ✅ Зимнее время: с 17:30 до 24:00 МСК.
-            В выходные дни биржа не работает.
-
-    state: Время торгов_Гонконг
-        a: Основная сессия — с 8:00 до 11:00 МСК.
-            В выходные дни торги не проводятся.
-
-    state: Время торгов_Европейские биржи
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Париж (EURONEXT)" -> /Время торгов_Европейские биржи_Расписание
-            "Мадрид (BME)" -> /Время торгов_Европейские биржи_Расписание
-            "Франкфурт (Xetra)" -> /Время торгов_Европейские биржи_Расписание
-            "Лондон (LSE)" -> /Время торгов_Европейские биржи_Расписание
-            "Назад" -> /Время торгов
-
-    state: Время торгов_Европейские биржи_Расписание
-        a: ✅ Летнее время:
-            10:00 — 18:30 (по МСК).
-            ✅ Зимнее время:
-            11:00 — 19:30 (по МСК). 
-            В выходные дни торги не проводятся.
-
-    state: Время торгов_Внебиржевые торг
-        a: ✅ Внебиржевые торги на ММВБ (ОТС с ЦК):
-            Основная сессия — с 10:00 до 18:40 МСК, 
-            Вечерняя сессия — с 19:05 до 23:50 МСК.   
-            В выходные дни торги не проводятся. 
-            Торговый календарь: https://www.moex.com/ru/tradingcalendar/ 
-            ✅ Внебиржевые торги заблокированными ЦБ на ММВБ и СПБ Биржах:
-            с 11:00 до 17:00 МСК. 
-            В выходные дни торги не проводятся. 
-            Торговый календарь: https://spbexchange.ru/ru/about/torg_calendar/
-
-    state: Праздники || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /046 Праздники
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Расписание торгов на бирже" -> /Время торгов
-            "Режим работы «Финам»" -> /Контакты
-    #   "Перевод на оператора" -> /Перевод на оператора
-    state: Режим расчетов || sessionResult = "Важно + Готов", sessionResultColor = "#418614"
-        intent!: /047 Режим расчетов
-        a: ❗ СПБ биржа с 28 ноября 2023 перевела иностранные ценные бумаги на неторговый раздел счета. Подробнее: https://spbexchange.ru/ru/about/news.aspx?bid=25&news=45530
-            ❗ После перевода на неторговый раздел – бумаги исключены из торговых лимитов биржи, поэтому не отображаются в терминале, но их наличие отражено во вкладке «Портфель» в личном кабинете https://lk.finam.ru/
-        a: Торги на биржах осуществляются в режимах T+0, Т+1 и Т+2.
-            Это значит, что регистрация прав на ценные бумаги/валюту происходит не в момент заключения сделки, а позднее.
-            ✅ Т+0 – расчеты в день сделки,
-            ✅ Т+1 (Y1) – расчеты на следующий рабочий день,
-            ✅ Т+2 (Y2) – расчеты на второй рабочий день.
-            1. Торги облигациями осуществляются в режиме Т+1.
-            Накопленный купонный доход считается на дату расчетов по сделке и перечисляется продавцу в тот же день.
-            2. Торги на Московской бирже акциями, инвестиционными паями и ETF проводятся в режиме Т+1. Подробнее в презентации: https://fs.moex.com/files/25603 
-            3. Торги на СПБ Бирже российскими и квазироссийскими акциями проводятся в режиме Т+1, международными ценными бумагами — в режиме Т+2.
-            4. Торги международными ценными бумагами на иностранных биржах проходят в режиме Т+2.
-            5. Внебиржевые торги на ММВБ ОТС с ЦК осуществляются в режиме Т+1.
-            6. Торги валютой на бирже осуществляются в режимах: T+0 (TOD), T+1 (TOM, TMS) и T+2 (SPT).
-            7. Торги на срочном рынке (ПФИ) не имеют отложенных расчетов, но фактическое начисление вариационной маржи происходит только в основной клиринг (на FORTS в 18:50 - 19:00 МСК).
-        a: ❗ С 31 июля 2023 года Московская биржа перевела торги акциями и облигациями, а СПБ Биржа – российскими и квазироссийскими акциями, на единый расчетный цикл T+1.
-            Расчеты по заключенным сделкам в основных режимах торгов с ценными бумагами и поставка бумаг, в том числе по срочным контрактам на акции, теперь осуществляются на следующий торговый день.
-            Подробнее на сайте биржи: 
-            ✅ Московская биржа: https://www.moex.com/n56493/?nt=0 
-            ✅ СБП Биржа и список квазироссийских ЦБ: https://spbexchange.ru/ru/about/news.aspx?bid=25&news=43242 
-            ❗ По международным ценным бумагам на СПБ Бирже (за исключением квазироссийских) код расчётов не изменился и остаётся Т+2.
-
-    state: Ограничение ЦБ || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /048 Ограничения ЦБ
-        a: ❗ СПБ биржа с 28 ноября 2023 перевела иностранные ценные бумаги на неторговый раздел счета. Подробнее: https://spbexchange.ru/ru/about/news.aspx?bid=25&news=45530
-            ❗ После перевода на неторговый раздел – бумаги исключены из торговых лимитов биржи, поэтому не отображаются в терминале, но их наличие отражено во вкладке «Портфель» в личном кабинете https://lk.finam.ru/
-        a: ✅ Актуальные новости о решении проблемы заблокированных активов, в связи с санкциями западных регуляторов на российскую финансовую систему, публикуются на сайте «Финам» по ссылке: https://www.finam.ru/theme/unlocking-foreign-securities/
-            ✅ Клиентам «Финам» доступны сделки с заблокированными иностранными ценными бумагами на внебирже, ознакомиться можно, выбрав соответствующую кнопку ниже.
-            ✅ Если у вас сохранились акции, полученные после конвертации АДР/ГДР в 2022 году, нажмите на кнопку ниже, чтобы узнать, как перенести их на торговый раздел.
-            ✅ На брокерских счетах Банка «Финам» ограничены торговые операции, в связи с переводом брокерских счетов из Банка в инвестиционную компанию АО «Финам». Для сохранения инвестиционных возможностей рекомендуем открыть брокерский счет в АО «Финам».
-            Выберите нужную тему, чтобы узнать подробнее:
-        buttons:
-            "Разблокировка ЦБ после конвертации ДР" -> /Депозитарное поручение_Ещё_Разблокировка ЦБ
-            "Перевод активов из Банка в АО Финам" -> /Депозитарное поручение_Ещё_Перевод активов
-            "Торговля заблокированными ЦБ" -> /Как закрыть позиции_Продажа БлокЦБ
-            "Фонды FinEX" -> /Ограничение ЦБ_FinEX
-
-    state: Ограничение ЦБ_FinEX
-        a: Московская биржа исключила из списка ценных бумаг 22 фонда FinEx 9 августа 2023 года.
-            ✅ Изменения связаны с расторжением договоров по инициативе провайдера ETF с Московской биржей, на основании которых осуществлялся листинг ценных бумаг. Расторжение договора является основанием для делистинга ценных бумаг.
-            В соответствии с ранее раскрытой информацией FinEx, расторжение договорных отношений с Московской биржей осуществляется в рамках планируемых провайдером шагов, направленных на получение лицензии от Казначейства Бельгии.
-            ✅ Таким образом, делистинг FinEx с Мосбиржи не означает прекращение деятельности фондов. Фонды продолжат функционировать, управление ими никак не затронуто принятым решением. Портфели фондов, по которым производится расчет СЧА (суммы чистых активов), регулярно перебалансируются, полученные купоны и дивиденды – реинвестируются. При этом фонды сохранят листинг на Euronext Dublin, Euronext Amsterdam (FXGD) и LSE (FXRU).
-            ✅ Данные фонды будут у вас отображаться в справке по счету и в личном кабинете https://lk.finam.ru/ 
-            ✅ Официальный сайт  FinEx : https://finex-etf.ru/ 
-            ✅ Рассмотрите возможность реализации фондов FinEx на внебиржевом рынке, нажмите кнопку, чтобы узнать подробнее.
-        buttons:
-            "Торговля заблокированными ЦБ" -> /Как закрыть позиции_Продажа БлокЦБ
-
-    state: Санкции || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /049 Санкции
-        a: На СПБ Бирже приостановлены торги Иностранными ценными бумагами.
-            ❗ «Финам» получил от СПБ Биржи часть разблокированных средств инвесторов. Речь идет о рублевых активах, которые были распределены по счетам клиентов. Поскольку СПБ Биржа находится под санкциями, часть средств инвесторов остается заблокированной. Так как в механизме распределения средств учитывались не только разблокированные, но и заблокированные активы, был ограничен доступ инвесторов к части средств, а именно к гонконгским долларам и долларам США, полученным в результате продаж на СПБ Бирже, но не более свободного остатка на момент блокировки.
-            ❗ Ограничения носят временный характер и будут сняты, как только СПБ Биржа добьется прогресса в получении разрешения OFAC (Управления по контролю за иностранными активами США) на вывод активов.
-            ❗ Актуальная информация размещается на официальном сайте СПБ Биржи: https://spbexchange.ru/ru/about/news2.aspx 
-            ❗ При торговле на иностранных биржах через брокера «Финам», инфраструктура СПБ Биржи не задействована. Вышестоящий брокер-партнёр не раскрывает перед американскими биржами гражданство своих клиентов, поэтому риски в данном направлении минимальны.
-
-    state: Корпоративные действия || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /050 Корпоративные действия
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Размещение акций и облигаций" -> /Корпоративные действия_Размещение
-            "Замещение облигаций" -> /Корпоративные действия_Замещение
-            "Оферта по облигации" -> /Корпоративные действия_Оферта
-            "Другие корпоративные действия" -> /Корпоративные действия_Другие
-
-    state: Корпоративные действия_Размещение || sessionResult = "Orange", sessionResultColor = "#B65A1E"
-        a: Инвесторам «Финам» доступно участие в публичных размещениях облигаций и ценных бумаг (IPO).
-                ✅ IPO на зарубежных площадках доступно со статусом квалифицированного инвестора.
-                ✅ Заявка на участие в аукционе ОФЗ аналогична стандартной процедуре участия в IPO.
-                ✅ Подать заявку и посмотреть ее статус можно:
-                — в личном кабинете по ссылке: https://lk.finam.ru/ipo 
-                — в веб-терминале или в мобильном приложении FinamTrade в левом вертикальном меню в разделе «Первичные размещения» выбрать «Текущие размещения»
-                ❗ Номер заявки отобразится в личном кабинете в день размещения.
-                ✅ Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            # "Учавствовать в IPO" -> /Корпоративные действия_Размещение_Участие
-            "Условия участия в IPO" -> /Корпоративные действия_Размещение_Условия
-            "Календарь IPO" -> /Корпоративные действия_Размещение_Календарь
-            "Отменить заявку на IPO" -> /Корпоративные действия_Размещение_Отмена
-            "Назад" -> /Корпоративные действия
-
-    state: Корпоративные действия_Замещение || sessionResult = "Orange", sessionResultColor = "#B65A1E"
-        a: Замещающие облигации — это локальные, выпущенные и обращающиеся в российской юрисдикции долговые бумаги, которые держатель получает взамен замещаемых евробондов.
-            ✅ Подробная информация и полный перечень выпущенных замещающих облигаций в разделе «Частые вопросы» по ссылке https://www.finam.ru/landings/replacement-bonds/ 
-            ✅ Как подать заявку: 
-            1. перейдите на сайт:  https://edox.finam.ru/Ipo/Securities
-            3. выберите соответствующий выпуск,
-            4. подайте заявку, 
-            5. выберите счет, на котором находятся еврооблигации, в графе «Мин. купон» — выберите нужный купон из диапазона (от 1000 долларов/евро). «Сумма заявки» — количество еврооблигаций для обмена * 1000. 
-            6. подпишите заявление.
-            ❗ Если после подачи поручения пришел отказ из-за нехватки денежных средств, то повторно заполнять форму не нужно, текущая заявка будет обработана.
-
-    state: Корпоративные действия_Оферта || sessionResult = "Orange", sessionResultColor = "#B65A1E"
-        a: Оферта по облигации — это возможность досрочно продать ее эмитенту. Подробнее: https://www.finam.ru/publications/item/oferta-obligacii-chto-eto-zachem-o-neiy-znat-investoru-20200917-16480/
-            ✅ Подать заявку на участие в оферте можно в личном кабинете по ссылке: https://edox.finam.ru/orders/default.aspx?ts=OFFER%20BONDS 
-            ✅ Детальную информацию об условиях участия в корпоративных действиях по конкретному инструменту можно уточнить у менеджера.
-
-    state: Корпоративные действия_Другие
-        a: Корпоративными действиями называются мероприятия эмитента, направленные на распределение доходов в денежной или иной форме между держателями ценных бумаг или изменение структуры ценных бумаг. Примеры:
-            1. дробление/консолидация ценных бумаг (сплит),
-            2. смена тикера,
-            3. добровольные и принудительные выкупы ценных бумаг.
-            ❗ Реквизиты для зачисления средств необходимо предоставить в личном кабинете: https://edox.finam.ru/orders/depoBankAccountDetails.aspx
-            ❗ Инвестор должен самостоятельно отслеживать корпоративные действия с ценными бумагами на сайте биржи, где бумага приобреталась, также «Финам» публикует  актуальные корпоративные действия в разделе «Новости депозитария» https://www.finam.ru/publications/section/deponews/ 
-            ✅ Детальную информацию об условиях участия в корпоративных действиях по конкретному инструменту можно уточнить у менеджера.
-        buttons:
-            "Как подать заявку на участие" -> /Корпоративные действия_Другие_Как подать
-            "Сроки выплат/зачислений" -> /Выплата дохода_Срок выплаты
-            "TMF" -> /Корпоративные действия_Другие_TMF
-            "Назад" -> /Корпоративные
-
-    # state: Корпоративные действия_Размещение_Участие
-    #     a: Подать заявку и посмотреть статус заявки на участие в первичном размещении акций и облигаций можно:
-    #         ✅ в личном кабинете по ссылке: https://lk.finam.ru/ipo
-    #         ✅ в веб-терминале или в мобильном приложении FinamTrade в левом вертикальном меню в разделе «Первичные размещения» выбрать «Текущие размещения»
-
-    state: Корпоративные действия_Размещение_Условия
-        a: Условия подачи заявки на участие в IPO зависят от выбранной биржи. Выберите биржу:
-        buttons:
-            "Московская ФБ" -> /Корпоративные действия_Размещение_Условия_Москва
-            "Биржа СПБ" -> /Корпоративные действия_Размещение_Условия_СПБ
-            "NYSE/NASDAQ" -> /Корпоративные действия_Размещение_Условия_NYSE NASDAQ
-            "Назад" -> /Корпоративные действия_Размещение
-
-    state: Корпоративные действия_Размещение_Календарь
-        a: Следите за предстоящими IPO в специальном календаре: https://edox.finam.ru/Ipo/Securities
-
-    state: Корпоративные действия_Размещение_Отмена
-        a: Чтобы отменить заявку на участие в IPO:
-            ✅ зайдите в раздел подачи заявок на IPO по ссылке: https://lk.finam.ru/ipo 
-            ✅ выберите нужное размещение
-            ✅ в появившемся меню выберите «Отменить поручение (КЛФ-***)»
-
-    state: Корпоративные действия_Размещение_Условия_Москва
-        a: Заявки принимаются от 1000 ₽ для размещений бумаг «Финама» и от 10000 ₽ для сторонних размещений, если иное не установлено эмитентом.
-            ✅ Комиссии за участие в размещении:
-            1. облигаций российских эмитентов: 0,04% от оборота (при обороте в день до 1000000 ₽), 0,015% комиссия биржи за урегулирование, комиссия от оборота на фондовой секции по тарифному плану.
-            2. иных ценных бумаг: 0,236% от суммы сделки, 0,03% комиссия биржи за урегулирование, комиссия от оборота на фондовой секции по тарифному плану.
-            ✅ Статус квалифицированного инвестора не требуется, если иное не установлено эмитентом.
-
-    state: Корпоративные действия_Размещение_Условия_СПБ
-        a: Заявки принимаются от 1000 ₽ для размещений бумаг «Финама» и от 10000 ₽ для сторонних размещений, если иное не установлено эмитентом.
-            ✅ Комиссии за участие в размещении: 0,01% комиссия биржи за урегулирование, комиссия от оборота на фондовой секции по тарифному плану.
-            ✅ Статус квалифицированного инвестора не требуется, если иное не установлено эмитентом.
-
-    state: Корпоративные действия_Размещение_Условия_NYSE NASDAQ
-        a: Заявки принимаются от 1000 $, если иное не установлено эмитентом.
-            Дополнительная комиссия за участие в размещении составляет 5% от размещенной суммы (2,5% - в рублях РФ, 2,5% - в долларах США).
-            ✅ На момент подачи заявки по счету необходимо обеспечить свободные доллары США в сумме, достаточной для подачи заявки.
-            ✅ Доступно только со статусом квалифицированного инвестора.
-
-    state: Корпоративные действия_Другие_Как подать
-        a: Подать заявку на участие в добровольном выкупе ценных бумаг можно в личном кабинете по ссылке: https://edox.finam.ru/Depo/CorporateActionsTypes
-            Заявка на участие в принудительном выкупе не требуется.
-            ❗ Реквизиты для зачисления средств необходимо предоставить в личном кабинете https://edox.finam.ru/orders/depoBankAccountDetails.aspx
-
-    state: Корпоративные действия_Другие_TMF || sessionResult = "Orange", sessionResultColor = "#B65A1E"
-        a: Торги по инструменту Direxion Daily 20 Year Plus Tr (TMF) приостановлены в связи с проходящим корпоративным действием, сплит 10 к 1.
-            ✅ Бумаги недоступны в торговых системах до завершения корпоративного действия.
-            ✅ Информация о бумагах в наличии доступна в личном кабинете вкладке «Портфель» в личном кабинете https://lk.finam.ru/ 
-            Корректное отображение восстановится после завершения корпоративного действия.
-            ✅ Дробный лот акций будет выплачен в виде денежных средств.
-
-    state: Американский турнир || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /051 Американский турнир
-        a: ✅ Зарегистрируйтесь до 4 октября 2023 года для участия в конкурсе «Американский турнир» и получите виртуальные 100000 $ на конкурсный демо-счет на платформе web-версии терминала FinamTrade.
-            ✅ В период до 10 ноября 2023 года торгуйте на эти деньги на американских биржах NASDAQ и NYSE и получите приз до 100000 ₽ за лучшую доходность по счету.
-            ✅ Узнать подробнее и зарегистрироваться в турнире можно по ссылке: https://www.finam.ru/landings/konkurs-trader-2023
-
-    state: Pre-IPO || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /052 Pre-IPO
-        a: Pre-IPO позволяет инвестировать в акции компаний, которые пока не торгуются на бирже, но в ближайшем будущем могут там появиться. Услуга доступна только квалифицированным инвесторам. Минимальная сумма вложений — 10000 $. Больше информации о Pre-IPO и доступных инструментах — на нашем сайте: https://www.finam.ru/landings/landing-pre-ipo
-
-    state: Криптовалюты || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /053 Криптовалюты
-        a: ✅ «Финам» не предоставляет доступ к торговле криптовалютой. В терминале FinamTrade текущие котировки криптовалют отображаются для ознакомления.
-            ✅ «Финам» предлагает альтернативные инвестиции в майнинг криптовалют с помощью ЗПИФ комбинированный «Финам — Цифровые активы». (Доступно со статусом квалифицированного инвестора.)
-            ✅ У клиентов «Финам» также есть возможность приобрести готовый портфель «Криптовалюта, майнинг, блокчейн» и инвестировать в высокотехнологичные крипто- и майнинг-компании без активного совершения сделок и рисков блокировки активов.
-            Выберите интересующий вариант, чтобы узнать подробнее:
-        buttons:
-            "ЗПИФ Цифровые активы" -> /ЗПИФ на майнинг
-            "Портфель Криптовалюта, майнинг" -> /Криптовалюта_Портфель
-
-    state: Криптовалюта_Портфель
-        a: Вы сможете участвовать в росте компаний высокотехнологичного сектора, инвестируя в готовый портфель. Портфель «Криптовалюта, майнинг, блокчейн» реализован в виде стратегии автоследования – это значит, что все сделки будут автоматически повторяться на счёте инвестора, подключившего стратегию.
-            Подробнее по ссылке: https://www.comon.ru/strategies/113405/
-
-    state: Индексы и сырье || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /054 Индексы и сырье
-        a: Индексы и сырье являются индикативными инструментами и недоступны для торговли.
-            Альтернативными вариантами вложений могут являться:
-            ✅ российские и американские фьючерсные контракты на индексы и сырье, подробнее: https://www.moex.com/ru/derivatives/ 
-            ✅ ETF, основанные на ценных бумагах, входящих в состав индекса,
-            ✅ ETF, основанные на ценных бумагах сырьевой отрасли.
-
-    state: CFD контракты || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /055 CFD контракты
-        a: «Финам» не предоставляет доступ к торговле CFD-контрактами.
-
-    state: Аристократы Финам || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /056 Аристократы Финам
-        a: 2 мая 2023 года ООО «Управляющая компания «Финам Менеджмент»  приняла решение о прекращении БПИФ «Дивидендные Аристократы РФ» и «Дивидендные Аристократы США».
-            ✅ Официальная информация на сайте Управляющей компании: https://www.fdu.ru/news/37168 
-            ✅ В целях соблюдения интересов пайщиков Управляющая компания планирует завершить все действия, связанные с прекращением фондов и выплатой денежных средств в максимально возможные короткие сроки, учитывая требования Законодательства РФ. 
-            Денежные средства от погашения инвестиционных паев будут перечислены на специальный депозитарный счет НРД для дальнейшей выплаты пайщикам в первой половине августа 2023 года. 
-            ✅ Дополнительных действий со стороны инвесторов не требуется.
-
-    state: Форвардные контракты || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /057 Форвардные контракты
-        a: «Финам» не предоставляет доступ к торговле форвардными контрактами.
-
-    state: Бинарные опционы || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /058 Бинарные опционы
-        a: «Финам» не предоставляет доступ к торговле бинарными опционами.
-
-    state: J2T (Lime Trading) || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /059 Lime Trading
-        a: По вопросам обслуживания счетов Just2Trade (Lime Trading) обратитесь по контактам: https://just2trade.online/ru/
-
-    state: Сторонее ПО || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /060 Сторонее ПО
-        a: Подключить сторонние программы можно с помощью TRANSAQ Connector, ComonTrade API и QUIK.
-            ✅ Оплата доступа к стороннему ПО производится на сайте разработчиков.
-            ✅ Подробнее о программах для торговли по ссылке: https://www.finam.ru/howtotrade/Welcome/#auto.area_a
-        buttons:
-            "TRANSAQ Connector" -> /Сторонее ПО_TRANSAQ Connector
-            "QUIK" -> /Сторонее ПО_QUIK
-            "ComonTrade API" -> /Сторонее ПО_ComonTrade API
-
-    state: Сторонее ПО_TRANSAQ Connector || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: Подключить счет к TRANSAQ Connector можно в личном кабинете: https://edox.finam.ru/ITS/AddTerminal
-            Доступ к системе бесплатный. 
-            После того, как вы подпишите заявление на подключение терминала, вам придет СМС с паролем от системы. Логин находится в личном кабинете: https://edox.finam.ru/Home/Account/Terminals?id= Найдите в открывшемся списке идентификатор терминала TRANSAQ Connector.
-
-    state: Сторонее ПО_QUIK
-        a: Подключить счет к QUIK можно в личном кабинете: https://edox.finam.ru/ITS/AddTerminal
-            Доступ к системе бесплатный. 
-            Подробная информация о том, как сгенерировать ключи (логин и пароль), доступна по ссылке: https://www.finam.ru/howtotrade/KeyGen/  
-            После того, как вы подключите счет к терминалу, свяжитесь с менеджером «Финама». Он поможет активировать поток обезличенных сделок.
-
-    state: Сторонее ПО_ComonTrade API
-        a: Comon Trade Api — это REST API, предназначенное для организации взаимодействия пользовательских приложений с сервером TRANSAQ. Детальнее ознакомится и получить токен можно на сайте: https://finamweb.github.io/trade-api-docs/
-
-    state: ИТС || sessionResult = "Готов", sessionResultColor = "#418614"
-        intent!: /061 ИТС
-        a: ❗ СПБ биржа с 28 ноября 2023 перевела иностранные ценные бумаги на неторговый раздел счета. Подробнее: https://spbexchange.ru/ru/about/news.aspx?bid=25&news=45530
-            ❗ После перевода на неторговый раздел – бумаги исключены из торговых лимитов биржи, поэтому не отображаются в терминале, но их наличие отражено во вкладке «Портфель» в личном кабинете https://lk.finam.ru/
-        a: «Финам» предоставляет доступ к нескольким торговым системам:
-            ✅ FinamTrade (веб-версия и мобильное приложение),
-            ✅ TRANSAQ/TRANSAQ US (программы для ПК),
-            ✅ QUIK (программа для ПК),
-            ✅ QUIKX/WebQUIK (платное мобильное приложение — 420 ₽ в месяц),
-            ✅ MetaTrader 5 (программа для ПК).
-            ✅ Подключить стороннее ПО можно через TRANSAQ Connector (шлюз данных для подключения), ComonTrade API и QUIK.
-            Выберите торговую систему, по которой у вас вопрос:
-        buttons:
-            "FinamTrade" -> /ИТС_FinamTrade
-            "TRANSAQ" -> /ИТС_TRANSAQ
-            "QUIK" -> /ИТС_QUIK
-            "Другие ИТС" -> /ИТС_Другие
-            "Демо-счета/Обучение" -> /Демо-счет
-
-    state: ИТС_FinamTrade
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Авторизация в FinamTrade" -> /ИТС_FinamTrade_Авторизация
-            "Настройки" -> /ИТС_FinamTrade_Настройки
-            "Работа с портфелем" -> /ИТС_FinamTrade_Работа с портфелем
-            "Работа с заявками" -> /Заявки
-            "Работа с графиком" -> /ИТС_FinamTrade_Работа с графиком
-            "Дополнительные функции" -> /ИТС_FinamTrade_Дополнительные функции
-            "Частые ошибки" -> /Ошибки заявок
-            "Назад" -> /ИТС
-
-    state: ИТС_FinamTrade_Авторизация
-        a: Данными для входа в FinamTrade, при использовании типа авторизации «Личный кабинет», являются логин и пароль от личного кабинета https://lk.finam.ru/
-            ✅ По умолчанию логином от личного кабинета является номер телефона в международном формате (например: начиная с «7…» - Россия, «375…» - Беларусь, «997…» - Казахстан).
-            ✅ Пароль вы задавали самостоятельно.
-            ✅ Для восстановления доступа к личному кабинету:
-            1. перейдите по ссылке → https://lk.finam.ru/ 
-            2. нажмите на кнопку «Забыли логин или пароль?»
-            3. введите ФИО, паспортные данные и подтвердите восстановление
-            4. На вашу электронную почту придет письмо с логином и ссылкой на создание нового пароля.
-
-    state: ИТС_FinamTrade_Настройки
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Выбор счета по умолчанию" -> /ИТС_FinamTrade_Настройки_Выбор счета
-            "Сохранение настроек" -> /ИТС_FinamTrade_Настройки_Сохранение настроек
-            "Настройка интерфейса" -> /ИТС_FinamTrade_Настройки_Настройка интерфейса
-            "Настройка горячих клавиш" -> /ИТС_FinamTrade_Настройки_Горячие клавиши
-            "Назад" -> /ИТС_FinamTrade
-
-    state: ИТС_FinamTrade_Настройки_Выбор счета
-        a: Стандартно в заявке выбирается первый активный счёт, выбранный счёт можно поменять в самой заявке, либо выставить счёт по умолчанию через раздел «Меню» → «Настройки» для Android системы, на IOS системе выбрать счет по умолчанию нельзя.
-
-    state: ИТС_FinamTrade_Настройки_Сохранение настроек
-        a: Сохранение списков избранного происходит автоматически на сервере торговой системы, списки синхронизируются на всех ваших устройствах с выбранным аккаунтом.
-            Сохраненные настройки графика сохраняются автоматически локально на устройстве (в кэше устройства), синхронизация с другими устройствами не происходит. 
-            Также, возможен сброс всех настроек до исходного состояния в настройках веб-терминала: «Настройки приложения» → «Сервис» → «Сбросить состояние приложения».
-
-    state: ИТС_FinamTrade_Настройки_Настройка интерфейса
-        a: Во всех версиях торговой системы доступен выбор светлой/темной темы, а также выбор языка интерфейса. Настройка данных опций находится в меню основных настроек.
-
-    state: ИТС_FinamTrade_Настройки_Горячие клавиши
-        a: Для упрощения работы с интерфейсом веб-версии FinamTrade можно использовать комбинации горячих клавиш, список актуальных комбинаций и настройка доступны в меню: «Настройки приложения» → «Горячие клавиши».
-
-    state: ИТС_FinamTrade_Работа с портфелем
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Состояние счета" -> /ИТС_FinamTrade_Работа с портфелем_Состояние
-            "Выбор валюты отображения" -> /ИТС_FinamTrade_Работа с портфелем_Выбор валюты
-            "Средняя цена" -> /Балансовая средняя
-            "Закрытие позиций" -> /ИТС_FinamTrade_Работа с портфелем_Закрытие позиций
-            "Риск параметры" -> /ИТС_FinamTrade_Работа с портфелем_Риск параметры
-            "История операций" -> /ИТС_FinamTrade_Работа с портфелем_История операций
-            "Назад" -> /ИТС_FinamTrade
-
-    state: ИТС_FinamTrade_Работа с портфелем_Состояние
-        a: Для просмотра состояния портфеля необходимо выбрать счет (в личном кабинете доступно обозначение счета вручную), в состоянии счета отображаются все открытые позиции и остатки средств в соответствующих валютах.
-            Также, отображается общая оценка вашего портфеля с учетом всех активов по текущему биржевому курсу в соответствии с выбранной настройкой валюты отображения.
-
-    state: ИТС_FinamTrade_Работа с портфелем_Выбор валюты
-        a: Валюту отображения можно выбрать самостоятельно на странице портфеля, по умолчанию инструменты транслируются в валюте номинала. При изменении валюты отображения происходит перерасчет по текущему биржевому курсу.
-
-    state: ИТС_FinamTrade_Работа с портфелем_Закрытие позиций
-        a: Для просмотра состояния портфеля необходимо выбрать счет (в личном кабинете доступно обозначение счета вручную), в состоянии счета отображаются все открытые позиции и остатки средств в соответствующих валютах.
-            Также, отображается общая оценка вашего портфеля с учетом всех активов по текущему биржевому курсу в соответствии с выбранной настройкой валюты отображения.
-
-    state: ИТС_FinamTrade_Работа с портфелем_Риск параметры
-        a: В терминале FinamTrade начальные требования, суммарную оценку денежных средств, ценных бумаг и обязательств клиента можно посмотреть в разделе «Аналитика» по счету (прокрутить ниже), в мобильном приложении FinamTrade – в разделе «Детали» по счету.
-
-    state: ИТС_FinamTrade_Работа с портфелем_История операций
-        a: ✅ Историю операций в онлайн режиме можно посмотреть в FinamTrade (Android, IOS и Web) -
-             https://trading.finam.ru/ , а также в личном кабинете во вкладке «История» - https://lk.finam.ru/history 
-            ✅ Справку по счету с детальным описанием операций и сделок можно загрузить только за закрытый торговый день в личном кабинете: https://lk.finam.ru/reports/tax
-
-    state: ИТС_FinamTrade_Работа с графиком
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Настройки графика" -> /ИТС_FinamTrade_Работа с графиком_Настройки
-            "Инструменты тех. анализа" -> /ИТС_FinamTrade_Работа с графиком_Тех анализ
-            "Одновременное отображение нескольких графиков" -> /ИТС_FinamTrade_Работа с графиком_Несколько графиков
-
-    state: ИТС_FinamTrade_Работа с графиком_Настройки
-        a: На странице отображения графика расположены меню управления основными параметрами: установка отображаемого периода, выбор вида графика, добавление отображения открытых позиций и активных заявок.
-
-    state: ИТС_FinamTrade_Работа с графиком_Тех анализ
-        a: 1. В мобильном приложении, чтобы выбрать и добавить индикаторы или инструменты технического анализа на график инструмента, выберите символ «ƒₓ» над графиком.
-            2. В веб-версии терминала, инструменты и индикаторы («ƒₓ») находятся в верхнем левом углу над графиком инструмента.
-            ✅ В основных настройках веб-терминала есть возможность выбора отображения индикаторов для всех инструментов, либо индивидуально для каждого.
-            ✅ Подробные инструкции по видам и использованию индикаторов по ссылке: https://www.finam.ru/landings/tech-analysis-ab-test/?utm_source=mass&utm_medium=email&utm_campaign=tech_analyse 
-            ✅ Список индикаторов с описанием: https://www.finam.ru/publications/section/indicators/ 
-            ❗ Задействованные инструменты не переносятся на другие графики.
-            ❗ Загрузка индикаторов от сторонних разработчиков недоступна.
-
-    state: ИТС_FinamTrade_Работа с графиком_Несколько графиков
-        a: Одновременное отображение нескольких графиков доступно только в веб-терминале для созданных списков. Выбор режима отображения доступен во вкладке избранных инструментов. Одновременное отображение одного инструмента с разными периодами недоступно.
-
-    state: ИТС_FinamTrade_Дополнительные функции
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Работа с алертами" -> /ИТС_FinamTrade_Дополнительные функции_Алерты
-            "Подключение готовых портфелей" -> /ИТС_FinamTrade_Дополнительные функции_Готовые портфели
-            "Переход в личный кабинет" -> /ИТС_FinamTrade_Дополнительные функции_Личный кабинет
-            "Доска опционов" -> /ИТС_FinamTrade_Дополнительные функции_Доска опционов
-            "Назад" -> /ИТС_FinamTrade
-
-    state: ИТС_FinamTrade_Дополнительные функции_Алерты || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: В торговой системе есть возможность добавить оповещения о достижении уровня цены (алерты) по инструменту.
-            ✅ Чтобы включить оповещение, на странице инструмента рядом с его наименованием нужно нажать на «колокольчик» и выбрать нужные параметры алерта.
-            ✅ Для просмотра журнала алертов нужно выбрать значок «колокольчик» в левом вертикальном меню, при необходимости можно удалить неактуальные оповещения и просмотреть архив.
-            ✅ Исполненные алерты отображаются в разделе вертикального меню «Уведомления».
-            ✅ Алерты бесплатны.
-
-    state: ИТС_FinamTrade_Дополнительные функции_Готовые портфели
-        a: В торговой системе есть возможность использования готовых инвестиционных решений от ведущих аналитиков Финам. Возможно подключение объемных портфельных решений (сумму и срок инвестиции можно выбрать самостоятельно), а также доступно самостоятельное формирование портфеля на основании инвестиционных идей.
-            ❗ Данный функционал доступен только при использовании типа авторизации «Личный кабинет».
-
-    state: ИТС_FinamTrade_Дополнительные функции_Личный кабинет
-        a: В мобильной версии FinamTrade реализована возможность перехода в личный кабинет: необходимо нажать на три полоски для вызова панели с меню, далее необходимо нажать на имя и в конце списка выбрать опцию «Переход в личный кабинет».
-
-    state: ИТС_FinamTrade_Дополнительные функции_Доска опционов
-        a: Доска опционов доступна в торговых системах: TRANSAQ, QUIK, FinamTrade (web).
-            1. QUIK:
-            ✅ на панели инструментов нужно нажать «Создать окно» → «Все типы окон» → «Доска опционов».
-            2. TRANSAQ:
-            ✅ на панели инструментов нажать «Таблицы» → «Финансовые инструменты»,
-            ✅ нажать правой кнопкой мыши по таблице и с помощью выбора/поиска инструмента добавить необходимый базовый актив (фьючерс),
-            ✅ нажать правой кнопкой мыши по добавленному инструменту и выбрать меню «Доска опционов».
-            3. FinamTrade:
-            ✅ слева на панели инструментов нужно перейти в категорию «Рынки» и выбрать необходимый фьючерс,
-            ✅ справа от кнопки «Заявка» будет доступна кнопка «Опционы».
-
-    state: ИТС_TRANSAQ || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: Торговая система TRANSAQ предназначена для установки на ПК с системой Windows.
-            ✅ Предоставляется бесплатно.
-            ✅ Скачать дистрибутив можно по ссылке:
-            1. TRANSAQ https://www.finam.ru/howtotrade/transaq/
-            2. TRANSAQ US https://www.finam.ru/howtotrade/soft/transaq/downloads-us/
-            ❗ Язык интерфейса TRANSAQ US – английский.
-            ❗ Торговый сервер TRANSAQ US запускается в 11:30 МСК, подключение до этого времени недоступно.
-            ✅ Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Авторизация в Transaq" -> /ИТС_TRANSAQ_Авторизация
-            "Настройки" -> /ИТС_TRANSAQ_Настройки
-            "Особенности отображения портфеля" -> /ИТС_TRANSAQ_Отображение
-            "Работа с короткими позициями" -> /ИТС_TRANSAQ_Шорты
-            "Частые ошибки" -> /Ошибки заявок
-            "Назад" -> /ИТС
-
-    state: ИТС_TRANSAQ_Авторизация
-        a: Вы можете посмотреть логин в личном кабинете: https://edox.finam.ru/Home/Account/Terminals?id=
-            Нажмите на счет, к которому нужен логин в TRANSAQ. Вы увидите список подключенных ко счету платформ. Найдите в нем идентификатор TRANSAQ. Пароль к терминалу вы получали в виде СМС при открытии счета. Если сообщение утеряно, вы можете восстановить пароль в личном кабинете: https://edox.finam.ru/ITS/ChangeTerminalPassword
-            После первого входа нужно поменять пароль в настройках TRANSAQ.
-            При подключении брокерских счетов АО «Финам» используется сервер tr1.finam.ru и порт 3900. 
-            При подключении брокерских счетов АО «Банк Финам» используется сервер tr1.finambank.ru и порт: 3324.
-
-    state: ИТС_TRANSAQ_Настройки
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Сохранение настроек" -> /ИТС_TRANSAQ_Настройки_Сохранение
-            "Отображение/добавление вкладок" -> /ИТС_TRANSAQ_Настройки_Вкладки
-            "Функции по умолчанию" -> /ИТС_TRANSAQ_Настройки_Функции
-            "Настройки стакана котировок" -> /ИТС_TRANSAQ_Настройки_Стакан
-            "Включение/отключение уведомлений" -> /ИТС_TRANSAQ_Настройки_Уведомления
-            "Трансляция в системы тех. анализа" -> /ИТС_TRANSAQ_Настройки_Трансляция
-            "Назад" -> /ИТС_TRANSAQ
-
-    state: ИТС_TRANSAQ_Настройки_Сохранение
-        a: Обращаем Ваше внимание, что при подключении брокерских счетов АО Финам используется сервер: tr1.finam.ru, порт: 3900. При подключении брокерских счетов АО Банк Финам используется сервер: tr1.finambank.ru, порт: 3324.
-
-    state: ИТС_TRANSAQ_Настройки_Вкладки
-        a: Для добавления вкладок необходимо зайти в меню Вид (на верхней панели терминала), далее необходимо перейти в пункт Настройка экранов. Скрыть, либо снова вернуть отображение вкладок можно в меню Вид – Закладки.
-
-    state: ИТС_TRANSAQ_Настройки_Функции
-        a: В меню Настройки – Параметры торгового терминала - Ввод заявок, есть возможность устанавливать по умолчанию такие параметры как: стандартное количество лотов, использование кредитных средств, принцип расчета выставляемой заявки и прочее.
-
-    state: ИТС_TRANSAQ_Настройки_Стакан
-        a: В меню Настройки – Параметры торгового терминала – Представление информации, есть возможность устанавливать/менять параметры отображения стакана котировок: порядок отображения, отображение собственных заявок.
-
-    state: ИТС_TRANSAQ_Настройки_Уведомления
-        a: Отключение/включение уведомлений и звуковых сигналов доступно в меню «Настройки» → «Параметры торгового терминала» → «Прочее» → «Звуковое оповещение».
-
-    state: ИТС_TRANSAQ_Настройки_Трансляция
-        a: Для активации функции экспорта данных необходимо в меню «Настройки» → «Параметры торгового терминала» → «Прочее», активировать функцию. Загрузить библиотеку экспорта данных в системы теханализа. Далее можно выбирать параметры экспорта в меню Файл → Экспорт сделок рынка.
-
-    state: ИТС_TRANSAQ_Отображение
-        a: Для корректного отображения портфеля по счетам типа «Единая денежная позиция» в верхней панели инструментов необходимо нажать кнопку «Режим Клиент/Юнион». В данном режиме весь состав портфеля отобразится в таблице «Единый портфель».
-
-    state: ИТС_TRANSAQ_Шорты
-        a: По умолчанию использование кредитных средств при выставлении заявки отключено. Для работы с короткими позициями в момент выставления заявки необходимо включать пункт «Использовать кредит».
-
-    state: ИТС_QUIK
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Установка и создание ключей QUIK" -> /ИТС_QUIK_Ключи
-            "Авторизация в QUIK" -> /ИТС_QUIK_Авторизация
-            "Настройки QUIK" -> /ИТС_QUIK_Настройки
-            "Работа с портфелем" -> /ИТС_QUIK_Портфель
-            "Работа с заявками" -> /ИТС_QUIK_Заявки
-            "Работа с графиком" -> /ИТС_QUIK_График
-            "Частые ошибки" -> /Ошибки заявок_Другие_QUIK
-            "Назад" -> /ИТС
-
-    state: ИТС_QUIK_Ключи
-        a: Шаг 1. Скачайте и установите программу по ссылке: https://www.finam.ru/howtotrade/quik/
-            Шаг 2. Чтобы открыть доступ к QUIK для уже имеющегося счета, зайдите в личный кабинет → https://edox.finam.ru/ITS/AddTerminal  и подключите терминал к желаемому счету.
-            Шаг 3. В корневой папке программы откройте папку KeyGen и запустите приложение с таким же названием.
-            Шаг 4. В программе KeyGen на первом этапе выберите, где будут храниться файлы ключей (по умолчанию они сохраняются в папку KeyGen). Придумайте логин (имя пользователя) и пароль. Далее вы будете использовать их для входа в программу. Нажмите кнопку «Создать».
-            Шаг 5. Зайдите в личный кабинет: https://edox.finam.ru/cryptography/CreateQuikCertificates.aspx
-            Выберите идентификатор терминала для регистрации ключей, нажмите кнопку «Выберите файл» и укажите публичный ключ (pubring.txk), который вы создали на третьем шаге. Далее нажмите кнопку «Загрузить».  
-            Шаг 6. Откройте QUIK, зайдите в меню «Система» → «Настройки» → «Основные настройки» → «Программа» → «Шифрование». Нажмите на кнопку с изображением молотка в конце третьей строки и укажите путь к файлам ключей pubring.txk и secring.txk в соответствующих полях. Для этого нажмите на кнопку с тремя точками и выберите ключ в открывшемся окне.   
-            Шаг 7. После прохождения четвертого шага необходимо подождать 1 час. Затем вы сможете авторизоваться в QUIK с помощью логина и пароля, который придумали при создании ключей.
-            Видео-инструкция по установке QUIK по ссылке: https://www.youtube.com/watch?v=A1dpP0fRToQ
-
-    state: ИТС_QUIK_Авторизация
-        a: Логин и пароль вы придумываете на этапе регистрации ключей для QUIK. К сожалению, восстановить эти данные невозможно, поэтому вам придется создать новую пару ключей.
-            ✅ Рекомендуем пройти обучение по работе в QUIK. В первом уроке — инструкция по регистрации ключей: https://dist.finam.ru/course/view/388
-
-    state: ИТС_QUIK_Настройки
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Подключение счета к QUIK" -> /ИТС_QUIK_Настройки_Подключение
-            "Поток обезличенных сделок" -> /ИТС_QUIK_Настройки_Поток сделок
-            "Сохранение рабочего места" -> /ИТС_QUIK_Настройки_Сохранение места
-            "Подключение роботов" -> /ИТС_QUIK_Настройки_Роботы
-            "Очистка от временных файлов" -> /ИТС_QUIK_Настройки_Очистка файлов
-            "Модуль опционной аналитики" -> /ИТС_QUIK_Настройки_Модуль аналитики
-            "Опционы в QUIK" -> /ИТС_QUIK_Настройки_Опционы
-            "Назад" -> /ИТС_QUIK
-
-    state: ИТС_QUIK_Настройки_Подключение
-        a: В QUIK можно одновременно подключить только счета одного типа, например, два счета типа «Единая денежная позиция».
-            ✅ При открытии счета типа «Единая денежная позиция» обратите внимание, будет ли вам доступен QUIK. Счета с запретом использования данного терминала не предусматривают его ручного подключения. 
-            ✅ Создание нового терминала по счету доступно в личном кабинете по ссылке: https://edox.finam.ru/ITS/AddTerminal 
-            ✅ Подключение дополнительного счета к терминалу QUIK доступно в личном кабинете по ссылке: https://edox.finam.ru/ITS/AddTerminalByAccount/IndexAsync
-
-    state: ИТС_QUIK_Настройки_Поток сделок || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: ✅ Чтобы подключить/отключить поток обезличенных сделок нужно:
-            1. Оформить заявку в личном кабинете по ссылке: https://edox.finam.ru/ITS/DepersonalizedTransactions 
-            2. Через час после подписания заявления активируется поток данных. Обязательно нужно переподключиться к торговому серверу.
-            ✅ Если нужно подключить поток по классу «Индексы», обратитесь к менеджеру «Финам».
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: ИТС_QUIK_Настройки_Сохранение места
-        a: ✅ Для сохранения рабочего места в QUIK необходимо перейти в меню «Система» → «Сохранить настройки в файл».
-            ✅ Для автоматического сохранения настроек необходимо в меню «Система» → «Настройки» → «Основные настройки» → «Программа» → «Файлы настроек» → установить галку «Сохранять настройки в файл при выходе», предварительно необходимо выбрать файл для автоматического сохранения в меню «Использовать файл настроек».
-
-    state: ИТС_QUIK_Настройки_Роботы
-        a: Для подключения готовых алгоритмов (роботов) для системы QUIK необходимо зайти в меню «Сервисы» → «Lua скрипты».
-            Для уточнения деталей и особенностей работы таких алгоритмов рекомендуем обращаться к разработчикам программы: https://arqatech.com/ru/support/
-
-    state: ИТС_QUIK_Настройки_Очистка файлов
-        a: Для очистки временных файлов в системе QUIK рекомендуется выполнить следующие действия:
-            1. Закрыть программу QUIK, если она при этом открыта.
-            2. В директории с программой удалить все файлы с расширением «*.log» и «*.dat» (кроме файлов с расширением «*.dat», в которых хранятся настройки внешних систем технического анализа, если такие подключены). 
-            3. Запустить программу QUIK.
-
-    state: ИТС_QUIK_Настройки_Модуль аналитики
-        a: Последнюю версию модуля опционной аналитики можно получить у менеджера.
-            ✅ Перед установкой данного обновления убедитесь, что у вас установлена версия Рабочего места QUIK не ниже 9.0.0.
-            ✅ Версия отображается в заголовке окна Рабочего места QUIK.
-            1. Установите Рабочее место QUIK.
-            2. Распакуйте архив с обновлением Модуля опционной аналитики (StratVolat) в каталог с Рабочим местом QUIK.
-            3. Запустите Рабочее место QUIK.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: ИТС_QUIK_Настройки_Опционы
-        a: Система QUIK позволяет работать с опционами Московской биржи FORTS только в рамках срочного рынка договора с раздельными счетами.
-            ❗ В рамках счетов типа «Единая денежная позиция» поток опционов не отображается. 
-            ✅ Доска опционов открывается через панель инструментов: «Создать окно» → «Все типы окон» → «Доска опционов».
-
-    state: ИТС_QUIK_Портфель
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Нулевые позиции в состоянии счета" -> /ИТС_QUIK_Портфель_Нулевые позиции
-            "Не отобразились позиции в портфеле" -> /ИТС_QUIK_Портфель_Позиции в портфеле
-            "Состояние портфеля моносчета FORTS" -> /ИТС_QUIK_Портфель_Состояние портфеля
-            "Как закрыть все позиции?" -> /ИТС_QUIK_Портфель_Закрыть позиции
-            "Назад" -> /ИТС_QUIK
-
-    state: ИТС_QUIK_Портфель_Нулевые позиции
-        a: В таблице «Состояние счета» могут отображаться позиции с количеством «0».
-            Данное отображение показывает, что категория инструментов доступна для торгов. В верхней панели таблицы можно выбрать пункт «Открытые», в данном режиме отобразится только текущий состав портфеля.
-
-    state: ИТС_QUIK_Портфель_Позиции в портфеле
-        a: Расчеты на бирже являются отложенными, и не совпадают с моментом сделки. Для отображения портфеля с учетом будущих расчетов необходимо переключить в таблице «Состояние счета» показатель «На дату» в положение T2.
-
-    state: ИТС_QUIK_Портфель_Состояние портфеля
-        a: Таблица «Состояние счета» предназначена для работы со счетами типа «Единая денежная позиция».
-            Для отображения позиций и средств на срочном рынке в рамках договора с раздельными счетами нужно открыть таблицы в меню «Создать окно» → «Все типы окон» → «Ограничения по клиентским счетам» и «Позиции по клиентским счетам».
-
-    state: ИТС_QUIK_Портфель_Закрыть позиции
-        a: Для закрытия всех позиций в портфеле в верхней панели таблицы «Состояние счета» необходимо нажать кнопку «Закрыть все». В диалоговом окне необходимо выбрать тип заявки и подтвердить действие.
-
-    state: ИТС_QUIK_Заявки
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Нет торгового кода в заявке" -> /Ошибки заявок_Другие_QUIK_Системные_Торговый код
-            "Выставление заявок с графика" -> /ИТС_QUIK_Заявки_Выставление заявок
-            "Настройка скальперского стакана" -> /ИТС_QUIK_Заявки_Настройка стакана
-            "Назад" -> /ИТС_QUIK
-
-    state: ИТС_QUIK_Заявки_Выставление заявок
-        a: Ввод заявки из окна графика возможен несколькими способами:
-            1. На графике необходимо навести курсор на тело свечи и нажать левую кнопку мыши, удерживая нажатой клавишу «Ctrl». 
-            2. Необходимо включить режим ввода заявки из окна диаграммы, нажав кнопку «Поставить новую заявку» на панели инструментов «Графики» (отображена рука с двумя поднятыми пальцами). При этом окно ввода заявки открывается по нажатию левой кнопки мыши на теле свечи графика.
-            3. Выбрать пункт «Новая заявка»/«Новая стоп-заявка» в контекстном меню на линии либо на легенде графика.
-
-    state: ИТС_QUIK_Заявки_Настройка стакана
-        a: Для активации «скальперского стакана» необходимо нажать правой кнопкой мыши по «Таблице котировок» и перейти в меню «Редактировать…».
-            В редакторе необходимо включить пункт «Панель торговли». 
-            Нажатием на кнопку «…» открывается окно «Настройки панели торговли». При использовании панели торговли в «Таблице котировок» становятся доступными дополнительные комбинации клавиш.
-
-    state: ИТС_QUIK_График
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Добавление индикаторов" -> /ИТС_QUIK_График_Добавляение
-            "Как отобразить заявки на графике?" -> /ИТС_QUIK_График_Заявки
-            "Склейка графиков" -> /ИТС_QUIK_График_Склейка
-            "Назад" -> /ИТС_QUIK
-
-    state: ИТС_QUIK_График_Добавляение
-        a: Для добавления индикатора из стандартного набора необходимо нажать правой кнопкой мыши по окну графика и выбрать «Добавить график (индикатор)…».
-            Также, система позволяет загружать сторонние индикаторы совместимые с системой QUIK. Скачанный файл с индикатором необходимо поместить в папку «LuaIndicators» в корневом каталоге программы. 
-            Далее необходимо повторно запустить программу QUIK.
-
-    state: ИТС_QUIK_График_Заявки
-        a: Для включения отображения необходимо нажать правой кнопкой мыши по окну графика и выбрать пункт «Редактировать …».
-            В окне редактора необходимо слева нажать на наименование инструмента и перейти во вкладку «Дополнительно».
-            По желанию можно активировать отображение заявок, сделок, стоп-заявок, а также настроить цвет линий.
-
-    state: ИТС_QUIK_График_Склейка
-        a: При замене текущего фьючерса на следующий система предлагает произвести автоматическую склейку графиков.
-            ✅ Включить данную опцию можно в меню «Система» → «Настройки» → «Основные настройки» → «Программа» → «Замена инструментов». 
-            ✅ Произвести склейку самостоятельно можно в меню «Система» → «Заказ данных» → «Склейка архивов графиков». 
-            ✅ Если удалить файлы с расширением «.dat» по нужному инструменту из папки «archive» (находится в папке установки программы QUIK), то можно убрать склейку графиков.
-
-    state: ИТС_Другие
-        a: Выберите торговую систему:
-        buttons:
-            "QUIK X/WebQUIK" -> /ИТС_Другие_QUIK X
-            "MetaTrader 5" -> /ИТС_Другие_MetaTrader 5
-            "Стороннее ПО" -> /Сторонее ПО
-            "Назад" -> /ИТС
-
-    state: ИТС_Другие_QUIK X
-        a: Подключить WebQUIK к брокерскому счету можно в личном кабинете: https://edox.finam.ru/Items/ItsEnablePaidService
-            Торговая система платная — 420 ₽ в месяц. Пароль к терминалу вы получите в СМС при подключении к счету, логин — в личном кабинете: https://edox.finam.ru/Home/Account/Terminals?id= Найдите в открывшемся списке идентификатор терминала QUIK.  
-            QUIK X доступен по ссылке: https://webquik6.finam.ru/  
-            Здесь используются те же логин и пароль, что и в WebQUIK. После того, как вы подключите счет к терминалу, свяжитесь с менеджером «Финама». Он поможет активировать QUIK X.
-
-    state: ИТС_Другие_MetaTrader 5 || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: Торговая система MetaTrader 5 предназначена для установки на ПК с системой Windows.
-            ✅ Скачать дистрибутив для установки MetaTrader 5 можно по ссылке: https://download.mql5.com/cdn/web/jsc.investment.company/mt5/finam5setup.exe 
-            Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Подключить счет к MetaTrader 5" -> /ИТС_MetaTrader 5_Подключить счет
-            "Авторизация в MetaTrader 5" -> /ИТС_MetaTrader 5_Авторизация
-            "Не отобразились средства в MetaTrader 5" -> /ИТС_MetaTrader 5_Не отобразились средства
-            "Сохранение настроек" -> /ИТС_MetaTrader 5_Сохранение настроек
-            "Таблица Портфель" -> /ИТС_MetaTrader 5_Таблица Портфель
-            "Особенности терминала" -> /ИТС_MetaTrader 5_Особенности терминала
-            "Назад" -> /ИТС_Другие
-
-    state: ИТС_MetaTrader 5_Подключить счет
-        a: Подключить счет к терминалу можно в личном кабинете: https://edox.finam.ru/ITS/AddTerminal
-            Договора с раздельными брокерскими счетами недоступны для подключения к MetaTrader 5. 
-            К одному идентификатору (логину) можно подключить только один брокерский счет.
-
-    state: ИТС_MetaTrader 5_Авторизация
-        a: Логин отображается в личном кабинете: https://edox.finam.ru/Home/Account/Terminals?id=  Идентификатор терминала является логином. Пароль вам придет в виде СМС после того, как вы подпишете заявление на получение новой ИТС: https://edox.finam.ru/ITS/AddTerminal
-            Восстановить пароль можно в личном кабинете: https://edox.finam.ru/ITS/ChangeTerminalPassword
-
-    state: ИТС_MetaTrader 5_Не отобразились средства
-        a: Данная ошибка может возникнуть при первой авторизации в терминале. Обратитесь к менеджеру для принудительного обновления информации в торговой системе.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: ИТС_MetaTrader 5_Сохранение настроек
-        a: Под панелью «Инструменты» отображается текущее название профиля. При нажатии левой кнопкой мыши по названию, появляется возможность сохранять и выбирать разные профили.
-
-    state: ИТС_MetaTrader 5_Таблица Портфель
-        a: «Портфель» MetaTrader 5 – приложение-сервис разработки компании «Финам», визуально схожее с таблицей «Портфель» в терминале TRANSAQ.
-            ✅ Скачать «Портфель» и изучить инструкцию по установке можно по ссылке: https://www.finam.ru/Files/htt/metatrader/portfolio/MQL5.zip
-
-    state: ИТС_MetaTrader 5_Особенности терминала
-        a: Если вы столкнулись с ошибкой в работе терминала, обратитесь к менеджеру «Финама». Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Балансовая цена" -> /ИТС_MetaTrader 5_Особенности_Цена
-            "Отображение истории" -> /ИТС_MetaTrader 5_Особенности_История
-            "Синхронизация с другими ИТС" -> /ИТС_MetaTrader 5_Особенности_Синхронизация
-            "Срок действия стоп заявок" -> /ИТС_MetaTrader 5_Особенности_Стоп заявки
-            "Склейка фьючерсов" -> /ИТС_MetaTrader 5_Особенности_Склейка фьючерсов
-            "Назад" -> /ТС_Другие_MetaTrader 5
-
-    state: ИТС_MetaTrader 5_Особенности_Цена
-        a: Трансляция балансовой цены может быть некорректной, ведется работа по данному функционалу.
-
-    state: ИТС_MetaTrader 5_Особенности_История
-        a: Раздел «История» находится в процессе доработки, может содержать некорректную информацию.
-
-    state: ИТС_MetaTrader 5_Особенности_Синхронизация
-        a: При исполнении заявок в других терминалах, позиции не отображаются в системе MetaTrader 5.
-            При этом, все совершенные сделки в MetaTrader 5 будут отображены в других торговых терминалах.
-
-    state: ИТС_MetaTrader 5_Особенности_Стоп заявки
-        a: В торговой системе MetaTrader 5 можно выставлять ордера только со сроком «До конца дня».
-
-    state: ИТС_MetaTrader 5_Особенности_Склейка фьючерсов
-        a: Выполнить склейку фьючерсных контрактов можно при добавлении пользовательского индикатора в торговую систему. Ознакомится с инструкцией можно на сайте разработчиков MetaTrader 5 https://www.mql5.com/ru/articles/802
-
-    state: Заявки || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /062 Заявки
-        a: ❗ СПБ биржа с 28 ноября 2023 перевела иностранные ценные бумаги на неторговый раздел счета. Подробнее: https://spbexchange.ru/ru/about/news.aspx?bid=25&news=45530
-            ❗ После перевода на неторговый раздел – бумаги исключены из торговых лимитов биржи, поэтому не отображаются в терминале, но их наличие отражено во вкладке «Портфель» в личном кабинете https://lk.finam.ru/
-        a: С 01.01.2023 вступил в силу запрет Банка России на покупку инвесторами без статуса «квал» акций компаний из недружественных стран, доступно только закрытие позиций через отдел голосового трейдинга, системы QUIK и TRANSAQ.
-            Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Типы заявок" -> /Заявки_Типы
-            "Выставление заявок" -> /Заявки_Выставление
-            "Отмена заявки" -> /Заявки_Отмена
-            "Как закрыть позицию" -> /Как закрыть позиции
-            "Статус заявки" -> /Заявки_Статус
-            "Ошибки при выставлении заявок" -> /Ошибки заявок
-
-    state: Заявки_Типы
-        a: ❗ По индикативным и недоступным для торговли инструментам данная опция заблокирована.
-                ❗ Прежде чем подтвердить выставленную заявку, проверьте номер выбранного счета и наличие свободных средств на нем. Если у Вас возникла ошибка в процессе выставления заявки с активного брокерского счета и в рабочее время биржи, обратитесь к менеджеру «Финам». 
-                В торговых системах доступно несколько видов заявок:
-        buttons:
-            "Рыночная заявка" -> /Заявки_Типы_Рыночная
-            "Лимитная заявка" -> /Заявки_Типы_Лимитная
-            "Условная заявка" -> /Заявки_Типы_Условная
-            "Стоп-заявка/Тейк-профит" -> /Заявки_Типы_Стоп_Тейк
-            "Связанные заявки" -> /Заявки_Типы_Связанные
-            "Назад" -> /Заявки
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Заявки_Выставление
-        a: ✅ Для выставления заявки через таблицу инструментов:
-                1. выбрать инструмент,
-                2. нажать кнопку «заявка» в FinamTrade либо в терминалах QUIK, MetaTrader 5, TRANSAQ нужно начать правой кнопкой мыши по инструменту и выбрать «новая заявка»/«новый ордер».
-                ✅ Для выставление заявки с графика:
-                1. в веб-версии FinamTrade, данная опция активируется в настройках терминала, в меню «торговля»,
-                2. в других торговых системах выставить заявку можно нажатием правой кнопки мыши по графику инструмента.
-                ❗ По индикативным и недоступным для торговли инструментам данная опция заблокирована.
-                ❗ Прежде чем подтвердить выставленную заявку, проверьте номер выбранного счета и наличие свободных средств на нем. Если у вас возникла ошибка в процессе выставления заявки с активного брокерского счета и в рабочее время биржи, обратитесь к менеджеру «Финам».
-        buttons:
-            "Фондовый рынок МБ/СПБ" -> /Заявки_Выставление_Фондовый
-            "Срочный рынок МБ FORTS" -> /Срочный рынок_Купить фьючерс
-            "Валютный рынок" -> /Валютный рынок_Как купить
-            "NYSE/NASDAQ" -> /Заявки_Выставление_NYSE_NASDAQ
-            "Гонконг (HKEX)" -> /Доступные биржи_Ещё_Гонконгская
-            "Торговля заблокированными ЦБ" -> /Как закрыть позиции_Продажа БлокЦБ
-            "Назад" -> /Заявки
-        
-    state: Заявки_Отмена
-        a: Отмена/снятие заявки доступно на странице отображения портфеля в разделе Заявки. Необходимо нажать на интересующую заявку и выбрать действие. Исполненные/снятые/отмененные заявки редактирование не подлежат.
-
-    state: Заявки_Статус
-        a: Статус заявки можно проверить в торговом терминале.
-            Заявки со статусами «исполнена», «отклонена» или «снята» не переносятся на следующую торговую сессию, информация по ним очищается в системе. 
-            Условные и стоп-заявки до момента их исполнения хранятся на сервере торговой системы. Поэтому ордера, выставленные в одном терминале, не отображаются в другом до тех пор, пока не будут активированы.
-
-    state: Заявки_Типы_Рыночная
-        a: Рыночная заявка исполняется по принципу «лучшего исполнения», при покупке будет автоматически выбрана наименьшая доступная цена среди продавцов, при продаже – наибольшая доступная цена среди покупателей.
-            ❗ В момент выставления рыночной заявки требуется больше обеспечения по сравнению с лимитными заявками. 
-            Для фьючерсов при выставлении рыночной заявки блокируется 1,5 гарантийного обеспечения (ГО). 
-            По некоторым инструментам данный вид заявок недоступен.
-            ❗ Во время премаркета и постмаркета на рынке NYSE/NASDAQ недоступно выставление «рыночных» заявок, рекомендуем работать с «лимитными» ордерами (по определенной цене).
-
-    state: Заявки_Типы_Лимитная
-        a: Лимитная заявка исполняется по принципу «лучшего исполнения».
-            Для покупки исполнение происходит по цене не выше указанной (меньше или равно), для продажи не ниже указанной (больше или равно).
-
-    state: Заявки_Типы_Условная
-        a: В системе реализованы следующие условия выставления заявки:
-            ✅ «Время исполнения» (заявка будет активирована и отправлена на биржу в указанное время), 
-            ✅ «Сделка выше или равна» (условие выставления заявки считается выполненным, если сервер получит данные о появлении на рынке хотя бы одной сделки по цене выше или равно заданной в условии, при выполнении указанного условия заявка будет выставлена на биржу по цене, заданной в поле «цена исполнения»), 
-            ✅ «Сделка ниже или равна» (условие выставления заявки считается выполненным, если сервер получит данные о появлении на рынке хотя бы одной сделки по цене ниже или равно заданной в условии, при выполнении указанного условия заявка будет выставлена на биржу по цене заданной в поле «цена исполнения»).
-            ✅ Срок действия заявки выбирается самостоятельно: до отмены, до конца дня, до указанной даты.
-
-    state: Заявки_Типы_Стоп_Тейк
-        a: Стоп-заявка содержит два либо одно из условий:
-                ✅ Стоп-лосс (далее SL),
-                ✅ Тейк-профит (далее TP).
-                Стоп-заявка предполагает, что инвестор заранее выбирает условия, при которых заявка активируется - и выставится лимитная либо рыночная.
-                Для закрытия коротких позиций следует выставлять стоп-заявки на покупку, для закрытия длинных позиций - на продажу. 
-                ❗ Заявка может быть выставлена со сроком действия: до отмены, до конца дня, до указанной даты.
-        buttons:
-            "Стоп-лосс (SL)" -> /Заявки_Типы_Стоп_Тейк_SL
-            "Тейк-профит (TP)" -> /Заявки_Типы_Стоп_Тейк_TP
-            "Назад" -> /Заявки_Типы
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Заявки_Типы_Связанные
-        a: В веб-терминале есть возможность с графика выставить лимитную заявку со связанными стоп-заявками (стоп-лоссом и тейк-профитом) на закрытие позиции. Возможность привязки заявки к уже существующей отсутствует.
-
-    state: Заявки_Типы_Стоп_Тейк_SL
-        a: SL на продажу активируется, когда цена на рынке станет меньше либо равна цене активации.
-            SL на покупку активируется, когда цена на рынке станет больше либо равна цене активации.
-            При выставлении SL необходимо задать «Цену активации» и «Цену заявки».
-            При активации SL на биржу будет выставлена заявка по цене, заданной в поле «Цена исполнения».
-
-    state: Заявки_Типы_Стоп_Тейк_TP
-        a: TP на продажу активируется, когда цена на рынке станет больше либо равна цене активации.
-            TP на покупку активируется, когда цена на рынке станет меньше либо равна цене активации. 
-            1. Можно увеличить вероятность совершения сделки при исполнении стопа, задав «Защитный спред» либо использовав ✅ «Рыночная».
-            Если указать «0» в поле «Защитный спред», то на Биржу будет отправлена заявка с ценой, равной цене первой же сделки на рынке, которая удовлетворяет цене активации.
-            — Для определения цены заявки, исполняющей TP на покупку, защитный спред прибавляется к цене рынка.
-            — Для определения цены заявки, исполняющей TP на продажу, защитный спред вычитается из цены рынка. 
-            2. «Коррекция» используется для того, чтобы включить механизм отслеживания тренда, используется следующим образом: 
-            — для TP на продажу считается, что растущий тренд заканчивается в тот момент, когда после того, как рынок вырос до уровня цены активации или выше, он снизится на величину коррекции от максимальной цены; 
-            — для TP на покупку считается, что нисходящий тренд заканчивается в тот момент, когда после того, как рынок снизился до уровня цены активации или ниже, он вырастет на величину коррекции от минимальной цены.
-
-    state: Заявки_Выставление_Фондовый
-        a: ✅ С 01.01.2023 вступил в силу запрет Банка России на покупку инвесторами без статуса «квал» акций компаний из недружественных стран, доступно только закрытие позиций через отдел голосового трейдинга, системы QUIK и TRANSAQ.
-            ✅ Торговля акциями дружественных стран, хранящихся в депозитариях недружественных юрисдикций, без статуса квалифицированного инвестора доступна через терминалы TRANSAQ и FinamTrade. 
-            Дополнительно нужно:
-            1. Подписать «Согласие на торговые операции с иностранными бумагами с местом хранения недруж. инфраструктура» по ссылке https://edox.finam.ru/ForeignSecurities/UnfriendlyDepoConsent 
-            2. Пройти тестирование в личном кабинете «ИЦБ, требующие тестирования»: https://edox.finam.ru/Questionnaire/Questionnaires
-
-    state: Заявки_Выставление_HKEX
-        a: Во время премаркета и постмаркета на рынке NYSE/NASDAQ недоступно выставление «рыночных» заявок, рекомендуем работать с «лимитными» ордерами (по определенной цене).
-
-    state: Голосовой трейдинг || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /063 Голосовой трейдинг
-        a: Для подачи заявки через отдел голосового трейдинга необходимо позвонить по одному из номеров ниже:
-                +7 (495) 796-93-88 — доб. 2200
-                +7 (495) 1-346-346 — доб. 2200
-                *1945 — доб. 2200 (Бесплатно по РФ для МТС, Билайн, МегаФон и Tele2)
-                ❗ Идентификация счета происходит только по торговому коду.
-                ✅ Время работы отдела голосового трейдинга с 6:50 до 00:00 МСК.
-                ✅ Рекомендуем ознакомится с особенностями выставления заявок:
-        buttons:
-            "На срочном рынке" -> /Голосовой трейдинг_Срочный
-            "На фондовом рынке" -> /Голосовой трейдинг_Фондовый
-            "На валютном рынке" -> /Голосовой трейдинг_Фондовый
-
-    state: Голосовой трейдинг_Срочный
-        a: Минимальный объем гарантийного обеспечения (ГО) для открытия новой позиции — от 10000 ₽. Закрытие позиции в полном объеме, стоимостью меньше 10000 ₽, доступно только по рыночной цене.
-            По заявкам, принятым через отдел голосового трейдинга, удерживается комиссия от стоимости инструмента, а не фиксированная сумма:
-            ✅ По фьючерсам:
-            0,0354 % от суммы ПФИ (начиная с первого поручения) + 236 ₽ за каждое последующее поручение, начиная с шестого по соответствующему клиентскому счету за день.
-            (Исключение: ТП «Консультационный Фортс»: 0,03611% от суммы ПФИ, начиная с первого поручения + 236 ₽ за каждое последующее поручение, начиная с шестого по соответствующему клиентскому счету за день).
-            ✅ По опционам:
-            2 ₽ за каждый ПФИ (начиная с первого поручения) + 236 ₽ за каждое последующее поручение, начиная с шестого по соответствующему клиентскому счету за день.
-
-    state: Голосовой трейдинг_Фондовый
-        a: Минимальный объем заявки на открытие позиции составляет от 10000 ₽. Закрытие позиции в полном объеме, стоимостью меньше 10000 ₽, доступно только по рыночной цене.
-            ✅ Начиная с 6-й заявки в день, по каждому из счетов удерживается дополнительная комиссия 236 ₽ за заявку.
-
-    state: Как закрыть позиции || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /064 Как закрыть позиции
-        a: На СПБ Бирже приостановлены торги Иностранными ценными бумагами.
-            ❗ «Финам» получил от СПБ Биржи часть разблокированных средств инвесторов. Речь идет о рублевых активах, которые были распределены по счетам клиентов. Поскольку СПБ Биржа находится под санкциями, часть средств инвесторов остается заблокированной. Так как в механизме распределения средств учитывались не только разблокированные, но и заблокированные активы, был ограничен доступ инвесторов к части средств, а именно к гонконгским долларам и долларам США, полученным в результате продаж на СПБ Бирже, но не более свободного остатка на момент блокировки.
-            ❗ Ограничения носят временный характер и будут сняты, как только СПБ Биржа добьется прогресса в получении разрешения OFAC (Управления по контролю за иностранными активами США) на вывод активов.
-            ❗ Актуальная информация размещается на официальном сайте СПБ Биржи: https://spbexchange.ru/ru/about/news2.aspx 
-            ❗ При торговле на иностранных биржах через брокера «Финам», инфраструктура СПБ Биржи не задействована. Вышестоящий брокер-партнёр не раскрывает перед американскими биржами гражданство своих клиентов, поэтому риски в данном направлении минимальны.
-        a: ❗ СПБ биржа с 28 ноября 2023 перевела иностранные ценные бумаги на неторговый раздел счета. Подробнее: https://spbexchange.ru/ru/about/news.aspx?bid=25&news=45530
-            ❗ После перевода на неторговый раздел – бумаги исключены из торговых лимитов биржи, поэтому не отображаются в терминале, но их наличие отражено во вкладке «Портфель» в личном кабинете https://lk.finam.ru/
-        a: В любой торговой системе вы можете закрыть позицию, перейдя в раздел «Портфель». Например, в терминале FinamTrade для этого достаточно нажать на строку с нужным активом, а в TRANSAQ и QUIK – нажать правой кнопкой мыши по позиции в портфеле и выбрать действие.
-            ✅ Также закрыть позицию можно с помощью новой заявки, купленные инструменты нужно продать, проданные (шорт позиции) - откупить.
-            ✅ Прежде чем закрыть позицию, убедитесь, что она активна и проверьте наличие выставленных ордеров на ее закрытие. 
-            ✅ Если в рабочее время биржи у вас не получается закрыть позицию, обратитесь за помощью к менеджеру «Финам».
-            ❗ С 01.01.2023 вступил в силу запрет Банка России на покупку инвесторами без статуса «квал» акций компаний из недружественных стран, доступно только закрытие позиций через отдел голосового трейдинга, системы QUIK и TRANSAQ.  
-            ❗ С 26.04.23 «Финам» запустил сервис по продаже и покупке иностранных ценных бумаг на СПБ Бирже, ранее заблокированных европейскими депозитариями Euroclear и Clearstream.
-        buttons:
-            "Неполный лот" -> /Как закрыть позиции_Неполный лот
-            "Продать валюту" -> /Валютный рынок
-            "Продажа заблокированных ЦБ" -> /Как закрыть позиции_Продажа БлокЦБ
-            "Закрыть задолженность" -> /Как закрыть позиции_Закрыть задолженность
-            "Как выставить заявку" -> /Заявки
-
-    state: Как закрыть позиции_Неполный лот
-        a: 1. Продать неполный лот ценных бумаг вы можете через отдел голосового трейдинга. (С мобильного: тел. *1945 — доб. 2200)
-            2. Также режим торгов в неполном лоте доступен в торговых системах:
-            ✅ TRANSAQ — в форме ввода заявки нужно сменить режим на «неполные лоты»,
-            ✅ QUIK — в профиле поиска инструментов нужно выбрать инструмент с припиской неполный лот.
-            3. Неполные лоты валют доступны в виде контрактов _TMS (торгуются кратно 0,01 ед. валюты, минимальная заявка от 1 ед. валюты, расчеты на следующий рабочий день после 23:50 МСК).
-
-    state: Как закрыть позиции_Продажа БлокЦБ || sessionResult = "Orange", sessionResultColor = "#B65A1E"
-        a: «Финам» предоставляет сервис по продаже и покупке на Московской и СПБ Бирже* иностранных ценных бумаг, ранее заблокированных европейскими депозитариями Euroclear и Clearstream.
-            *- торги на СПБ Бирже временно приостановлены.
-            ✅ В рамках сервиса заблокированные ИЦБ представляют собой торговый инструмент с тикером, состоящим из оригинального торгового кода бумаги и постфикса «SPBZ» либо «MMBZ».
-            ✅ Торги доступны в дни работы бирж 11:00–17:00 МСК через ИТС TRANSAQ и FinamTrade.
-            ✅ В терминале FinamTrade список доступных инструментов находится в левом вертикальном меню в разделе «рынки», в подборках «Заблокированные инструменты».
-            ✅ Все поручения на сделки являются неторговыми и проводятся исключительно между клиентами «Финам».
-            ✅ Валюта расчетов – рубли РФ
-            ✅ Комиссия за сделку — 0,8%
-            ❗ Недоступно для ИИС
-            ❗ Предварительно перед совершением сделок нужно подписать «Согласие на торговые операции с заблокированными ИЦБ» по ссылке: https://edox.finam.ru/ForeignSecurities/BlockedSecuritiesConsent 
-            ❗ Для покупки заблокированных ЦБ нужен статус квалифицированного инвестора, для продажи - не требуется.
-            ✅ Подробнее об услуге, инструкции и список бумаг на сайте: https://www.finam.ru/landings/blocked-securities/?key=2e6d8aef-4940-4105-aee4-d0b892894664
-
-    state: Как закрыть позиции_Закрыть задолженность || sessionResult = "Orange", sessionResultColor = "#B65A1E"
-        a: ✅ Если у вас в портфеле появилась графа «Обязательства», это говорит о том, что у вас возникла маржинальная позиция или задолженность перед брокером.
-            ✅ Погасить задолженность на брокерском счете можно следующими способами:
-            1. внести денежные средства на брокерский счет в количестве не менее суммы задолженности;
-            2. перевести денежные средства с одного брокерского счета на другой;
-            3. изменить структуру портфеля, например, закрыв часть позиций;
-            4. если у вас на счете есть валютная задолженность, то вы можете приобрести соответствующую валюту.
-        buttons:
-            "Пополнение счета" -> /Движение ДС_Пополнение
-            "Перевод между счетами в «Финам»" -> /Движение ДС_Перевод
-            "Как купить/продать валюту" -> /Валютный рынок_Как купить
-            "Назад" -> /Как закрыть позиции
-
-    state: Ошибки заявок || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /065 Ошибки заявок
-        a: ❗ СПБ биржа с 28 ноября 2023 перевела иностранные ценные бумаги на неторговый раздел счета. Подробнее: https://spbexchange.ru/ru/about/news.aspx?bid=25&news=45530
-                ❗ После перевода на неторговый раздел – бумаги исключены из торговых лимитов биржи, поэтому не отображаются в терминале, но их наличие отражено во вкладке «Портфель» в личном кабинете https://lk.finam.ru/
-        a: ✅ Популярные типы ошибок при выставлении заявок:
-            1. «Не пройдено тестирование»
-            Вы не прошли тестирование «Производные финансовые инструменты».
-            2. «Не подтвержден квалификационный уровень»
-            Для подтверждения уровня достаточно пройти тестирование по категории «Необеспеченные сделки»
-            3. «Вам запрещены сделки с инструментами»
-            Данная ошибка может возникать в том случае, если у вас отсутствует квалификационный уровень для работы с данным инструментом.
-            Решение:
-            — Тестирование для неквалифицированных инвесторов по ряду категорий можно пройти в личном кабинете: https://lk.finam.ru/user/invest-status/qual-exam/tests 
-            — Получить статус квалифицированного инвестора.
-            ✅ Другие ошибки и способы их решения при выставлении заявок:
-        buttons:
-            "Нет кнопки Заявка/Замок" -> /Ошибки заявок_Нет кнопки
-            "Доступное колличество в портфеле "0" -> /Ошибки заявок_Доступное кол-во
-            "Дежурный режим" -> /Ошибки заявок_Дежурный режим
-            "Сделки по данному инструменту запрещены" -> /Ошибки заявок_Сделки по данному
-            "Нехватка средств/Недостаточно обеспечения" -> /Ошибки заявок_Нехватка
-            "Цена сделки вне лимита" -> /Ошибки заявок_Вне лимита
-            "Запрет трейдера на открытие позиций" -> /Ошибки заявок_Запрет трейдера
-            "Другие ошибки" -> /Ошибки заявок_Другие
-
-    state: Ошибки заявок_Нет кнопки || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: По недоступным для торговли инструментам кнопка «Заявка» заблокирована, в терминале FinamTrade такие инструменты отмечены символом «Замок».
-            ✅ В торговых системах есть как торговые так и индикативные инструменты, индикативные не торгуются (индексы, криптовалюты, сырье), а несут информационный характер.
-            ✅ Торги могут быть заблокированы на период корпоративных событий, или по инициативе вышестоящих организаций. 
-            ✅ По счету может быть установлен запрет электронных торгов (часто встречается в день открытия счета, доступ появится на следующий торговый день).
-            ❗ Обращаем Ваше внимание, активация счета происходит после пополнения от 150 рулей. 
-            ✅ Фиолетовый символ  «Замок» в терминале FinamTrade говорит о том, что инструмент доступен со статусом квалифицированного инвестора.
-
-    state: Ошибки заявок_Доступное кол-во
-        a: При продаже уже рассчитанных и поставленных валютных пар/металлов с помощью контрактов TOM/TMS количество в портфеле может отображаться «0», при этом выставление заявки будет доступно.
-            Поставленные валюты и металлы отображаются как контракты TOD/TMS. Проверить доступное количество для продажи можно в портфеле. 
-            При выставлении заявки на сумму, не превышающую остаток валюты/металлов в портфеле, короткая позиция не возникнет. 
-            Для продажи валюты (доллар США, евро, юань) в количестве менее 1000 ед. используйте инструменты с окончанием TMS.
-
-    state: Ошибки заявок_Дежурный режим || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: ✅ Торги на разных торговых площадках проводятся в разный период времени. В выходные и праздничные дни торги не проводятся, либо осуществляются в ограниченном формате. Рекомендуем ознакомится детальнее.
-                При выставлении «лимитных» и «рыночных» заявок в неторговое время возникает сообщение «Торговые операции недоступны в дежурном режиме». В данный период доступно выставление только условных заявок и стоп ордеров (стоп-лосса и тейк-профита). 
-                ✅ В рамках учебных счетов в неторговый период выставление всех типов заявок недоступно. Сервера учебных счетов начинают работать с 10:00 по МСК. В выходные и праздничные дни торги не проводятся.
-        buttons:
-            "Время торгов на биржах" -> /Время торгов
-
-    state: Ошибки заявок_Сделки по данному
-        a: Данная ошибка может возникать в том случае, если заявка выставляется со счета нерезидента РФ.
-                ✅ На текущий момент открытие позиций нерезидентам РФ доступно только на валютном рынке московской биржи.
-                ✅ Резидентам дружественных стран дополнительно доступны сделки на фондовом рынке московской биржи.
-                ❗ Проверка производится со стороны биржи. 
-                Подробнее об особенностях выставления заявок на разных рынках:
-        buttons:
-            "Доступные биржи" -> /Доступные биржи
-
-    state: Ошибки заявок_Нехватка
-        a: Данная ошибка может возникать в том случае, если у вас недостаточно средств для выставления заявки.
-                ❗ Сумма, свободная для открытия позиций, отображается в портфеле в виде денежных остатков.
-                ✅ Обеспечение для открытия позиций с займом («плечом») рассчитывается как разница оценки портфеля и заблокированной начальной маржи по счету (начальных требований).
-                ✅ При выставлении «рыночной заявки» размер обеспечения выше стандартного (на срочном рынке обеспечение увеличивается в 1,5 раза). Рекомендуем использовать «лимитные» заявки (по определенной цене).
-                ✅ Обязательно убедитесь, что у вас нет лишних активных заявок по каким-либо инструментам. Под активные ордера блокируется обеспечение (маржа), что может помешать выставлению заявки.
-                ✅ По счетам типа «Единая денежная позиция» со стандартным уровнем риска (КСУР) на срочном рынке может блокироваться ГО в 1,5—2 раза выше биржевого. Для снижения ГО можно отключить фондовый и валютный рынки по счету через обращение к менеджеру, а также воспользоваться услугой «Пониженное ГО».
-                Подробнее:
-        buttons:
-            "Гарантийное обеспечение" -> /Срочный рынок_Обеспечение
-            "Маржинальная торговля" -> /Маржа
-
-    state: Ошибки заявок_Вне лимита
-        a: По каждому инструменту существует свой диапазон выставления заявок.
-            ✅ По инструментам срочного рынка в спецификации контракта на бирже указываются значения верхнего и нижнего лимита на момент последнего клиринга. 
-            ✅ По ценным бумагам данный диапазон составляет от 5% до 15% от текущей стоимости инструмента. 
-            ❗ Биржа может ограничивать диапазон выставления заявок на свое усмотрение в случае резкого изменения цены инструмента.
-
-    state: Ошибки заявок_Запрет трейдера || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: Открытие позиций в поставочных фьючерсах в последний день обращения (за день до экспирации и поставки) недоступно. Используйте следующие контакты.
-
-    state: Ошибки заявок_Другие
-        a: Другие ошибки и способы их решения:
-        buttons:
-            "Недопустимое значение для данного инструмента" -> /Ошибки заявок_Другие_Недопустимое значение
-            "Не найден доступный маршрут" -> /Ошибки заявок_Другие_Маркетные
-            "Маркетные заявки в условных поручениях не разрешены" -> /Ошибки заявок_Другие_Маркетные
-            "Данная ценная бумага не допущена к заключению сделок" -> /Ошибки заявок_Сделки по данному
-            "HALT_INSTRUMENT" -> /Ошибки заявок_Другие_HALT_UNSTRUMENT
-            "BAD_CLIENTID/Попытка операции на несуществующий код клиента" -> /Ошибки заявок_Другие_BAD_CLIENTID
-            "Типовые ошибки в Рабочем месте QUIK" -> /Ошибки заявок_Другие_QUIK
-            "Назад" -> /Ошибки заявок
-
-    state: Ошибки заявок_Другие_Недопустимое значение
-        a: Данная ошибка может возникать в том случае, если в форме заявки указано некорректное значение.
-            ✅ Цена заявки должна соответствовать шагу цены по инструменту, информация указана в описании инструмента. 
-            ✅ Обращайте внимание на разрядность цены.
-
-    state: Ошибки заявок_Другие_Маркетные
-        a: Данная ошибка может возникать в том случае, если нарушены условия выставления заявки.
-            ✅ Необходимо соблюдать минимальный объем заявок, при торговле на бирже HKEX (Гонконг) минимальный объем заявки — 8000 HKD.
-            ✅ Во время премаркета и постмаркета на рынке NYSE/NASDAQ недоступно выставление «рыночных» заявок, рекомендуем работать с «лимитными» ордерами (по определенной цене). 
-            Для исключения ошибок при срабатывания отложенных ордеров на рынке NYSE/NASDAQ запрещено выставление условных заявок, тейк-профита и стоп-лосса с «рыночным» исполнением. Цену исполнения и защитный спред необходимо указать самостоятельно (как «лимитный» ордер). 
-            Подробнее об особенностях выставления заявок на разных рынках:
-        buttons:
-            "Выставление заявок" -> /Заявки_Выставление
-
-    state: Ошибки заявок_Другие_HALT_UNSTRUMENT
-        a: Данная ошибка может возникать в том случае, если по торговому инструменту приостановлены/заблокированы/прекращены торги.
-            ❗ По многим иностранным инструментам на бирже СПБ торги начинаются позже.
-
-    state: Ошибки заявок_Другие_BAD_CLIENTID
-        a: Данная ошибка может возникать в том случае, если счет с данным торговым кодом не зарегистрирован.
-            Регистрация торгового кода возможна до трех рабочих дней с момента отправки заявки. 
-            Уточнить информацию по конкретному счету можно у менеджера «Финам».
-
-    state: Ошибки заявок_Другие_QUIK
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Ошибки при авторизации в QUIK" -> /Ошибки заявок_Другие_QUIK_Авторизация
-            "Системные ошибки в QUIK" -> /Ошибки заявок_Другие_QUIK_Системные
-            "Назад" -> /Ошибки заявок_Другие
-
-    state: Ошибки заявок_Другие_QUIK_Авторизация
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Error 2 reading file" -> /Ошибки заявок_Другие_QUIK_Авторизация_Error2
-            "Кнопка Ключ сервера или пользователя не найден" -> /Ошибки заявок_Другие_QUIK_Авторизация_Ключ сервера
-            "Вы используете ключи, не зарегистрированные на сервере" -> /Ошибки заявок_Другие_QUIK_Авторизация_РегКлючей
-            "Вы уже работаете в системе" -> /Ошибки заявок_Другие_QUIK_Авторизация_Вы уже работаете
-            "Назад" -> /Ошибки заявок_Другие_QUIK
-
-    state: Ошибки заявок_Другие_QUIK_Системные
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Не обновляется программа QUIK" -> /Ошибки заявок_Другие_QUIK_Системные_Обновление
-            "Не хватило памяти под объекты" -> /Ошибки заявок_Другие_QUIK_Системные_Память
-            "General protection fault" -> /Ошибки заявок_Другие_QUIK_Системные_GeneralProtection
-            "Нет данных в таблицах Сделки/Заявки" -> /Ошибки заявок_Другие_QUIK_Системные_ДанныеСделки
-            "Не обновляются данные на графиках/в таблицах" -> /Ошибки заявок_Другие_QUIK_Системные_Данные график
-            "Нет торгового кода в заявке" -> /Ошибки заявок_Другие_QUIK_Системные_Торговый код
-            "Назад" -> /Ошибки заявок_Другие_QUIK
-
-    state: Ошибки заявок_Другие_QUIK_Авторизация_Error2
-        a: Данная ошибка означает, что при соединении с сервером, программа QUIK не может найти файлы с публичной и/или секретной частью ключей.
-            Необходимо выполнить следующее:
-            1. Открываем пункт меню «Система» → «Настройки» → «Основные настройки» → «Основные» → «Программа» → «Шифрование» и нажимаем на кнопку в поле «Настройки по умолчанию».
-            2. В появившейся форме «Текущие настройки» в полях «Файл с публичными ключами» и «Файл с секретными ключами» при нажатии на кнопки вида […] нужно указать местоположение публичного ключа «pubring.txk» и секретного «secring.txk» ключа соответственно.
-
-    state: Ошибки заявок_Другие_QUIK_Авторизация_Ключ сервера
-        a: Данная ошибка может возникать в том случае, когда пользователь совершает ошибку при наборе своего логина.
-            В поле «Введите Ваше Имя» можно ввести только один первый символ, а не весь логин полностью, учитывайте раскладку клавиатуры (английская или русская). Например, если логин «Иванов», то можно ввести только букву «И» или, если логин «2081263954» — только «2». 
-            Пароль нужно вводить полностью. Также нужно обратить особое внимание, что верхний и нижний регистр (большие и маленькие буквы) программой идентифицируются как разные символы.
-
-    state: Ошибки заявок_Другие_QUIK_Авторизация_РегКлючей
-        a: Данное сообщение об ошибке может возникать если пользователь пытается установить соединение с сервером QUIK с ключами, незарегистрированными на сервере.
-            После подписания заявления на регистрацию публичной части ключа «pubring.txk» необходимо ожидать не менее часа. Регистрация новой пары ключей к одному идентификатору QUIK деактивирует предыдущую пару ключей.
-
-    state: Ошибки заявок_Другие_QUIK_Авторизация_Вы уже работаете
-        a: Сервер QUIK не допускает одновременную работу двух пользователей с одинаковыми ключами доступа.
-            Для одновременной работы с одной парой ключей можно выбирать подключение к разным серверам (MAIN1 и т.д.). Если такое сообщение получено при восстановлении соединения после обрыва, то достаточно повторить попытку через несколько секунд, когда сервер QUIK прекратит обработку предыдущего соединения.
-
-    state: Ошибки заявок_Другие_QUIK_Системные_Обновление
-        a: После автоматического обновления программы QUIK или выводе на экран сообщения после соединения с сервером «На сервере появилась новая версия программы…», принятии файлов и перезапуска программы, версия программы QUIK не изменилась.
-            Данная проблема актуальна для 32-х разрядных операционных систем Windows. Для корректного обновления программы QUIK необходимо установить 64-х разрядную систему Windows. 
-            Возможна ситуация, когда произошло некорректное обновление версии программы, после которого программа не запускается. 
-            В данном случае нужно восстановить предыдущее состояние программы. Для этого в рабочей директории программы QUIK нужно найти папку «backup». В данной папке расположены подпапки с именами формата: «DDMMYYYY», где «DD» — число, «MM» — месяц, а «YYYY» — год даты последнего успешного обновления программы. 
-            Выберите папку с датой последнего обновления и скопируйте из нее все файлы в рабочую директорию QUIK с заменой текущих файлов. После чего программу нужно запустить от имени администратора, и выполнить обновление.
-
-    state: Ошибки заявок_Другие_QUIK_Системные_Память
-        a: Причиной данной ошибки может являться недостаток ресурсов компьютера и/или программный сбой. Первым делом нужно проверить потребление оперативной памяти и загрузку ЦП в диспетчере задач Windows.
-            Для очистки временных файлов в системе QUIK рекомендуется выполнить следующие действия:
-            1. Закрыть программу QUIK, если она при этом открыта.
-            2. В директории с программой удалить все файлы с расширением «*.log» и «*.dat» (кроме файлов с расширением «*.dat», в которых хранятся настройки внешних систем технического анализа, если такие подключены). 
-            3. Запустить программу QUIK.
-            Если вышеприведенные рекомендации не помогут, то это означает, что файл с настройками (по умолчанию, «finam.wnd») поврежден. 
-            В данном случае нужно удалить файл с настройками, запустить программу без файла, и создать настройки заново (если сохранялись резервные копии настроек, то возможен запуск настроек с предыдущего сохранения из папки «WNDSAV»).
-
-    state: Ошибки заявок_Другие_QUIK_Системные_GeneralProtection
-        a: При запуске/работе с программой QUIK выводится сообщение вида — «General protection fault. Internal exception happened. Please send info.rpt to support@quik.ru Sorry for inconvenience».
-            Данное сообщение означает, что произошел программный сбой, и программа была завершена аварийно. 
-            В большинстве случаев работоспособность программы можно восстановить путем удаления из директории с программой всех файлов с расширением «*.log» и «*.dat». 
-            Если вышеприведенные рекомендации не помогут, то это означает, что файлы повреждены. 
-            В данном случае нужно повторно установить программу (перед удалением можно сохранить файл с настройками «*.wnd» и ключи («pubring.txk», «secring.txk») в отдельную папку).
-
-    state: Ошибки заявок_Другие_QUIK_Системные_ДанныеСделки
-        a: Если при работе с заявками в таблицах Заявки/Сделки/Стоп-Заявки не появляются данные, необходимо нажать правой кнопкой мыши по таблице и выбрать пункт «Редактировать». В окне редактора необходимо снять «лишние» фильтры. Также, если постоянно ведется работа с разными счетами, можно устанавливать нужный номер счета в общем фильтре клиентов (устанавливается в верхней панели инструментов программы QUIK).
-
-    state: Ошибки заявок_Другие_QUIK_Системные_Данные график
-        a: Если происходил кратковременный разрыв с сервером (потеря интернет связи) возможно отставание данных на графиках и в таблицах.
-            В данном случае нужно зайти в меню «Система» → «Заказ данных» → «Перезаказать данные», рекомендуется указывать все пункты для перезаказа данных.
-
-    state: Ошибки заявок_Другие_QUIK_Системные_Торговый код
-        a: Если на форме ввода заявки не отображается торговый счет (список выбора торгового счета пустой), необходимо выполнить следующее: открыть пункт меню «Система» → «Настройки» → «Основные настройки» → «Торговля» → «Настройка счетов» и переместить (кнопка «Добавить все») все счета из поля «Доступные» в поле «Выбранные».
-            Если в поле «Доступные» не отображается ни один торговый счет, то это означает, что по данному коду клиента не задан ни один лимит по бумагам (возможно счет пустой).
-
-    state: Некорректное отображение || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /066 Некорректное отображение
-        a: ✅ Баланс счета не отображается ночью в будние дни, во время технических перерывов, связанных с обслуживанием серверов торговых систем:
-            — QUIK: с 3:00 до 6:40 МСК, 
-            — TRANSAQ и FinamTrade: с 5:00 до 6:40 МСК. 
-            В выходные дни дополнительные технические работы могут проводится в дневное время, так как торги не проводятся.
-            ✅ В выходные и праздничные дни торги не проводятся, либо осуществляются в ограниченном формате.
-            ✅ В рамках учебных счетов в неторговый период выставление всех типов заявок недоступно. Сервера учебных счетов начинают работать с 10:00 по МСК. В выходные и праздничные дни торги не проводятся.
-        a: Для устранения проблем, связанных с отображением информации, необходимо выполнить следующие действия:
-            1. Личный кабинет и FinamTrade (web):
-            — проверить скорость интернета,
-            — проверить работу в разных браузерах (Chrome, Firefox, Yandex), 
-            — очистить cache и cookies файлы (могут быть утеряны персональные настройки),
-            — отключить все плагины и расширения на устройстве, vpn и антивирус.
-            2. FinamTrade (android/ios):
-            — проверить скорость интернета,
-            — отключить vpn,
-            — произвести повторную авторизацию,
-            — переустановить приложение (могут быть утеряны персональные настройки).
-            3. QUIK: 
-            — проверить скорость интернета,
-            — при авторизации подключиться к другому серверу QUIK (main1/main2),
-            — перезаказать данные в разделе Система - Заказ данных - Перезаказать данные (рекомендуется предварительно сохранить настройки в файл через: Система- Сохранить настройки в файл),
-            — переоткрыть необходимую таблицу/график,
-            — активировать в настройках клиентского места пункт «получать пропущенные данные».
-            4. TRANSAQ:
-            — проверить скорость интернета,
-            — при авторизации подключиться к резервному серверу,
-            — обновить TRANSAQ до последней версии (Файл - Произвести обновление программы),
-            — переустановить TRANSAQ с сайта: https://www.finam.ru/howtotrade/soft/transaq/ 
-            Если произведенные действия не привели к решению проблемы, просьба обратиться к менеджеру технической поддержки.
-
-    state: Сайт || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /067 Сайт
-        a: Для устранения проблем на ресурсах компании (сайте, портале и т.д.), связанных с отображением информации, необходимо выполнить следующие действия:
-            — проверить скорость интернета,
-            — проверить работу в разных браузерах (Chrome, Firefox, Yandex), 
-            — закрыть все вкладки кроме FinamTrade, 
-            — очистить cache и cookies файлы (могут быть утеряны персональные настройки),
-            — отключить все плагины и расширения на устройстве, vpn и антивирус.
-            Если произведенные действия не привели к решению проблемы, просьба обратиться к менеджеру технической поддержки.
-
-    state: Актуальный портфель || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /068 Актуальный портфель
-        a: ❗ СПБ биржа с 28 ноября 2023 перевела иностранные ценные бумаги на неторговый раздел счета. Подробнее: https://spbexchange.ru/ru/about/news.aspx?bid=25&news=45530
-            ❗ После перевода на неторговый раздел – бумаги исключены из торговых лимитов биржи, поэтому не отображаются в терминале, но их наличие отражено во вкладке «Портфель» в личном кабинете https://lk.finam.ru/
-        a: ✅ Актуальная стоимость портфеля с учетом текущих биржевых цен отображается:
-            1. во вкладке «портфель» в личном кабинете https://lk.finam.ru/ 
-            2. в мобильном приложении (нажать «три полоски» в верхнем левом углу экрана и выбрать нужный счет в отрывшемся меню).
-            ✅ Оценка портфеля включает в себя стоимость открытых позиций и свободный остаток денежных средств. 
-            ❗Вариационная маржа по срочному рынку также учитывается в общей оценке портфеля, но фактическое зачисление/списание средств происходит только после 18:50 МСК.
-            ✅ При пополнении счетов нужно учитывать сроки зачисления средств в зависимости от способа пополнения. В выходные дни сроки зачисления могут быть увеличены. В торговых системах баланс обновляется в рабочее время бирж.
-            ✅ Если вы подали поручение на вывод средств с брокерского счета, то средства под вывод в личном кабинете отображаются как «заблокировано (под вывод)».
-            ✅ Ценная бумага может отображаться заблокированной в портфеле по причине проходящего по ней корпоративного действия (отражается в справке по счету) либо по причине ограничений вышестоящих депозитариев.
-            ✅ Оценка портфеля уменьшается на сумму купона или дохода от погашения облигации за день до выплаты.
-            ✅ При переводе бумаг от другого брокера (из реестра) в торговой системе может отображаться другая балансовая (средняя) стоимость позиции.
-            ❗ Личный кабинет и торговые терминалы проводят оценку счета на основе разных источников данных, данные могут отличаться в период перезапуска торговых серверов.
-        buttons:
-            "Баланс в торговых системах" -> /Актуальный портфель_Баланс
-            "Справка по счету" -> /Справка по счету
-            "Ограничения" -> /Ограничение ЦБ
-            "Изменить балансовую (среднюю) цену" -> /Балансовая средняя
-
-    state: Актуальный портфель_Баланс
-        a: ✅ Наиболее распространенной причиной отсутствия счета в терминале является отсутствие подключения к выбранному идентификатору (логину).
-            Подключите счет к терминалу в личном кабинете: https://edox.finam.ru/ITS/AddTerminalAccount 
-            ✅ В день открытия брокерского договора новые счета не отображаются в системе QUIK.
-            ✅ На текущий момент распространенной проблемой является блокировка иностранных ценных бумаг со стороны вышестоящих организаций, данные бумаги не отображаются в торговых системах по причине хранения на неторговом разделе счета ДЕПО. Необходимо ожидать снятия ограничений. 
-            ✅ Активация счета происходит после пополнения от 99 ₽.
-            ✅ Технические перерывы в будние дни, связанные с обслуживанием серверов торговых систем (в эти периоды баланс счета не отображается): 
-            — QUIK: с 3:00 до 6:40 МСК, 
-            — TRANSAQ и FinamTrade: с 5:00 до 6:40 МСК. 
-            В выходные дни дополнительные технические работы могут проводится в дневное время, так как торги не проводятся.
-
-    state: Минималка || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /069 Минималка
-        a: Чтобы активировать счет в любой торговой системе, внесите на него минимальную сумму — 99 ₽.
-
-    state: Балансовая средняя || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /070 Балансовая средняя
-        a: ❗ СПБ биржа с 28 ноября 2023 перевела иностранные ценные бумаги на неторговый раздел счета. Подробнее: https://spbexchange.ru/ru/about/news.aspx?bid=25&news=45530
-            ❗ После перевода на неторговый раздел – бумаги исключены из торговых лимитов биржи, поэтому не отображаются в терминале, но их наличие отражено во вкладке «Портфель» в личном кабинете https://lk.finam.ru/
-        a: Балансовая стоимость рассчитывается как среднее арифметическое всех открытых позиций.
-            ✅ В балансовой стоимости также учитывается накопленный купонный доход по облигациям, уплаченный покупателем продавцу. 
-            ✅ С 07.08.2023 в качестве средней цены приобретения на срочном рынке используется фактическая средняя цена открытия позиции (ранее использовалась цена последнего клиринга). Для корректного отображения, нужно обновить торговый терминал. 
-            ✅ Если ценные бумаги переведены от другого брокера, балансовая цена в валюте может отличаться от цены приобретения, так как в торговой системе отображается курс на дату ввода бумаг (в целях налогообложения будет учтен курс покупки, проверить информацию можно в справке по счету). 
-            При необходимости, для вашего удобства, цена может быть скорректирована. Обратитесь к менеджеру «Финам». 
-            ✅ По заблокированным ценным бумагам балансовая стоимость будет скорректирована только после снятия ограничений.
-
-    state: Как начать || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /071 Как начать
-        a: Инвестировать — просто!
-            ✅ Для начала рекомендуем:
-            1. открыть и пополнить брокерский счет;
-            2. ознакомиться с принципами выставления заявок в торговых системах.
-            ✅ Чтобы усовершенствовать навыки торговли вы можете:
-            1. открыть демо-счет и воспользоваться акцией «Умный старт», чтобы получить реальный приз, торгуя с виртуальным счетом на реальном рынке;
-            2. пройти обучение в учебном центре «Финам» или ознакомиться с обучающими видео-материалами по торговым системам.
-            ✅ Воспользуйтесь готовыми инвестиционными решениями от профессионалов «Финам».
-            Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Открыть брокерский счет" -> /Открытие_счета
-            "Как выставить заявку" -> /Заявки
-            "Обучение от Финам" -> /Обучение на сайте
-            "Открыть демо-счет" -> /Демо-счет
-            "Инвестиционные услуги" -> /Услуги компании
-
-    state: Учебные видео || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /072 Учебные видео
-        a: Предлагаем посмотреть обучающие видеокурсы по работе торговых терминалов:
-        buttons:
-            "FinamTrade" -> /Учебные видео_FinamTrade
-            "TRANSAQ" -> /Учебные видео_TRANSAQ
-            "QUIK" -> /Учебные видео_QUIK
-
-    state: Учебные видео_FinamTrade
-        a: 1. Для просмотра цикла обучающих видео выберите нужный формат торгового терминала и перейдите по ссылке:
-            ✅ Веб-версия: https://dist.finam.ru/course/start/377 
-            ✅ Мобильная версия: https://dist.finam.ru/course/start/349 
-            2. Также вы можете посмотреть серию видеоуроков на Youtube-канале «Финам Инвестиции», в которых подробно рассказывается, как пользоваться торговой платформой FinamTrade, по ссылке: https://www.youtube.com/watch?v=OgIQQJr92F8&t=8s
-
-    state: Учебные видео_TRANSAQ
-        a: Смотрите бесплатный обучающий курс по ссылке:  https://dist.finam.ru/course/start/31
-
-    state: Учебные видео_QUIK
-        a: Смотрите бесплатный обучающий курс по ссылке: https://education.finam.ru/course/de5a9d1c-224f-4376-882b-8eb221fa779b
-
-    state: Обучение на сайте || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /073 Обучение на сайте
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Учебный центр «Финам»" -> /Обучение на сайте_Учебный центр
-            "Обучение для неквалифицированных" -> /Обучение на сайте_Неквалы
-            "Демо-счета" -> /Демо-счет
-            "Видео-курсы по торговым системам" -> /Учебные видео
-
-    state: Обучение на сайте_Учебный центр
-        a: Учебный центр «Финам» проводит регулярные встречи, вебинары, учебные курсы, для новичков, для продвинутых инвесторов и для профессионалов:
-            ✅ Дистанционные курсы → https://dist.finam.ru/ 
-            ✅ Актуальное расписание видеосеминаров → https://www.finam.ru/webinars/timetable/ 
-            ✅ Очные встречи, обучения, клубы инвесторов → https://www.finam.ru/landings/training/?market=&level=&type=2&cost=&agency= 
-            ❗ Контактная информация для решения вопросов, касательно мероприятий, указана в карточке самого мероприятия.
-            ❗ Подробнее об Учебном центре: https://www.finam.ru/landings/about-education/
-        buttons:
-            "Курс «Первые шаги»" -> /Обучение на сайте_Учебный центр_Первые шаги
-            "Финансовый наставник" -> /Обучение на сайте_Учебный центр_Финансовый наставник
-            "Назад" -> /Обучение на сайте
-
-    state: Обучение на сайте_Учебный центр_Первые шаги
-        a: Онлайн-курс «Первые шаги» — 10-дневное обучение инвестиционному делу от преподавателей с многолетним стажем.
-            Записаться можно в личном кабинете Учебного центра «Финам» по ссылке: https://education.finam.ru/all-courses
-
-    state: Обучение на сайте_Учебный центр_Финансовый наставник
-        a: Осваивайте науку успешного инвестирования под руководством опытного трейдера.
-            ✅ Выбрать преподавателя и записаться можно по ссылке: https://www.finam.ru/landings/management-colsunting/ 
-            ✅ Подпишитесь на консультационное обслуживание, чтобы бесплатно просматривать вебинары, выбранного преподавателя. 
-            ✅ Отключится можно в любой момент, необходимо обратится к менеджеру «Финам».
-
-    state: Обучение на сайте_Неквалы
-        a: Учебные материалы для неквалифицированных инвесторов позволят успешно пройти тестирование и получить доступ к большему количеству финансовых инструментов: https://www.finam.ru/landings/attestation-main/
-            Все материалы разделены по темам тестов.
-
-    state: Демо-счет || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /074 Демо счет
-        a: Демо-счета предназначены для ознакомления с функционалом торговой системы, торги проводятся на основе учебных котировок, поставляемых биржей.
-            Режим работы демо-серверов:
-            ✅ Фондовый рынок – с 10 до 19 МСК
-            ✅ Срочный рынок – с 09:00 до 13:00, с 13:05 до 15:45, с 16:00 до 22:00 МСК
-            ❗ В выходные и праздничные дни торги не проводятся, и сервера недоступны.
-            ❗ Чтобы добавить срочную секцию в QUIK Junior, обратитесь к менеджеру «Финам» и сообщите ему логин своего учебного счета в формате 000000******. 
-            Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Открыть демо-счет" -> /Открытие учебного счета
-            "Срок действия демо-счета" -> /Демо-счет_Срок действия
-            "Доступные рынки на демо-счетах" -> /Демо-счет_Доступные рынки
-            "Проблемы при торговле на демо-счете" -> /Демо-счет_Проблемы
-            "Программа Тест-драйв" -> /Тест-драйв
-            "Обучающие видеокурсы" -> /Учебные видео
-
-    state: Демо-счет_Срок действия
-        a: Срок действия демосчета в:
-            — FinamTrade и TRANSAQ — 2 недели, 
-            — TRANSAQ Connector — 1 неделя, 
-            — QUIK — 3 месяца.
-            Продлить действие учебного счета нельзя. Если вы хотите повторно использовать систему в учебном режиме, создайте новую заявку на открытие демосчета с использованием другого номера телефона и электронной почты.
-
-    state: Демо-счет_Доступные рынки
-        a: На демо-счетах разных торговых систем доступны различные финансовые рынки:
-            ✅ FinamTrade - Московская биржа, NYSE/NASDAQ
-            ✅ QUIK - Московская биржа
-            ✅ TRANSAQ - Московская биржа, Биржа СПБ, NYSE/NASDAQ
-
-    state: Демо-счет_Проблемы
-        a: ✅ Если у вас не отображаются открытые позиции и доступные для торговли средства, обратитесь к менеджеру «Финам». Обращаем внимание, сервера учебных счетов начинают работать с 10:00 МСК. В выходные и праздничные дни торги не проводятся.
-            При выставлении заявки в неторговое время возникает сообщение «Торговые операции недоступны в дежурном режиме».
-            ✅ Если у вас завершился период действия демо-счета, торговля будет заблокирована. Дату открытия и срок действия можно проверить в письме на почте. 
-            ✅ Если при открытии счета не поступило письмо с данными демо-счета, проверьте папку «Спам» у себя на почте. Частой ошибкой являются опечатки при заполнении регистрационных данных. Необходимо создать новую заявку с другим номером телефона и почтой.
-
-    state: Comon || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /075 Comon
-        a: Детальная информация и правила сервиса «Финам Автоследование» доступны по ссылке: https://docs.comon.ru/general-information/
-            Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Авторизация на comon.ru" -> /Comon_Авторизация
-            "Подключить/отключить стратегию" -> /Comon_Подключить стратегию
-            "Синхронизация" -> /Comon_Синхронизация
-            "Торговля по счету с автоследованием" -> /Comon_Торговля по счету
-            "Комиссии за автоследование" -> /Комиссии_Другие_Автоследование
-            "Если аккаунт заблокирован" -> /Comon_Блок
-            "Тестирование для автоследования" -> /Comon_Тестирование
-
-    state: Comon_Авторизация
-        a: Данными для входа на https://www.comon.ru/ являются логин и пароль от личного кабинета https://lk.finam.ru/
-            ✅ По умолчанию логином от личного кабинета является номер телефона в международном формате (например: 7********** - Россия, 375********** - Беларусь, 997********** - Казахстан).
-            ✅ Пароль вы задавали самостоятельно. 
-            ✅ Для восстановления доступа к личному кабинету:
-            1. перейдите по ссылке https://lk.finam.ru/ 
-            2. нажмите на кнопку «Забыли логин или пароль?»
-            3. введите ФИО, паспортные данные и подтвердите восстановление
-            4. на вашу электронную почту придет письмо с логином и ссылкой на создание нового пароля
-
-    state: Comon_Подключить стратегию
-        a: 1. Подключение:
-            ✅ авторизуйтесь на сайте https://www.comon.ru/ 
-            ✅ убедитесь, что на вашем брокерском счете есть денежные средства
-            ✅ пройдите инвестиционное профилирование по ссылке: https://lk.finam.ru/user/invest-profile 
-            ✅ выберите нужную стратегию, перейдите на страницу с ее описанием и нажмите на кнопку «подключить»
-            ❗ Не все стратегии подходят для счетов ИИС (торги на иностранных биржах по счетам ИИС недоступны).
-            2. Отключение:
-            ✅ авторизуйтесь на сайте https://www.comon.ru/ 
-            ✅ нажмите на свой никнейм и перейдите в раздел «подписки» (здесь отображается информация о подключенных стратегиях)
-            ✅ нажмите на значок шестеренки и выберите «отключить автоследование»
-            ❗ Позиции будут закрыты во время активной торговой сессии рынка, на котором торгуются используемые ценные бумаги. Если рынок закрыт, то подписка перейдет в статус удаления. Дальнейшие действия будут доступны только после закрытия позиций.
-
-    state: Comon_Синхронизация
-        a: Для синхронизации со стратегией автора необходимо:
-            ✅ авторизоваться на сайте https://www.comon.ru/ 
-            ✅ нажать на свой никнейм и перейти в раздел «подписки» (здесь отображается информация о подключенных стратегиях) 
-            ✅ при нажатии на значок шестеренки отобразится меню «синхронизировать портфель»
-
-    state: Comon_Торговля по счету
-        a: Мы не рекомендуем вам совершать торговые операции со счета, к которому подключена стратегия автоследования. Такое вмешательство нарушит доходность по данной стратегии, а также может привести к совершению дополнительных сделок.
-            Например, автор может купить или продать выбранный вами инструмент. В этом случае есть вероятность получить убыток по позиции и заплатить дополнительную комиссию за покупку/продажу.
-
-    state: Comon_Блок
-        a: Если аккаунт заблокирован, отправьте письмо со своей электронной почты на autotrade@corp.finam.ru
-
-    state: Comon_Тестирование
-        a: Перед подключением к любой из стратегий, при отсутствии статуса «квал», нужно пройти ряд тестирований для неквалифицированных инвесторов.
-            ✅ Пройти тестирование можно в личном кабинете: https://lk.finam.ru/user/invest-status/qual-exam/tests  
-            ✅ Перечень необходимых тестов:
-            — Производные финансовые инструменты
-            — Акции вне котировальных списков
-            — Необеспеченные сделки
-            — Облигации со структурным доходом
-            — ИЦБ, требующие тестирования
-
-    state: Услуги компании || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /076 Услуги компании
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Помощники инвестирования" -> /Услуги компании_Помощники
-            "Готовые решения" -> /Услуги компании_Готовые решения
-            "Акции в подарок" -> /Услуги компании_Акции в подарок
-            "Партнерская программа" -> /Услуги компании_Партнерская программа
-            "Финам Бонус" -> /Финам-бонус
-            "Умный старт" -> /Тест-драйв
-
-    state: Услуги компании_Помощники
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Аналитика" -> /Услуги компании_Помощники_Аналитика
-            "Диагностика" -> /Услуги компании_Помощники_Диагностика
-            "Прямой доступ на биржи (DMA услуги)" -> /Услуги компании_Помощники_Прямой доступ
-            "Консультационное управление" -> /КУ
-            "Robo-Advisor" -> / Услуги компании_Помощники_Robo-Advisor
-            "AI-cкринер" -> /Услуги компании_Помощники_AI-cкринер
-            "Назад" -> /Услуги компании
-
-    state: Услуги компании_Помощники_Аналитика
-        a: Подпишитесь на бесплатную аналитику от «Финам» — и узнавайте в числе первых, как главные мировые события влияют на финансовые рынки.
-            ✅ Подробности по ссылке: https://www.finam.ru/landings/analytics/ 
-            ✅ Для отключения услуги нужно обратиться к менеджеру «Финам».
-
-    state: Услуги компании_Помощники_Диагностика
-        a: «Диагностика» — бесплатный аналитический сервис, который помогает увеличивать эффективность вложений начинающим и опытным инвесторам.
-            Подключить сервис и ознакомится детальнее можно по ссылке: https://www.finam.ru/landings/diagnostics 
-            Отключение сервиса не требуется.
-
-    state: Услуги компании_Помощники_Прямой доступ || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: «Финам» предлагает услуги прямого подключения (DMA) на российские рынки.
-            Ознакомится детальнее можно по ссылке: https://broker.finam.ru/landings/direct-access 
-            Чтобы получить консультацию, подключить или отключить услугу можно обратиться по телефону *1945 доб.3024 или на электронную почту dma@corp.finam.ru
-
-    state: Услуги компании_Помощники_Robo-Advisor || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: «Robo–Advisor» – автоматизированный советник по инвестициям, который предоставляет финансовые консультации и сервис по созданию и управлению инвестиционным портфелем с минимальным вмешательством человека.
-            Подключить сервис и ознакомится детальнее можно по ссылке: https://www.finam.ru/landings/adviser2/ 
-            Отключение сервиса не требуется.
-
-    state: Услуги компании_Помощники_AI-cкринер || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: «AI-скринер» — это инструмент для инвесторов на основе искусственного интеллекта, обученный и протестированный на финансовых показателях компаний, макроэкономических данных, техническом анализе и других данных. Скринер дает годовой прогноз по российским и иностранным ценным бумагам.
-            ✅ Подключить сервис и ознакомится детальнее можно по ссылке: https://www.finam.ru/landings/ai-screener/ 
-            Отключение сервиса не требуется.
-
-    state: Услуги компании_Готовые решения
-        a: Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Индивидуальный инвестиционный портфель (ИИП)" -> /Услуги компании_Готовые решения_ИИП
-            "Управляющая компания" -> /Услуги компании_Готовые решения_УК
-            "Инвестиционное сопровождение" -> /Услуги компании_Готовые решения_Сопровождение
-            "Структурные облигации" -> /Услуги компании_Готовые решения_Структурные облигации
-            "Ежемесячный купон (ОФЗ)" -> /Услуги компании_Готовые решения_ОФЗ
-            "Назад" -> /Услуги компании
-
-    state: Услуги компании_Готовые решения_ИИП
-        a: Индивидуальные инвестиционные портфели — готовые решения с защитой вложений до 100% или доходностью до 400%, составленные профессиональными аналитиками. Подробности по ссылке: https://www.finam.ru/landings/iip-main/
-
-    state: Услуги компании_Готовые решения_УК
-        a: По вопросам счетов, открытых в рамках УК «Финам Менеджмент», обратитесь к менеджеру управляющей компании любым удобным способом: https://www.fdu.ru/funds/aboutcompany/
-
-    state: Услуги компании_Готовые решения_Сопровождение
-        a: Услуги инвестиционного сопровождения — это индивидуальная поддержка экспертами «Финам» для доступа к эксклюзивным финансовым инструментам США. Доступно только для квалифицированных инвесторов.
-            Подробнее на сайте https://www.finam.ru/landings/invest-soprovojdenie/ 
-            Для отключения услуги нужно обратиться к менеджеру «Финам».
-
-    state: Услуги компании_Готовые решения_Структурные облигации
-        a: Структурная облигация — это ценная бумага, выплата номинала и купона которой зависит от заранее оговоренных условий.
-            ✅ Структурные облигации выпускаются в российской юрисдикции, поэтому нет риска заморозки активов.
-            ✅ Подробнее: https://www.finam.ru/publications/item/strukturnye-obligacii-chto-nuzhno-znat-investoru-20230510-153700/  
-            ❗ Продукт предназначен только для квалифицированных инвесторов.
-            ❗ Узнать подробности, заказать консультацию, подключить или отключить данную услугу можно по ссылке: https://www.finam.ru/landings/structured-note/
-
-    state: Услуги компании_Готовые решения_ОФЗ
-        a: Подробности и подключение услуги доступны по ссылке:
-            https://trading.finam.ru/investments 
-            После подключения услуги, произойдет покупка бумаг. Реализовать инструмент вы можете в любой момент времени с помощью обратной сделки - продажи.
-
-    state: Услуги компании_Акции в подарок || sessionResult = "Orange", sessionResultColor = "#CD4C2B"
-        a: Через «Финам» вы можете покупать акции в подарок родственникам, друзьям или коллегам.
-            Все ценные бумаги, доступные для приобретения, на одной странице: https://shop.finam.ru/
-
-    state: Услуги компании_Партнерская программа
-        a: Станьте партнером и зарабатывайте вместе с «Финам».
-            Вы можете выбрать оптимальную форму сотрудничества в зависимости от своих ресурсов, планов развития и особенностей вашего города.
-            Подать заявку и узнать подробнее можно здесь https://edox.finam.ru/Partner/Registration
-
-    state: КУ || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /077 КУ
-        a: В рамках Консультационного управления (КУ) от «Отдела Инвестиционного Консультирования» предлагается три варианта, которые зависят от суммы средств инвестирования.
-        buttons:
-            "Пакет «Лайт»" -> /КУ_Лайт
-            "Пакет «Эксперт»" -> /КУ_Эксперт
-            "«Персональный брокер»" -> /КУ_Персональный брокер
-            "Как отключить услугу?" -> /КУ_Отключить услугу
-
-    state: КУ_Лайт
-        a: Пакет «Лайт» активируется при подключении тарифа «Консультационный». В рамках пакета услуг предоставляются инвестиционные идеи от профессиональных трейдеров.
-            Минимальная рекомендуемая сумма для инвестирования — от 30000 ₽. 
-            Подробнее о тарифе: https://www.finam.ru/landings/tariffs/ 
-            Подключить тариф можно в личном кабинете: https://lk.finam.ru/details
-            Услуга подходит для клиентов, которым нужна аналитическая поддержка. А также для тех, кто торгует небольшими объемами ценных бумаг на московской бирже. 
-            На электронную почту предоставляются следующие информационные материалы:
-            ✅ ежедневные инвестиционные идеи по Российскому рынку,
-            ✅ ежедневные инвестиционные идеи по Американскому рынку,
-            ✅ ежедневный обзор рынка,
-            ✅ еженедельный обзор рынка по понедельникам,
-            ✅ фундаментальные отчеты по инструментам глобального рынка.
-
-    state: КУ_Эксперт
-        a: Пакет «Эксперт» — продвинутая аналитическая поддержка.
-            Минимальная рекомендуемая сумма для инвестирования — от 300000 ₽.
-            0,1% от суммы активов (данная комиссия удерживается со счета клиента в течение пяти рабочих дней после окончания расчетного периода).
-            Для подключения необходимо обратиться к менеджеру компании.
-            Включает в себя:
-            ✅ ежедневные торговые идеи по российским и американским биржевым инструментам,
-            ✅ еженедельный аналитический обзор рынков РФ и США, включающий «закрытые» данные: инсайдерские покупки, дивидендные выплаты/отсечки, изменение консенсус-прогнозов аналитиков, статистика по открытым коротким/длинным позициям и другое,
-            ✅ закрытый еженедельный вебинар.
-
-    state: КУ_Персональный брокер
-        a: В рамках услуги «Персональный брокер» предоставляется информация о текущей рыночной ситуации, торговые идеи и торговые сигналы, консультанты помогают подобрать подходящую инвестиционную стратегию и сформировать инвестиционный портфель. Услугу предоставляет «Отдел Инвестиционного Консультирования».
-            Таким образом, «Персональный брокер» — это фактически полное финансовое сопровождение с самыми разнообразными финансовыми инструментами на всех рынках.
-            Для подключения необходимо обратиться к менеджеру компании.
-            Рекомендуемая минимальная сумма активов — от 3000000 ₽.
-            Детальнее об услуге: https://www.finam.ru/landings/personal-broker/
-
-    state: КУ_Отключить услугу
-        a: Для отключения консультационного управления нужно обратиться к менеджеру «Финам».
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Тест-драйв || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /078 Тест-драйв (Умный старт)
-        a: Научитесь инвестировать на реальном рынке с помощью уникальной программы «Тест-драйв».
-            После регистрации в программе участник получает 50000 ₽, на которые он может торговать в течение 5 рабочих дней акциями на Московской бирже и может получить денежное вознаграждение, ничего не теряя в случае убытка.
-            Узнать больше о программе «Тест-драйв» и зарегистрироваться можно по ссылке: https://www.finam.ru/landings/test-drive-vers/
-        buttons:
-            "Как получить доступ?" -> /Тест-драйв_Получить доступ
-            "Как получить приз?" -> /Тест-драйв_Получить приз
-            "Демо-счета" -> /Демо-счет
-
-    state: Тест-драйв_Получить доступ
-        a: ✅ Зарегистрироваться в программе можно по ссылке: https://www.finam.ru/landings/test-drive-vers/
-            ✅ Участие в программе бесплатное и доступно только для новых клиентов.
-            ✅ Принимать участие в программе можно до тех пор, пока инвестиции не принесут доход в размере 1500 ₽, который можно будет вывести на реальный брокерский счет. 
-            ✅ В период участия в программе инвесторам не потребуется платить комиссию за сделки и подоходный налог, эти расходы возьмет на себя «Финам».
-
-    state: Тест-драйв_Получить приз
-        a: Для получения приза нужно открыть и пополнить брокерский счет в «Финам» от 30000 ₽ в течение 7 рабочих дней.
-            «Финам» переведет деньги на брокерский счет. После этого можно купить на них акции, валюту и другие инструменты.
-
-    state: Финам-бонус || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /079 Финам бонус
-        a: Участвуйте в акции «Финам бонус 2.0».
-            Пройдите регистрацию и получите 500 приветственных бонусов. Накопите 2500 бонусов за использование сервисов «Финам» и получите их на брокерский счет. 1 бонус = 1 ₽.
-            1. Регистрация, выбор заданий для получения бонусов, детали акции:
-            ✅ для тех, у кого еще нет брокерского счета доступны по ссылке https://www.finam.ru/landings/bonus-finam/ 
-            ✅ для тех, у кого уже есть брокерский счет доступны по ссылке https://www.finam.ru/landings/finam-bonus/ 
-            2. Информация для участников акции в период с 1 октября 2023 по 29 декабря 2023 г:
-            ✅ бонусный баланс обновляется 1 раз в месяц: 15 октября 2023 года, 15 ноября 2023 года, 15 декабря 2023 года, 15 января 2024 года
-            ✅ когда вы накопите на своем бонусном счете не менее 2500 бонусов, в период с 5 по 15 января 2024 года деньги будут автоматически перечислены на ваш брокерский счет (не ИИС).*
-            *Если вы не предпочтете обменять бонусы на онлайн курс.
-        buttons:
-            "Кабинет участника Финам бонус" -> /Финам-бонус_Кабинет участника
-
-    state: Финам-бонус_Кабинет участника
-        a: Для входа в кабинет участника «Финам бонус 2.0» необходимо использовать логин/пароль, полученный при регистрации на сайте www.finam.ru
-            Доступ к разделу находится в правом верхнем углу сайта www.finam.ru по ссылке «Вход».
-            ❗ Если ранее вы не регистрировались на сайте, то на вашу электронную почту одновременно с письмом о регистрации в акции «Финам бонус 2.0» пришло письмо с логином и паролем от www.finam.ru
-
-    state: ЗПИФ на майнинг || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /080 ЗПИФ на майнинг
-        a: Зарабатывайте на развитии перспективной отрасли майнинга в России и росте биткойна через покупку паев закрытого паевого инвестиционного фонда, инвестирующего в майнинговое оборудование.
-            ✅ Количество паев ограничено. 
-            Успейте подать заявку — и окажитесь в числе инвесторов, которые станут первыми пайщиками ЗПИФ комбинированный «Финам — Цифровые активы». 
-            Подробнее: https://www.finam.ru/landings/zpif-mining/ 
-            ✅ Для консультации и подачи заявки обратитесь к менеджеру АО «Финам».
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Счет Иностранные биржи || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /081 Счет Иностранные биржи
-        a: «Финам» возобновляет возможность открывать счета «Иностранные биржи».
-            Счет «Иностранные биржи» позволяет хранить доллары США без комиссии, а также предоставляет доступ к фондовым биржам NYSE/NASDAQ и валютной секции ММВБ.
-            Торговля по счету через ИТС FinamTrade,TRANSAQ.
-            Детали акции можно уточнить у менеджера.
-            ❗ После подтверждения статуса КВАЛ в личном кабинете появится доступ к открытию счета «Иностранные биржи» по ссылке: https://lk.finam.ru/open/brokerage
-        buttons:
-            "Движение средств" -> /Счет Иностранные биржи_Движение средств
-    #    "Перевод на оператора" -> /Перевод на оператора
-    state: Счет Иностранные биржи_Движение средств
-        a: 1. Как пополнить брокерский счет «Иностранные биржи»:
-            – Безналичный перевод с банковского счета в валюте рубль/доллар США (Комиссия 0,6 % от суммы ввода, но не менее 25 $ и не более 4 000 $)
-            – Через кассу Банка ФИНАМ (рубли)
-            – С помощью банковской карты (рубли)
-            – С действующих брокерских счетов, открытых в «Финам» доступен перевод средств только в рублях.
-            Реквизиты для пополнения доступны в личном кабинете, авторизуйтесь в https://lk.finam.ru/ и перейдите в раздел «Информация» → «Реквизиты для перечисления средств». При переводе денежных средств выберите валюту, договор и номер счета.
-            Условия бесплатного хранения валюты можно уточнить у менеджера. 
-            2. Вывод средств также доступен в личном кабинете. Вывод доступен в рублях или в долларах США.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: Сегрегированный || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /082 Сегрегированный
-        a: Сегрегированные счета позволяют хранить ценные бумаги обособленно от остальных бумаг брокера. Соответственно, помогут защитить вложения от рисков ограничений на расчеты.
-            ✅ Счет доступен только квалифицированным инвесторам.
-            ✅ Подробнее: https://www.finam.ru/landings/segregated-account/ 
-            ✅ Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Открытие счета Global" -> /Сегрегированный_Открытие
-            "Пополнение счета Global" -> /Сегрегированный_Пополнение
-            "Доступные инструменты" -> /Сегрегированный_Инструменты
-            "Доступ к торговой системе" -> /Сегрегированный_Доступ к ТС
-            "Налогообложение" -> /Сегрегированный_Налогообложениее
-            "Вывод средств" -> /Сегрегированный_Вывод
-            "Перевод ценных бумаг" -> /Сегрегированный_ПереводЦБ
-
-    state: Сегрегированный_Открытие
-        a: Открытие счета «Сегрегированный Global» доступно только квалифицированным инвесторам, при личном посещении офиса или дистанционно. Помимо внутреннего паспорта РФ для открытия счета нужен второй документ из перечня на выбор:
-            – заграничный паспорт
-            – водительское удостоверение
-            – справка из банка (любого содержания, не старше 6 месяцев) с указанием ФИО и адреса
-            – счет за коммунальные услуги (не старше 6 месяцев) с указанием ФИО и адреса.
-            ✅ Счет открывается в течение одного дня. Торговля доступна с момента пополнения счета.
-            ✅ Перед посещением офиса предварительно рекомендуется согласовать время и цель визита с менеджером. Время работы и адреса офисов: https://www.finam.ru/about/contacts 
-            ✅ Дистанционное открытие счета «Сегрегированный Global» доступно для клиентов, у которых уже были ранее открыты счета в компании «Финам» при личном посещении офиса компании. Дистанционное открытие доступно в личном кабинете по ссылке https://edox.finam.ru/ → «Открыть счет» → «Брокерская компания» → «Иностранные рынки» → «Сегрегированный Global». (Данный раздел личного кабинета доступен только квалифицированным инвесторам).
-            ✅ Иллюстрированная инструкция по открытию счета по ссылке:  https://www.finam.ru/dicwords/file/files_chatbot_instrukciysegregopen
-
-    state: Сегрегированный_Пополнение
-        a: Пополнение счета «Сегрегированный Global» доступно в валютах рубли РФ и доллары США.
-            ✅ Валюта счета «Сегрегированный Global» - доллар США. При пополнении счета в другой валюте конвертация в доллары США происходит по текущему курсу + 4%.
-            ✅ Иллюстрированная инструкция по пополнению «Сегрегированный Global» через Банк «Финам» по ссылке: https://www.finam.ru/dicwords/file/files_chatbot_instrukciysegreg 
-            ❗ Перед пополнением счетов обязательно проконсультируйтесь с менеджером «Финам».
-
-    state: Сегрегированный_Инструменты
-        a: ✅ На счете «Сегрегированный Global» предоставляется доступ к биржам NYSE, NASDAQ и СВОЕ, в рамках которых доступна торговля Акциями, АДР, ETF, а также опционами и опционными стратегиями.
-
-    state: Сегрегированный_Доступ к ТС
-        a: Торговля доступна через торговые системы TRANSAQ US и FinamTrade.
-            Выберите, чтобы узнать подробнее:
-        buttons:
-            "FinamTrade" -> /ИТС_FinamTrade_Авторизация
-            "TRANSAQ US" -> /ИТС_TRANSAQ
-            "Назад" -> /Сегрегированный
-
-    state: Сегрегированный_Налогообложениее
-        a: ✅ АО «Финам» является налоговым агентом на доходы, полученные при самостоятельной торговле в рамках счета «Сегрегированный Global», за исключением дивидендов, полученных в иностранной валюте, по ним отчитываться необходимо самостоятельно в ИФНС.
-            ✅ Так как счет открывается в иностранной компании, об открытии счета необходимо уведомить налоговую службу.
-            Подать сведения об открытии счета в ФНС можно в мобильном приложении или через сайт nalog.ru в разделе «Жизненные ситуации» → «Информировать о счете в банке, расположенном за пределами РФ».
-            ❗ Подать сведения нужно в течение 1 месяца с даты открытия счета. Подавать выписку (отчет брокера Lime Trading) о движении средств необходимо до 1 июня года следующего за отчетным.
-
-    state: Сегрегированный_Вывод
-        a: Поручение на вывод денежных средств со счета «Сегрегированный Global» можно подать через личный кабинет Lime Trading: https://j2t.tech/ru/
-            1. Комиссии за вывод на счета Банка «Финам»:
-            ✅ комиссии за вывод со стороны брокера – отсутствуют;
-            ✅ комиссия за зачисление долларов и евро на банковский счет: 3% от суммы операции, но не менее 300 $/€ и не более суммы операции.
-            2. Комиссии за вывод в иной неподсанкционный банк РФ: 0,1%, мин. 1500 ₽, макс. 2500 ₽
-            Минимальная сумма вывода за транзакцию – 3000 ₽
-            3. Комиссии за вывод валюты в зарубежные банки (требуется предварительное согласование):
-            ✅ комиссия за вывод со стороны вышестоящего брокера:
-            – в долларах США: 0,40% (мин. 40 $, макс. 1000 $).
-            – в евро: без комиссии
-            Минимальная сумма вывода за транзакцию – 20 $/20 €
-            Актуальные комиссии на сайте вышестоящего брокера: https://j2t.tech/ru/solutions/mt5global/withdrawal/ 
-            ✅ комиссии за зачисление валюты на счета зарубежных банков необходимо уточнять самостоятельно у банка-получателя.
-            ❗ Выводы в валюте на счета в российских банках, кроме Банка «Финам», не осуществляются.
-
-    state: Сегрегированный_ПереводЦБ
-        a: К переводу на счет «Сегрегированный Global» доступны ценные бумаги, приобретенные на иностранных биржах со счетов «Финам».
-            Для корректного перевода активов обратитесь к менеджеру.
-        buttons:
-            "Оператор" -> /Перевод на оператора
-
-    state: FinamSmart || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /083 Finam Smart
-        a: Приложение FinamSmart является сервисом управления автоследованием. Установить приложение можно через:
-                ✅ AppStore — https://apps.apple.com/ru/app/id434829194 
-                ✅ PlayMarket — https://play.google.com/store/apps/details?id=ru.finam.android 
-                ✅ AppGallery — https://appgallery.huawei.com/#/app/C104184793 
-                Детальнее о сервисе автоследования:
-        buttons:
-            "Детальнее об автоследовании" -> /Comon
-
-    state: ЛЧИ || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /084 ЛЧИ
-        a: Конкурс «Лучший частный инвестор 2023» (ЛЧИ) проводится ПАО Московская биржа в период с 05 октября по 19:00 МСК 21 декабря 2023 года включительно. Подробнее: https://investor.moex.com/
-            ✅ Прием заявок на участие закрыт 7 декабря 2023 года
-            ✅ Текущие результаты отображаются на сайте конкурса: https://investor.moex.com/ru/statistics/2023/ 
-            ✅ Итоги ежегодного конкурса «Лучший частный инвестор 2022», который проводился с 15 сентября по 15 декабря 2022 года по ссылке: https://www.moex.com/n53851/?nt=106 
-            ✅ Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Условия участия в ЛЧИ" -> /ЛЧИ_Условия
-
-    state: ЛЧИ_Условия
-        a: ✅ Объем начальных средств (стартовая сумма) для всех активных участников конкурса – 10000 ₽.
-            ✅ Начальные средства участника конкурса могут быть увеличены в ходе конкурса согласно правилам расчета начальных средств (п.6.8 – п.6.12 Положения о конкурсе).
-            ✅ Допускается наличие открытых позиций по срочным контрактам и ценным бумагам.
-            ✅ Участник конкурса может указать в заявлении/регистрационной форме список ценных бумаг (из перечня ценных бумаг, согласно Приложению № 4 к Положению о конкурсе), допущенных к торгам Московской бирже и их количество, с которыми он вступает в конкурс.
-            ✅ Изменить количество ценных бумаг можно через личный кабинет на сайте конкурса до 18:50 МСК дня старта в конкурсе.
-
-    state: Экспорт котировок || sessionResult = "Готоа", sessionResultColor = "#15952F"
-        intent!: /085 Экспорт котировок
-        a: Бесплатная загрузка архивных котировок для их дальнейшего использования в системах технического анализа доступна по ссылке: https://www.finam.ru/profile/moex-akcii/gazprom/export/
-
-    state: Анекдоты || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /086 Анекдоты
-        a: Деньги не сделают вас счастливее.
-            У меня сейчас 50 миллионов и я так же счастлив, как и тогда, когда у меня было 48 миллионов.
-            — Мама, мне сказали, что я шизофреник.
-            — Ну что ты сына, кто тебе такое сказал?
-            — Болинджеры... После того, как я Ар-Си-Айку зафильтровал через ФНЧ, кинул на нее веера Фибоначчи, и наложил на всё это Экспоненциаьные мувинги, форсированные по амплитуде, взвесив их по объему в моменте.
-            Чем отличается инвестор от спекулянта? 
-            Спекулянт покупает дешево, продаёт дорого; а инвестор покупает дорого, а продать не может вообще.
-            У аналитика спрашивают:
-            — Скажите, а ваши прогнозы всегда совпадают?
-            — Конечно, всегда, только даты иногда не совпадают...
-            Умирает брокер, над ним мечется бригада врачей-реаниматоров. 
-            Электрошок, искусственное дыхание. 
-            - Мы его теряем!!! 
-            - Пульс? 
-            - 9...8...7...6...5... 
-            Умирающий подскакивает: 
-            - Упадет до 3-х – начинай покупать!!!
-            — И что у тебя на завтрак?
-            — Овсяная каша, овсяный кисель. 
-            — Англия?
-            — Ипотека.
-            Устраивается молодой выпускник финансового института на работу трейдером.
-            Начальник отдела объясняет ему его обязанности и, указывая на компьютер, говорит: 
-            — А это ваш персональный помощник — компьютер. Он будет выполнять за вас половину работы. Вопросы есть? 
-            — Есть. А можно мне два компьютера?
-            Клиент брокеру: «Мо-мо-же-жет д-д-дадите п-п-плечо 40?»
-            Брокер: «Даже не заикайтесь…»
-
-    state: Иностранные облигации || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /089 Иностранные облигации
-        a: Квалифицированным инвесторам «Финам» доступны для покупки иностранные облигации на внебиржевом рынке:
-            ✅ Государственные облигации США «Treasuries»
-            ✅ Государственные облигации иных стран (Оман и Турция)
-            ✅ Корпоративные и государственные облигации Китая
-            Пожалуйста, выберите один из предложенных вариантов:
-        buttons:
-            "Облигации США" -> /Иностранные облигации_США
-            "Облигации Китая" -> /Иностранные облигации_Китая
-            "Облигации иных стран" -> /Иностранные облигации_Иных стран
-
-    state: Иностранные облигации_США
-        a: Квалифицированным инвесторам «Финам» доступны сделки на внебиржевом рынке с иностранными государственными облигациями США.
-            ✅ Минимальная сумма сделки от 50000 $
-            ✅ Купон 2,875 – 4,125 %
-            ✅ Комиссия за сделки - 0.7%
-            Чтобы заказать консультацию или подать поручение, нужно обратиться к менеджеру «Финам».
-
-    state: Иностранные облигации_Китая
-        a: Квалифицированным инвесторам «Финам» доступны сделки на внебиржевом рынке по ряду корпоративных и государственных бондов Китая.
-            ✅ Минимальная сумма сделки от 70000 $
-            ✅ Конечное хранение данных бумаг в дружественном Гонконгском брокере.
-            ✅ Комиссия за сделки - 0.118%
-            Чтобы заказать консультацию или подать поручение, нужно обратиться к менеджеру «Финам».
-
-    state: Иностранные облигации_Иных стран
-        a: Квалифицированным инвесторам «Финам» доступны сделки на внебиржевом рынке с иностранными государственными облигациями Турции и Омана.
-            ✅ Минимальная сумма сделки от 200000 $
-            ✅ Купон 6 - 6,75 %
-            ✅ Комиссия за сделки - 0.7%
-            Чтобы заказать консультацию или подать поручение, нужно обратиться к менеджеру «Финам».
-
-    state: Finam Invest || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /090 Finam Invest
-        a: Finam Invest — это новое мобильное приложение от «Финам», включает в себя все необходимое для осознанных инвестиций, полагаясь на интересы и предпочтения самого пользователя:
-            ✅ Готовые подборки ценных бумаг для портфеля и инвестиционных продуктов.
-            ✅ Инвестор определяет параметры своего инвестпортфеля, а сервис рекомендует варианты с указанием соответствия, интересности, перспективности, предельно кратко и понятно.
-            ✅ Информация о состоянии брокерских и банковских счетов пользователя наглядно отображается на одной странице.
-            ✅ Самая актуальная финансовая информация из интеллектуальной новостной ленты Limex. В приложение встроен новостной агрегатор с возможностью фильтрации по темам. Умная лента настраивается под предпочтения инвестора.
-            ✅ Опция «Избранное» работает в двух вариантах: первый — список интересующих инструментов, сервисов и инвестпродуктов, второй — отслеживание ценных бумаг (Watchlist). Список может включать до 350 позиций.
-            ✅ Визуализация портфеля в 3D позволит наглядно увидеть соотношение активов в портфеле, а алгоритмы искусственного интеллекта подскажут прогноз по ним.
-            ✅ Сервис «Диагностика» проведет анализ портфеля пользователя по 7 параметрам, оценит качество вашей торговли.
-            ✅ Выставляйте торговые заявки прямо из Watchlist. Форма ввода заявок простая и интуитивно понятная.
-            ❗ Приложение находится в разработке, пожелания по улучшению сервиса можно оставить по ссылке: https://www.finam.ru/landings/finam-invest-feedback/ 
-            ❗ Основной функционал приложения доступен всем пользователям приложения, но некоторые инвестиционные продукты — только клиентам «Финам».
-            ❗ Представленные подборки не являются индивидуальной инвестиционной рекомендацией.
-
-    state: ИПИФ «Алгоритм роста» || sessionResult = "Готов", sessionResultColor = "#15952F"
-        intent!: /091 ИПИФ Алгоритм роста
-        a: ИПИФ «Алгоритм роста» позволяет воспользоваться всеми преимуществами высокочастотного трейдинга при относительно небольших вложениях, так как оборудование для такого вида инвестирования обычно стоит несколько миллионов рублей.
-            ✅ Количество паев ограничено.
-            ✅ Услуга доступна для квалифицированных инвесторов.
-            ✅ Чтобы воспользоваться предложением, нужно:
-            1. Открыть счет в управляющей компании (УК) «Финам», перейдя по ссылке https://edox.finam.ru
-            2. Выбрать стратегию «Алгоритм роста»
-            3. Пополнить новый счёт в УК от 100000 ₽
-            ✅ Подробности и инструкции по ссылке https://www.finam.ru/landings/asset-management-hft/ 
-            ✅ Актуальные новости для владельцев паев:
-            С 23 по 24 ноября 2023 года ожидается начисление паев регистратором. На данный момент происходят последние настройки архитектуры ИПИФ «Алгоритм Роста». В ближайшие 2 недели будет полноценный запуск фонда.
-
-    state: Пресса || sessionResult = "Green", sessionResultColor = "#15952F"
-        intent!: /092 Пресса
-        a: ✅ Финансовая группа «Финам» рада сотрудничеству со СМИ и блогерами, освещающими деловые, экономические, общественно-политические и информационно-развлекательные темы. Пресс-служба и специалисты профильных подразделений,
-            в том числе профессиональная команда биржевых аналитиков,
-            всегда готовы на регулярной основе предоставлять аналитические материалы, пресс-релизы и комментарии по широкому кругу экономических тем и вопросам, связанным с бизнесом финансовой группы. Связаться с пресс-службой и узнать подробнее можно по ссылке: https://www.finam.ru/landings/press 
-            ✅ Ознакомиться с опубликованными публикациями «Финам» в прессе можно по ссылке: https://www.finam.ru/publications/section/press
-
-    state: Инструменты
-        intent!: /093 Инструменты
-        a: ✅ Найти интересующий торговый инструмент можно как на сайтах бирж, например, Московской https://www.moex.com/s4  или СПБ Биржи https://spbexchange.ru/ru/listing/securities/
-            Так и воспользовавшись поиском в торговой системе.
-            ✅ Для подбора облигаций, также можно воспользоваться сервисом от «Финам» по ссылке: https://bonds.finam.ru/issue/info/ 
-            ✅ Информация о доступности инструментов для отдельных категорий инвесторов и по доступным биржам с брокером «Финам» - по кнопке «Актуальные доступы».
-            ✅ Бумаги могут отображаться недоступными для торгов по причине проходящего корпоративного действия либо по причине ограничений вышестоящих депозитариев.
-            ✅ Проверить необходимость статуса для торговли определенным инструментом можно с помощью кнопки меню «Проверка инструмента на КВАЛ».
-            Чтобы узнать подробнее, выберите один из предложенных вариантов:
-        buttons:
-            "Как найти инструмент" -> /Инструменты_Найти
-            "Актуальные доступы" -> /Доступные биржи
-            "Ограничения" -> /Ограничение ЦБ
-            "Предложить добавить инструмент в ИТС" -> /Инструменты_Предложить добавить инструмент
-            "Проверка инструмента на КВАЛ" -> /КВАЛ_Проверка инструмента
-
-    state: Инструменты_Найти
-        a: ✅ Самый удобный поиск инструментов в торговой системе FinamTrade: инструменты можно выбирать как через строку поиска, где дополнительно будут предложены альтернативные и производные финансовые инструменты, так и через готовые подборки инструментов в левом вертикальном меню «Рынки»
-            ✅ В системе TRANSAQ для поиска и выбора инструмента нужно нажать правой кнопкой мыши по таблице «Финансовые инструменты». Обучающие видео-материалы по ссылке: https://education.finam.ru/articles/43 
-            ✅ Для поиска инструмента в системе QUIK нужно перейти по следующим вкладкам: «Система» → «Заказ данных» → «Поток котировок», далее выбрать классы нужных инструментов, при необходимости в этом же поле настроить «Фильтр инструментов»
-            Обучающие видео-материалы по ссылке: https://education.finam.ru/lk/course/de5a9d1c-224f-4376-882b-8eb221fa779b 
-            ✅ Обзор бумаг и фундаментальный анализ и прогнозы с сервисом «Финам AI-скринер» по ссылке: https://ai.finam.ru/
-            ✅ Нажмите кнопку ниже, если не удалось найти ценную бумагу в торговых системах.
-        buttons:
-            "Предложить добавить инструмент в ИТС" -> /Инструменты_Предложить добавить инструмент
-
-    state: Инструменты_Предложить добавить инструмент
-        a: Если не удалось найти ценную бумагу в торговых системах, то для предложения к добавлению такой бумаги, в продолжение данного чата, направьте:
-            ✅ полное наименование бумаги
-            ✅ тикер
-            ✅ ISIN (международный идентификационный код ценной бумаги)
-            ✅ наименование торговой системы
-            После введенных данных, нажмите «Перевод на оператора»
-            Менеджер поддержки проверит информацию и сориентирует вас.
-        buttons:
-            "Оператор" -> /Перевод на оператора
+    state: TransferEvent
+        event: transfer
+        if: $dialer.getTransferStatus().status === 'FAIL'
+            a: Приносим свои извинения мы вынуждены завершить звонок. Нам важна каждая минута вашего времени. Сейчас все операторы заняты. 
+            a: Пожалуйста, обратитесь к нам в чат поддержки на сайте фина'м ру, или в терминале фина'м трейд. Или перезвоните позднее.
+            script:
+                $analytics.setSessionResult("Ошибка перевода на оператора");
+                $dialer.hangUp();
