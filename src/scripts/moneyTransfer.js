@@ -24,7 +24,7 @@ function moneyTransferRun(firstRun) {
     var parseTree = $jsapi.context().parseTree;
     var moneyTransfer = {}
     
-    
+    // Блок для вывода текста и содержимого обращения
     // $jsapi.context().response.replies = $jsapi.context().response.replies || [];
     //                 $jsapi.context().response.replies.push({
     //                     "type": "text",
@@ -64,12 +64,6 @@ function moneyTransferRun(firstRun) {
     
     $jsapi.context().session.moneyTransfer = moneyTransfer;
     
-    // $jsapi.context().response.replies = $jsapi.context().response.replies || [];
-    // $jsapi.context().response.replies.push({
-    //                     "type": "text",
-    //                     "text": JSON.stringify($jsapi.context().session.moneyTransfer)
-    //                 });
-    
     if(moneyTransfer.company == "undefined") {
         $reactions.transition("/MoneyTransfer/MoneyTransferGetCompany");
         return true;
@@ -82,12 +76,12 @@ function moneyTransferRun(firstRun) {
             return true;
         }    
     }
-    // $reactions.answer("11");
+
     if(moneyTransfer.assetType == "undefined") {
         $reactions.transition("/MoneyTransfer/MoneyTransferGetAssetType");
         return true;
     }
-    // $reactions.answer("22");
+
   if(moneyTransfer.type == "undefined") {
     $reactions.transition("/MoneyTransfer/MoneyTransferGetType");
     return true;
@@ -103,7 +97,6 @@ function moneyTransferRun(firstRun) {
       break;  
     }
   }
-    // $reactions.answer("33");
   if(moneyTransfer.assetType == assetType.CB){
      moneyTransfer.method = 'default';
   }
@@ -112,12 +105,6 @@ function moneyTransferRun(firstRun) {
     $reactions.transition("/MoneyTransfer/MoneyTransferGetMethod");
     return true;
   }
-//   $reactions.answer("44");
-//   $reactions.answer(assetType.CB);
-//   $reactions.answer(moneyTransferType.transfer);
-//   $reactions.answer(moneyTransfer.assetType);
-//   $reactions.answer(moneyTransfer.type);
-//   $reactions.answer(moneyTransfer.transferCBbetweenАccounts);
 
     if((moneyTransfer.assetType == assetType.CB) && (moneyTransfer.type == moneyTransferType.transfer)){
       if(moneyTransfer.transferCBbetweenАccounts == "undefined") {
@@ -125,7 +112,6 @@ function moneyTransferRun(firstRun) {
         return true;
       }
     }
-//  $reactions.answer("55");
   $reactions.transition("/MoneyTransfer/MoneyTransferText");
   return true;
 }
@@ -140,25 +126,13 @@ function getTestForMoneyTransfer(moneyTransfer) {
   } else {
     textType = 'default';
   }
-    // $reactions.answer(moneyTransfer.assetType);
-    // $reactions.answer(moneyTransfer.type);
-    // $reactions.answer(moneyTransfer.company);
-    // $reactions.answer(moneyTransfer.assetType);
-    // $reactions.answer(moneyTransfer.type);
-    // $reactions.answer(moneyTransfer.method);
-    // $reactions.answer(textType);
-    // $reactions.answer(assetType.CB);
-    // $reactions.answer(moneyTransfer.transferCBbetweenАccount);
-    // $reactions.answer(moneyTransferType.transfer);
+ 
     
     if((moneyTransfer.assetType == assetType.CB) && (moneyTransfer.type == moneyTransferType.transfer)){
-        // $reactions.answer("66");
         text = textMoneyTrfansfer[moneyTransfer.company][moneyTransfer.assetType][moneyTransfer.type][moneyTransfer.transferCBbetweenАccounts][textType];  
     } else {
-        //  $reactions.answer("77");
         text = textMoneyTrfansfer[moneyTransfer.company][moneyTransfer.assetType][moneyTransfer.type][moneyTransfer.method][textType]; 
     }
-//  $reactions.answer(text);
   return text;
 }
 

@@ -1,3 +1,5 @@
+//Проверка на постоврение фразы в шапке интента и в уточнении, проставляется флаг при прохождении функции
+
 function countersArrayCheckAndCreate($context, countersArray, currentState){
     
     if( !countersArray ){
@@ -10,8 +12,6 @@ function countersArrayCheckAndCreate($context, countersArray, currentState){
     
     $context.session.countersArray[2] = true;
     
-    // $reactions.answer(JSON.stringify($context.session.countersArray));
-    
     return $context.session.countersArray;
     
     }
@@ -22,15 +22,15 @@ function countersArrayCheckAndCreate($context, countersArray, currentState){
     
 }
 
+// Функция проверяет дату запуска скрипта с текстом праздника (Если для интента праздник не влияет, то необходимо закомментировать)
 
 function holiday($context, countersArray, currentState){
 
     var countersArray = countersArrayCheckAndCreate($context, countersArray, currentState);
     
-    
     var date = currentDate();
     
-    var allHolidaysDates = "21/3/2024 22/3/2024 23/3/2024 24/3/2024 25/3/2024 28/3/2024 29/3/2024 30/3/2024 31/3/2024 1/4/2024";
+    var allHolidaysDates = "21/3/2024 22/3/2024 23/3/2024 24/3/2024 25/3/2024 28/3/2024 2/4/2024 3/4/2024 4/4/2024 5/4/2024";
     
     var allHolidaysArray = allHolidaysDates.split(' ');
     
@@ -40,7 +40,7 @@ function holiday($context, countersArray, currentState){
         
         if(currentState == "/Доступные биржи" && countersArray[0] == true){
             
-        $reactions.answer("С 22 по 25 марта 2024 года – праздничные дни в Казахстане, торги и расчеты с валютными парами с казахстанским тенге не проводятся.");
+        $reactions.answer("4 апреля, торги и расчёты не проводятся на бирже Гонконга, а также не проводятся торги и расчёты с валютами гонконгский доллар и китайский юань. 5 апреля, не проводятся торги и расчёты с валютой китайский юань.");
         countersArray[0] = false;
         return 0;    
         
@@ -48,7 +48,7 @@ function holiday($context, countersArray, currentState){
         
         if(currentState == "/Время торгов" && countersArray[1] == true){
             
-        $reactions.answer("С 22 по 25 марта 2024 года – праздничные дни в Казахстане, торги и расчеты с валютными парами с казахстанским тенге не проводятся.");
+        $reactions.answer("4 апреля, торги и расчёты не проводятся на бирже Гонконга, а также не проводятся торги и расчёты с валютами гонконгский доллар и китайский юань. 5 апреля, не проводятся торги и расчёты с валютой китайский юань.");
         countersArray[1] = false;
         return 0;    
         
@@ -56,7 +56,7 @@ function holiday($context, countersArray, currentState){
         
         if(currentState == "/Режим расчетов" && countersArray[2] == true){
             
-        $reactions.answer("С 22 по 25 марта 2024 года – праздничные дни в Казахстане, торги и расчеты с валютными парами с казахстанским тенге не проводятся.");
+        $reactions.answer("4 апреля, торги и расчёты не проводятся на бирже Гонконга, а также не проводятся торги и расчёты с валютами гонконгский доллар и китайский юань. 5 апреля, не проводятся торги и расчёты с валютой китайский юань.");
         countersArray[2] = false;
         return 0;    
         
