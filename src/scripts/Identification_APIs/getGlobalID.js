@@ -34,9 +34,11 @@ function getGlobalID(phoneNumber){
         for (var i in response.data.data) {
             if (response.data.data[i].type == "L"){
                 $analytics.setMessageLabel("ЮЛ", "IVR VB");
+                $jsapi.context().client.getGlobalID = response.data.data[i];
               return response.data.data[i].actualGlobalId  
             }
         }
+        $jsapi.context().client.getGlobalID = response.data.data[0];
         return response.data.data[0].actualGlobalId;
     } 
     else if (response.status == "404" && responseError.code == "5"){
