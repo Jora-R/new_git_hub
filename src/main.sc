@@ -3373,8 +3373,8 @@ theme: /
             q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
             # final answer
             
-        state: Комиссия_IPO
-            a: Тарифы IPO
+        state: IPOComission
+            a: Комиссии IPO
             # go!: /IPO_Условия участия 
         
     state: Комиссии_Форекс
