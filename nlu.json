@@ -1,7 +1,7 @@
 {
   "project" : {
-    "id" : "voicebot_prod-1000002-CqG",
-    "name" : "voicebot_prod-1000002-CqG",
+    "id" : "test_yura-1000074841-Xwi",
+    "name" : "test_yura-1000074841-Xwi",
     "folder" : "/platform"
   },
   "settings" : {
@@ -96,12 +96,14 @@
       "name" : "notifications",
       "entity" : "notifications",
       "required" : false,
-      "prompts" : [ ]
+      "prompts" : [ ],
+      "array" : false
     }, {
       "name" : "notifications_type",
       "entity" : "notifications_type",
       "required" : false,
-      "prompts" : [ ]
+      "prompts" : [ ],
+      "array" : false
     } ],
     "priority" : 0
   }, {
@@ -5195,6 +5197,8 @@
       "text" : "хочу тариф на иис финам фри"
     }, {
       "text" : "у меня тест драйв"
+    }, {
+      "text" : "тарифы IPO"
     } ],
     "classificationRules" : {
       "refs" : [ {
@@ -5222,7 +5226,8 @@
       "name" : "tarifs",
       "entity" : "tarifs",
       "required" : false,
-      "prompts" : [ ]
+      "prompts" : [ ],
+      "array" : false
     } ],
     "priority" : 0
   }, {
@@ -11295,6 +11300,8 @@
       "text" : "подскажите комиссию при покупке продаже"
     }, {
       "text" : "можете пояснить расчет комиссии"
+    }, {
+      "text" : "комиссии IPO"
     } ],
     "classificationRules" : {
       "refs" : [ ]
@@ -15089,12 +15096,14 @@
       "name" : "IIS_Open",
       "entity" : "IIS_Open",
       "required" : false,
-      "prompts" : [ ]
+      "prompts" : [ ],
+      "array" : false
     }, {
       "name" : "IIS_Close",
       "entity" : "IIS_Close",
       "required" : false,
-      "prompts" : [ ]
+      "prompts" : [ ],
+      "array" : false
     } ],
     "priority" : 0
   }, {
@@ -19563,12 +19572,6 @@
       "text" : "какие условия в рамках ipo"
     }, {
       "text" : "условия ipo"
-    }, {
-      "text" : "какие комиссии по ipo"
-    }, {
-      "text" : "тарифы проведения ipo"
-    }, {
-      "text" : "какие тарифы по ipo"
     } ],
     "classificationRules" : {
       "refs" : [ ]
@@ -21746,6 +21749,10 @@
       "hidden" : false
     },
     "records" : [ {
+      "type" : "pattern",
+      "rule" : [ "комис* IPO" ],
+      "value" : "{\n  \"name\": \"IPO\"\n}"
+    }, {
       "type" : "pattern",
       "rule" : [ "{(абонентск*|брокерск*|абонплат*) [плат*|комис*] [за|по] [обслужив*|веден*|услуг*] [брокерск*] [счет]}" ],
       "value" : "{\n  \"name\": \"обслуживание\"\n}"
@@ -26420,6 +26427,10 @@
     },
     "records" : [ {
       "type" : "pattern",
+      "rule" : [ "тариф* IPO" ],
+      "value" : "{\n  \"name\": \"IPOTarifs\"\n}"
+    }, {
+      "type" : "pattern",
       "rule" : [ "([как] (*смотр*|*видеть|проверить|узнат*|информац*) [все|про|о|по] (тариф*|перечень тарифов|список тарифов|справочник тарифов))" ],
       "value" : "{\n  \"name\": \"AllRatesList\"\n}"
     }, {
@@ -27601,533 +27612,533 @@
   } ],
   "enabledSystemEntities" : [ "mystem.geo", "pymorphy.name", "duckling.number", "duckling.time", "duckling.date", "duckling.time-of-day", "duckling.duration", "duckling.phone-number", "duckling.email", "duckling.url" ],
   "spellerDictionary" : [ {
-    "word" : "финам",
-    "frequency" : 2
-  }, {
-    "word" : "лимитки",
-    "frequency" : 1
-  }, {
-    "word" : "финаме",
-    "frequency" : -1
-  }, {
-    "word" : "сальдирование",
-    "frequency" : -1
-  }, {
-    "word" : "торговлю",
-    "frequency" : 1
-  }, {
-    "word" : "репо",
-    "frequency" : 3
-  }, {
-    "word" : "вебинары",
-    "frequency" : -1
-  }, {
-    "word" : "дайте",
-    "frequency" : 1
-  }, {
-    "word" : "трейду",
-    "frequency" : -1
-  }, {
-    "word" : "форекса",
-    "frequency" : -1
-  }, {
-    "word" : "даблю",
-    "frequency" : -1
-  }, {
-    "word" : "номинированный",
-    "frequency" : -1
-  }, {
-    "word" : "трехгодичная",
-    "frequency" : -1
-  }, {
-    "word" : "брокерским",
-    "frequency" : 2
-  }, {
-    "word" : "трейдер",
-    "frequency" : 1
-  }, {
-    "word" : "транзаку",
-    "frequency" : -1
-  }, {
-    "word" : "подгружается",
-    "frequency" : -1
-  }, {
-    "word" : "данные",
-    "frequency" : 4
-  }, {
-    "word" : "квал",
-    "frequency" : 3
-  }, {
-    "word" : "финанс",
-    "frequency" : 1
-  }, {
-    "word" : "гООгс",
-    "frequency" : -1
-  }, {
-    "word" : "найс",
-    "frequency" : -1
-  }, {
-    "word" : "найден",
-    "frequency" : -1
-  }, {
-    "word" : "КПУРом",
-    "frequency" : -1
-  }, {
-    "word" : "резидентство",
-    "frequency" : -1
-  }, {
-    "word" : "нерезиденту",
-    "frequency" : -1
-  }, {
-    "word" : "СММА",
-    "frequency" : -1
-  }, {
-    "word" : "маржинальную",
-    "frequency" : -1
-  }, {
-    "word" : "овернайт",
-    "frequency" : 1
-  }, {
-    "word" : "трейдинг",
-    "frequency" : 1
-  }, {
-    "word" : "брокера",
-    "frequency" : 3
-  }, {
-    "word" : "ФОРТС",
-    "frequency" : -1
-  }, {
-    "word" : "комса",
-    "frequency" : -1
-  }, {
-    "word" : "сегрегированные",
-    "frequency" : -1
-  }, {
-    "word" : "иисов",
-    "frequency" : -1
-  }, {
-    "word" : "демоверсию",
-    "frequency" : -1
-  }, {
-    "word" : "однерки",
-    "frequency" : -1
-  }, {
-    "word" : "синхрофазотрона",
-    "frequency" : 1
-  }, {
-    "word" : "юанях",
-    "frequency" : -1
-  }, {
-    "word" : "квику",
-    "frequency" : -1
-  }, {
-    "word" : "маржинального",
-    "frequency" : 1
-  }, {
-    "word" : "нибудь",
-    "frequency" : -1
-  }, {
-    "word" : "глобал",
-    "frequency" : -1
-  }, {
-    "word" : "однёрки",
-    "frequency" : -1
-  }, {
-    "word" : "фритрейд",
-    "frequency" : -1
-  }, {
-    "word" : "плагин",
-    "frequency" : 1
-  }, {
-    "word" : "транзак",
-    "frequency" : -1
-  }, {
-    "word" : "премаркет",
-    "frequency" : 1
-  }, {
-    "word" : "офисов",
-    "frequency" : 1
-  }, {
-    "word" : "фондовую",
-    "frequency" : -1
-  }, {
-    "word" : "госслужащ",
-    "frequency" : -1
-  }, {
-    "word" : "тинькоф",
-    "frequency" : 1
-  }, {
-    "word" : "айти",
-    "frequency" : -1
-  }, {
-    "word" : "едокса",
-    "frequency" : -1
-  }, {
-    "word" : "автоследование",
-    "frequency" : 1
-  }, {
-    "word" : "квиком",
-    "frequency" : 3
-  }, {
-    "word" : "внебиржевой",
-    "frequency" : -1
-  }, {
-    "word" : "приветики",
-    "frequency" : 1
-  }, {
-    "word" : "крика",
-    "frequency" : 1
-  }, {
-    "word" : "квика",
-    "frequency" : -1
-  }, {
-    "word" : "зачислится",
-    "frequency" : -1
-  }, {
-    "word" : "транзаке",
-    "frequency" : -1
-  }, {
-    "word" : "маржой",
-    "frequency" : -1
-  }, {
-    "word" : "клика",
-    "frequency" : 1
-  }, {
-    "word" : "четыре",
-    "frequency" : 1
-  }, {
-    "word" : "фьючерсам",
-    "frequency" : -1
-  }, {
-    "word" : "эпэшка",
-    "frequency" : 1
-  }, {
-    "word" : "алдохина",
-    "frequency" : -1
-  }, {
-    "word" : "деньги",
-    "frequency" : 4
-  }, {
-    "word" : "давайте",
-    "frequency" : 1
-  }, {
-    "word" : "квике",
-    "frequency" : -1
-  }, {
-    "word" : "финекс",
-    "frequency" : 2
-  }, {
-    "word" : "биду",
-    "frequency" : 1
-  }, {
-    "word" : "джуниор",
-    "frequency" : -1
-  }, {
-    "word" : "шортовую",
-    "frequency" : -1
-  }, {
-    "word" : "сбер",
-    "frequency" : -1
-  }, {
-    "word" : "мосбиржи",
-    "frequency" : -1
-  }, {
-    "word" : "вариационная",
-    "frequency" : -1
-  }, {
-    "word" : "Маржинальная",
-    "frequency" : -1
-  }, {
-    "word" : "картой",
-    "frequency" : 3
-  }, {
-    "word" : "неквалов",
-    "frequency" : 1
-  }, {
-    "word" : "metatrader",
-    "frequency" : 4
-  }, {
-    "word" : "транзака",
-    "frequency" : -1
-  }, {
-    "word" : "взимается",
-    "frequency" : 1
-  }, {
-    "word" : "трехгодичку",
-    "frequency" : -1
-  }, {
-    "word" : "брокерскому",
-    "frequency" : -1
-  }, {
-    "word" : "тинкофф",
-    "frequency" : 1
-  }, {
-    "word" : "сальдировать",
-    "frequency" : -1
-  }, {
-    "word" : "форекс",
-    "frequency" : 8
-  }, {
-    "word" : "тиньков",
-    "frequency" : 1
-  }, {
-    "word" : "друж",
-    "frequency" : 1
-  }, {
     "word" : "эпешки",
     "frequency" : 1
   }, {
-    "word" : "трейд",
-    "frequency" : -1
-  }, {
-    "word" : "расчитывается",
-    "frequency" : -1
-  }, {
-    "word" : "Зарубеж",
-    "frequency" : -1
-  }, {
-    "word" : "quik",
-    "frequency" : 2
-  }, {
-    "word" : "маржинальные",
-    "frequency" : -1
-  }, {
-    "word" : "депо",
-    "frequency" : -1
-  }, {
-    "word" : "разблокировку",
-    "frequency" : 1
-  }, {
-    "word" : "КПУРа",
-    "frequency" : -1
-  }, {
-    "word" : "синхрофазотрон",
-    "frequency" : 2
-  }, {
-    "word" : "ценных",
-    "frequency" : 3
-  }, {
-    "word" : "своими",
-    "frequency" : 2
-  }, {
-    "word" : "перого",
-    "frequency" : -1
-  }, {
-    "word" : "вариационной",
-    "frequency" : 1
-  }, {
-    "word" : "обнули",
-    "frequency" : -1
-  }, {
-    "word" : "Присвойте",
-    "frequency" : -1
-  }, {
-    "word" : "логином",
-    "frequency" : -1
-  }, {
-    "word" : "превед",
-    "frequency" : 1
-  }, {
-    "word" : "обычка",
-    "frequency" : 1
-  }, {
-    "word" : "лимитная",
-    "frequency" : -1
-  }, {
-    "word" : "комиссии",
-    "frequency" : 1
-  }, {
-    "word" : "иису",
-    "frequency" : 1
-  }, {
-    "word" : "тинкоф",
-    "frequency" : 1
-  }, {
-    "word" : "Айтишники",
-    "frequency" : -1
-  }, {
-    "word" : "метаке",
-    "frequency" : -1
-  }, {
-    "word" : "КПУР",
-    "frequency" : -1
-  }, {
-    "word" : "разблокируют",
-    "frequency" : 1
-  }, {
-    "word" : "маржинальное",
-    "frequency" : -1
-  }, {
-    "word" : "европлан",
-    "frequency" : 1
-  }, {
-    "word" : "преф",
-    "frequency" : -1
-  }, {
-    "word" : "звонил",
-    "frequency" : 1
-  }, {
-    "word" : "спред",
-    "frequency" : 1
-  }, {
-    "word" : "квалом",
-    "frequency" : 1
-  }, {
-    "word" : "фьючерсах",
-    "frequency" : -1
-  }, {
-    "word" : "едокс",
-    "frequency" : -1
-  }, {
-    "word" : "соммоn",
-    "frequency" : -1
-  }, {
-    "word" : "физлицо",
-    "frequency" : 2
-  }, {
-    "word" : "шортить",
-    "frequency" : -1
-  }, {
-    "word" : "эйпио",
-    "frequency" : 1
-  }, {
-    "word" : "срочка",
-    "frequency" : -1
-  }, {
-    "word" : "тенге",
-    "frequency" : 1
-  }, {
-    "word" : "комоне",
-    "frequency" : -1
-  }, {
-    "word" : "удержанному",
-    "frequency" : 1
-  }, {
-    "word" : "трейдером",
-    "frequency" : 1
-  }, {
-    "word" : "разблокировке",
-    "frequency" : -1
-  }, {
-    "word" : "закупилось",
+    "word" : "опционам",
     "frequency" : -1
   }, {
     "word" : "юрлицо",
     "frequency" : 1
   }, {
-    "word" : "шортится",
-    "frequency" : -1
-  }, {
-    "word" : "забанили",
-    "frequency" : -1
-  }, {
-    "word" : "покеда",
-    "frequency" : 1
-  }, {
-    "word" : "лосс",
-    "frequency" : -1
-  }, {
-    "word" : "дивидендный",
-    "frequency" : -1
-  }, {
-    "word" : "торговля",
-    "frequency" : 1
-  }, {
-    "word" : "алфа",
-    "frequency" : -1
-  }, {
-    "word" : "айпио",
-    "frequency" : 1
-  }, {
-    "word" : "драсти",
-    "frequency" : 2
-  }, {
-    "word" : "неторговом",
-    "frequency" : -1
-  }, {
-    "word" : "дисте",
-    "frequency" : -1
-  }, {
     "word" : "тинькофф",
     "frequency" : -1
   }, {
-    "word" : "опционам",
-    "frequency" : -1
-  }, {
-    "word" : "мето",
-    "frequency" : -1
-  }, {
-    "word" : "комон",
-    "frequency" : 1
-  }, {
-    "word" : "квик",
-    "frequency" : 4
-  }, {
-    "word" : "брокеры",
-    "frequency" : 1
-  }, {
-    "word" : "торгов",
-    "frequency" : 3
-  }, {
-    "word" : "опционами",
+    "word" : "лимитная",
     "frequency" : -1
   }, {
     "word" : "перевод",
     "frequency" : 2
   }, {
-    "word" : "насдак",
+    "word" : "найден",
     "frequency" : -1
   }, {
-    "word" : "коннектор",
-    "frequency" : -1
-  }, {
-    "word" : "брокерского",
-    "frequency" : 2
-  }, {
-    "word" : "трейдингом",
+    "word" : "иису",
     "frequency" : 1
+  }, {
+    "word" : "европлан",
+    "frequency" : 1
+  }, {
+    "word" : "лимитки",
+    "frequency" : 1
+  }, {
+    "word" : "взимается",
+    "frequency" : 1
+  }, {
+    "word" : "премаркет",
+    "frequency" : 1
+  }, {
+    "word" : "квика",
+    "frequency" : -1
+  }, {
+    "word" : "фьючерсах",
+    "frequency" : -1
+  }, {
+    "word" : "давайте",
+    "frequency" : 1
+  }, {
+    "word" : "приветики",
+    "frequency" : 1
+  }, {
+    "word" : "комоне",
+    "frequency" : -1
+  }, {
+    "word" : "квике",
+    "frequency" : -1
+  }, {
+    "word" : "репо",
+    "frequency" : 3
+  }, {
+    "word" : "квику",
+    "frequency" : -1
+  }, {
+    "word" : "вариационная",
+    "frequency" : -1
+  }, {
+    "word" : "гООгс",
+    "frequency" : -1
+  }, {
+    "word" : "спред",
+    "frequency" : 1
+  }, {
+    "word" : "нибудь",
+    "frequency" : -1
+  }, {
+    "word" : "едокс",
+    "frequency" : -1
   }, {
     "word" : "переведи",
     "frequency" : 1
   }, {
-    "word" : "звонили",
-    "frequency" : 1
-  }, {
-    "word" : "опшенс",
-    "frequency" : 1
-  }, {
-    "word" : "вариационную",
+    "word" : "обнули",
     "frequency" : -1
   }, {
     "word" : "зайти",
     "frequency" : 5
   }, {
-    "word" : "моносчетов",
+    "word" : "комиссии",
+    "frequency" : 1
+  }, {
+    "word" : "трехгодичку",
     "frequency" : -1
   }, {
-    "word" : "маркетные",
+    "word" : "КПУР",
     "frequency" : -1
   }, {
-    "word" : "метак",
+    "word" : "мето",
     "frequency" : -1
   }, {
-    "word" : "демо",
+    "word" : "трейду",
     "frequency" : -1
+  }, {
+    "word" : "подгружается",
+    "frequency" : -1
+  }, {
+    "word" : "тинкофф",
+    "frequency" : 1
+  }, {
+    "word" : "биду",
+    "frequency" : 1
+  }, {
+    "word" : "финам",
+    "frequency" : 2
+  }, {
+    "word" : "трейдер",
+    "frequency" : 1
+  }, {
+    "word" : "дайте",
+    "frequency" : 1
+  }, {
+    "word" : "перого",
+    "frequency" : -1
+  }, {
+    "word" : "тинькоф",
+    "frequency" : 1
+  }, {
+    "word" : "автоследование",
+    "frequency" : 1
+  }, {
+    "word" : "джуниор",
+    "frequency" : -1
+  }, {
+    "word" : "КПУРом",
+    "frequency" : -1
+  }, {
+    "word" : "однёрки",
+    "frequency" : -1
+  }, {
+    "word" : "внебиржевой",
+    "frequency" : -1
+  }, {
+    "word" : "своими",
+    "frequency" : 2
+  }, {
+    "word" : "госслужащ",
+    "frequency" : -1
+  }, {
+    "word" : "синхрофазотрон",
+    "frequency" : 2
+  }, {
+    "word" : "транзаке",
+    "frequency" : -1
+  }, {
+    "word" : "маржинального",
+    "frequency" : 1
+  }, {
+    "word" : "брокерскому",
+    "frequency" : -1
+  }, {
+    "word" : "логином",
+    "frequency" : -1
+  }, {
+    "word" : "квик",
+    "frequency" : 4
+  }, {
+    "word" : "фритрейд",
+    "frequency" : -1
+  }, {
+    "word" : "едокса",
+    "frequency" : -1
+  }, {
+    "word" : "транзака",
+    "frequency" : -1
+  }, {
+    "word" : "тиньков",
+    "frequency" : 1
   }, {
     "word" : "ресепшен",
+    "frequency" : 1
+  }, {
+    "word" : "неторговом",
+    "frequency" : -1
+  }, {
+    "word" : "друж",
+    "frequency" : 1
+  }, {
+    "word" : "ФОРТС",
+    "frequency" : -1
+  }, {
+    "word" : "метаке",
+    "frequency" : -1
+  }, {
+    "word" : "айпио",
+    "frequency" : 1
+  }, {
+    "word" : "вебинары",
+    "frequency" : -1
+  }, {
+    "word" : "преф",
+    "frequency" : -1
+  }, {
+    "word" : "офисов",
+    "frequency" : 1
+  }, {
+    "word" : "драсти",
+    "frequency" : 2
+  }, {
+    "word" : "маржинальное",
+    "frequency" : -1
+  }, {
+    "word" : "трейдером",
+    "frequency" : 1
+  }, {
+    "word" : "тинкоф",
+    "frequency" : 1
+  }, {
+    "word" : "quik",
+    "frequency" : 2
+  }, {
+    "word" : "опшенс",
+    "frequency" : 1
+  }, {
+    "word" : "забанили",
+    "frequency" : -1
+  }, {
+    "word" : "финанс",
+    "frequency" : 1
+  }, {
+    "word" : "фьючерсам",
+    "frequency" : -1
+  }, {
+    "word" : "квалом",
+    "frequency" : 1
+  }, {
+    "word" : "Айтишники",
+    "frequency" : -1
+  }, {
+    "word" : "комса",
+    "frequency" : -1
+  }, {
+    "word" : "звонил",
+    "frequency" : 1
+  }, {
+    "word" : "зачислится",
+    "frequency" : -1
+  }, {
+    "word" : "фондовую",
+    "frequency" : -1
+  }, {
+    "word" : "разблокировку",
+    "frequency" : 1
+  }, {
+    "word" : "ценных",
+    "frequency" : 3
+  }, {
+    "word" : "квал",
+    "frequency" : 3
+  }, {
+    "word" : "четыре",
+    "frequency" : 1
+  }, {
+    "word" : "сегрегированные",
+    "frequency" : -1
+  }, {
+    "word" : "соммоn",
+    "frequency" : -1
+  }, {
+    "word" : "удержанному",
+    "frequency" : 1
+  }, {
+    "word" : "овернайт",
     "frequency" : 1
   }, {
     "word" : "эцепешки",
     "frequency" : 1
   }, {
+    "word" : "номинированный",
+    "frequency" : -1
+  }, {
+    "word" : "иисов",
+    "frequency" : -1
+  }, {
+    "word" : "брокера",
+    "frequency" : 3
+  }, {
+    "word" : "Зарубеж",
+    "frequency" : -1
+  }, {
+    "word" : "плагин",
+    "frequency" : 1
+  }, {
+    "word" : "сальдировать",
+    "frequency" : -1
+  }, {
+    "word" : "комон",
+    "frequency" : 1
+  }, {
+    "word" : "депо",
+    "frequency" : -1
+  }, {
+    "word" : "Присвойте",
+    "frequency" : -1
+  }, {
+    "word" : "покеда",
+    "frequency" : 1
+  }, {
+    "word" : "трейд",
+    "frequency" : -1
+  }, {
+    "word" : "трейдингом",
+    "frequency" : 1
+  }, {
+    "word" : "звонили",
+    "frequency" : 1
+  }, {
+    "word" : "срочка",
+    "frequency" : -1
+  }, {
+    "word" : "брокеры",
+    "frequency" : 1
+  }, {
+    "word" : "торговля",
+    "frequency" : 1
+  }, {
+    "word" : "торговлю",
+    "frequency" : 1
+  }, {
+    "word" : "дивидендный",
+    "frequency" : -1
+  }, {
+    "word" : "опционами",
+    "frequency" : -1
+  }, {
+    "word" : "трехгодичная",
+    "frequency" : -1
+  }, {
+    "word" : "найс",
+    "frequency" : -1
+  }, {
+    "word" : "торгов",
+    "frequency" : 3
+  }, {
+    "word" : "metatrader",
+    "frequency" : 4
+  }, {
+    "word" : "шортить",
+    "frequency" : -1
+  }, {
+    "word" : "айти",
+    "frequency" : -1
+  }, {
+    "word" : "Маржинальная",
+    "frequency" : -1
+  }, {
+    "word" : "закупилось",
+    "frequency" : -1
+  }, {
     "word" : "войти",
     "frequency" : 3
+  }, {
+    "word" : "крика",
+    "frequency" : 1
+  }, {
+    "word" : "метак",
+    "frequency" : -1
+  }, {
+    "word" : "насдак",
+    "frequency" : -1
+  }, {
+    "word" : "брокерским",
+    "frequency" : 2
+  }, {
+    "word" : "транзаку",
+    "frequency" : -1
+  }, {
+    "word" : "квиком",
+    "frequency" : 3
+  }, {
+    "word" : "мосбиржи",
+    "frequency" : -1
+  }, {
+    "word" : "дисте",
+    "frequency" : -1
+  }, {
+    "word" : "шортовую",
+    "frequency" : -1
+  }, {
+    "word" : "коннектор",
+    "frequency" : -1
+  }, {
+    "word" : "финекс",
+    "frequency" : 2
+  }, {
+    "word" : "Евротранс",
+    "frequency" : 1
+  }, {
+    "word" : "деньги",
+    "frequency" : 4
+  }, {
+    "word" : "глобал",
+    "frequency" : -1
+  }, {
+    "word" : "финаме",
+    "frequency" : -1
+  }, {
+    "word" : "маржой",
+    "frequency" : -1
+  }, {
+    "word" : "шортится",
+    "frequency" : -1
+  }, {
+    "word" : "демоверсию",
+    "frequency" : -1
+  }, {
+    "word" : "неквалов",
+    "frequency" : 1
+  }, {
+    "word" : "алдохина",
+    "frequency" : -1
+  }, {
+    "word" : "вариационной",
+    "frequency" : 1
+  }, {
+    "word" : "однерки",
+    "frequency" : -1
+  }, {
+    "word" : "маржинальные",
+    "frequency" : -1
+  }, {
+    "word" : "физлицо",
+    "frequency" : 2
+  }, {
+    "word" : "КПУРа",
+    "frequency" : -1
+  }, {
+    "word" : "транзак",
+    "frequency" : -1
+  }, {
+    "word" : "разблокируют",
+    "frequency" : 1
+  }, {
+    "word" : "эпэшка",
+    "frequency" : 1
+  }, {
+    "word" : "форекс",
+    "frequency" : 8
+  }, {
+    "word" : "синхрофазотрона",
+    "frequency" : 1
+  }, {
+    "word" : "демо",
+    "frequency" : -1
+  }, {
+    "word" : "обычка",
+    "frequency" : 1
+  }, {
+    "word" : "эйпио",
+    "frequency" : 1
+  }, {
+    "word" : "тенге",
+    "frequency" : 1
+  }, {
+    "word" : "трейдинг",
+    "frequency" : 1
+  }, {
+    "word" : "СММА",
+    "frequency" : -1
+  }, {
+    "word" : "лосс",
+    "frequency" : -1
   }, {
     "word" : "сегрегированного",
     "frequency" : -1
   }, {
-    "word" : "Евротранс",
+    "word" : "картой",
+    "frequency" : 3
+  }, {
+    "word" : "алфа",
+    "frequency" : -1
+  }, {
+    "word" : "резидентство",
+    "frequency" : -1
+  }, {
+    "word" : "расчитывается",
+    "frequency" : -1
+  }, {
+    "word" : "сбер",
+    "frequency" : -1
+  }, {
+    "word" : "маржинальную",
+    "frequency" : -1
+  }, {
+    "word" : "разблокировке",
+    "frequency" : -1
+  }, {
+    "word" : "моносчетов",
+    "frequency" : -1
+  }, {
+    "word" : "клика",
     "frequency" : 1
+  }, {
+    "word" : "юанях",
+    "frequency" : -1
+  }, {
+    "word" : "превед",
+    "frequency" : 1
+  }, {
+    "word" : "даблю",
+    "frequency" : -1
+  }, {
+    "word" : "данные",
+    "frequency" : 4
+  }, {
+    "word" : "сальдирование",
+    "frequency" : -1
+  }, {
+    "word" : "вариационную",
+    "frequency" : -1
+  }, {
+    "word" : "маркетные",
+    "frequency" : -1
+  }, {
+    "word" : "форекса",
+    "frequency" : -1
+  }, {
+    "word" : "нерезиденту",
+    "frequency" : -1
+  }, {
+    "word" : "брокерского",
+    "frequency" : 2
   } ],
   "systemEntities" : [ {
     "name" : "mystem.geo",

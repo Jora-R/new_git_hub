@@ -1756,6 +1756,10 @@ theme: /
             q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
             # final answer
             
+        state: Брокер_IPOTarifs
+            # a: Тарифы IPO
+            go!: /IPO_Условия участия
+            
         state: Брокер_RateInformation
             script:
                 if ( typeof $session.tarifs == 'undefined'){
@@ -3368,6 +3372,10 @@ theme: /
             q: @repeat_please * ||toState = "."
             q: @disagree ||toState = "/Могу еще чем то помочь?/NO"
             # final answer
+            
+        state: Комиссия_IPO
+            # a: Тарифы IPO
+            go!: /IPO_Условия участия
         
     state: Комиссии_Форекс
         intent!: /007 Комиссии/Комиссии_Форекс
