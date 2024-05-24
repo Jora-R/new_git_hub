@@ -21750,7 +21750,7 @@
     },
     "records" : [ {
       "type" : "pattern",
-      "rule" : [ "комис* IPO" ],
+      "rule" : [ "комис* (IPO|айпио)" ],
       "value" : "{\n  \"name\": \"IPOComission\"\n}"
     }, {
       "type" : "pattern",
