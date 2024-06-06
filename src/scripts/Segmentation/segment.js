@@ -1,68 +1,82 @@
-function segment(phoneNumber){
-    var phoneNumberFinal = phoneNumber;
+// function segment(){
+//     var time = $jsapi.timeForZone("Europe/Moscow");
+//     var date = currentDate();
     
-    var time = $jsapi.timeForZone("Europe/Moscow");
-    var date = currentDate();
-    var day = date.locale("ru").format("dddd");
-    var hours = +moment(time).format("H");
-    var minutes = +moment(time).format("m");
+//     var hours = +moment(time).format("H");
+//     var day = date.locale("ru").format("dddd");
+//     var isVip = $jsapi.context().request.data.isVip;
+//     var ID_button = $jsapi.context().request.data.pressedButtonId;
+//     // isVip = true; // поле используется для теста нажатой кнопки рассылки
+//     if(ID_button == "" && $jsapi.context().session.to_division == undefined ){
+//         if((isVip == true) && ((day != 'воскресенье') && (day != 'суббота')) && (date.format("D/M/YYYY") != '3/3/2024') && (date.format("D/M/YYYY") != '8/3/2024') && (hours >= 10 && hours < 21)){ //если будний день будет выходным, то добавить (date.format("D/M/YYYY") != '1/1/2024')
+//             // $jsapi.context().session.to_division = "150ee7d9-1250-498f-ab33-2826f446b851"; // премиум дев1;
+//             $jsapi.context().session.to_division = "beb72565-ddaa-4fe1-9958-44b1c05467ac"; // премиум прод
+//         } else {
+//             // $jsapi.context().session.to_division = "abffdc56-aa1f-4fa8-bb19-ee52349c4bdc"; //кц дев3
+//             $jsapi.context().session.to_division = "2dec6d3f-1def-42ee-a6ec-a5e19addab04"; //кц прод
+//         }
+//         // if((isVip == true) && ((date.format("D/M/YYYY") == '1/1/2024') || (date.format("D/M/YYYY") == '2/1/2024')) && (hours >= 10 && hours < 19)){
+//         //     $jsapi.context().session.to_division = "150ee7d9-1250-498f-ab33-2826f446b851"; // премиум дев1;
+//         //     // $jsapi.context().session.to_division = "beb72565-ddaa-4fe1-9958-44b1c05467ac"; // премиум прод
+//         // } // для рабочих дней в сб и вс или особенных пн-пт
+//     }
+// }
+
+function segment(){
+    var holidayPremDateList = [
+                            '29/4/2024', 
+                            '30/4/2024', 
+                            '1/5/2024',
+                            '9/5/2024', 
+                            '10/5/2024', 
+                        ];
     
-    var exceptionPhoneNumber = ["3400", "2200", "3411", "3887", "1111", "3333"];//перечень отделов исключений, на них сегментация не распространяется
-    
-    var holidayDayList =    [
+    var holidaySuppDateList = [   
                             '29/4/2024', 
                             '30/4/2024', 
                             '1/5/2024',
                             '9/5/2024', 
                             '10/5/2024',
-                            ];
-    var indexOf = holidayDayList.indexOf(date.format("D/M/YYYY"));
-    // Проверка на наличие флага принудительной отмены сегментации
-    if($jsapi.context().session.noSegment){
-        return phoneNumberFinal;
-    }
-    // Проверка что выбранный добавочный не является исключением
-    if(exceptionPhoneNumber.indexOf(phoneNumberFinal) !== -1){
-        return phoneNumberFinal;
-    }
+                        ];
+    var time = $jsapi.timeForZone("Europe/Moscow");
+    var date = currentDate();
     
-    if((day != 'воскресенье') && ((day != 'суббота') || (date.format("D/M/YYYY") == "27/4/2024")) && (indexOf === -1) && (hours >= 20 && hours < 21)){
-        var resultDetokenization = phoneNumberDetokenization();
-        if(resultDetokenization == "error"){
-            $analytics.setMessageLabel("Детокенизация не прошла VB", "Сегмент");
-            $jsapi.context().session.officePhone = "Оператора поддержки";
-            $jsapi.context().session.departmentName = $jsapi.context().session.officePhone;
-            phoneNumberFinal = "2222";
+    var hours = +moment(time).format("H");
+    var day = date.locale("ru").format("dddd");
+    
+    var todayCurrentDate = date.format("D/M/YYYY");
+    var indexOfPrem = holidayPremDateList.indexOf(todayCurrentDate);
+    var indexOfSupp = holidaySuppDateList.indexOf(todayCurrentDate);
+    
+    var isVip = $jsapi.context().request.data.isVip;
+    var ID_button = $jsapi.context().request.data.pressedButtonId;
+    
+    // isVip = true; // поле используется для теста нажатой кнопки рассылки
+    // ID_button = "";
+    if(((ID_button == "") || (ID_button == undefined)) && $jsapi.context().session.to_division == undefined ){
+
+        if((isVip == true) && ((day != 'воскресенье') && ((day != 'суббота') || (todayCurrentDate == '27/4/2024'))) && (indexOfPrem === -1)  && (hours >= 10 && hours < 21)){ //если будний день будет выходным, то добавить (date.format("D/M/YYYY") != '1/1/2024')
+            // $jsapi.context().session.to_division = "150ee7d9-1250-498f-ab33-2826f446b851"; // премиум дев1;
+            $jsapi.context().session.to_division = "beb72565-ddaa-4fe1-9958-44b1c05467ac"; // премиум прод
+            $analytics.setMessageLabel("Премиум TB", "Сегмент");
         } else {
-            var resultGetGlobalID = getGlobalID(resultDetokenization);
-            if((resultGetGlobalID == "error1") || (resultGetGlobalID == "error2")){
-                $analytics.setMessageLabel("Отсутствует GlobalID VB", "Сегмент");
-                $jsapi.context().session.officePhone = "Оператора поддержки";
-                $jsapi.context().session.departmentName = $jsapi.context().session.officePhone;
-                phoneNumberFinal = "2222";
+            // $reactions.answer(JSON.stringify(profileCRM().Result.ClientStatus));
+            if(((profileCRM() != undefined) && (profileCRM().Result.ClientStatus == null)) && ((day != 'воскресенье') && ((day != 'суббота') || (todayCurrentDate == '27/4/2024'))) && (indexOfSupp === -1) && (hours >= 10 && hours < 19)){
+                // $jsapi.context().session.to_division = "5ec8de6b-7786-49b5-a3e5-d7bcc938cbb4"; //поддержка дев2
+                $jsapi.context().session.to_division = "ee7dc4b0-81f9-40dd-8c35-d424fc087649"; //поддержка прод
+                $analytics.setMessageLabel("Поддержка TB", "Сегмент");
             } else {
-                var resultGetProfileCRM = getProfileCRM(resultGetGlobalID);
-                if(resultGetProfileCRM == "error"){
-                    $analytics.setMessageLabel("Нет профиля CRM VB", "Сегмент");
-                    $jsapi.context().session.officePhone = "Оператора поддержки";
-                    $jsapi.context().session.departmentName = $jsapi.context().session.officePhone;
-                    phoneNumberFinal = "2222";
-                } else {
-                    if((resultGetProfileCRM != undefined) && (resultGetProfileCRM.Result.ClientStatus != null)){
-                        $analytics.setMessageLabel("Клиент со статусом VB", "Сегмент");
-                        $jsapi.context().session.officePhone = "Оператора поддержки";
-                        $jsapi.context().session.departmentName = $jsapi.context().session.officePhone;
-                        phoneNumberFinal = "2222";    
-                    } else {
-                        $analytics.setMessageLabel("Клиент без статуса VB", "Сегмент");
-                        $jsapi.context().session.officePhone = "Оператора поддержки";
-                        $jsapi.context().session.departmentName = $jsapi.context().session.officePhone;
-                        phoneNumberFinal = "3666";
-                    }
-                }
+                // $jsapi.context().session.to_division = "abffdc56-aa1f-4fa8-bb19-ee52349c4bdc"; //кц дев3
+                $jsapi.context().session.to_division = "2dec6d3f-1def-42ee-a6ec-a5e19addab04"; //кц прод
+                $analytics.setMessageLabel("КЦ TB", "Сегмент");
+                
             }
         }
-    } 
-    $jsapi.context().session.operatorPhoneNumber = phoneNumberFinal;
-    return phoneNumberFinal;
+        
+        if((isVip == true) && ((todayCurrentDate == '29/4/2024') || (todayCurrentDate == '30/4/2024') || (todayCurrentDate == '10/5/2024')) && (hours >= 10 && hours < 19)){
+            // $jsapi.context().session.to_division = "150ee7d9-1250-498f-ab33-2826f446b851"; // премиум дев1;
+            $jsapi.context().session.to_division = "beb72565-ddaa-4fe1-9958-44b1c05467ac"; // премиум прод
+            $analytics.setMessageLabel("Премиум TB", "Сегмент");
+        } // для рабочих дней в сб и вс или особенных пн-пт
+    }
 }
