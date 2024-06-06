@@ -7,44 +7,16 @@ language: ru
 
 tests:
   include:
-    - test.xml
-
-injector:
-    #dev токен КВАЛ ЦБ
-    #api_key_kval: "eyJraWQiOiI0MWRjYTE5Mi0wNTc4LTRiZTEtYTM2Zi04NjNhZTlmNDU0YmUiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhcmVhIjoiZGV2Iiwic2NvbnRleHQiOiJDZ3NJQnhJSGRXNXJibTkzYmdvb0NBTVNKRGRsTURNME1EWmxMVE5rWVRVdE5HRTRZUzFoT1ROa0xXSmlZV1ppWW1Nd05qbGhaZ29FQ0FVU0FBb0tDQUFTQmxORlVsWkZVZ29mQ0FJU0cxTkZVbFpKUTBVdFkyaGhkQzFpYjNRdE1qQXlNeTB3TXkwd053b0ZDQWdTQVRFS0JBZ0pFZ0FLQkFnS0VnQUtLQWdFRWlRME1XUmpZVEU1TWkwd05UYzRMVFJpWlRFdFlUTTJaaTA0TmpOaFpUbG1ORFUwWW1VU0JBZ0tFZ0FhREFqdStadWdCaERBdzY3MUFpSU1DTzZweExRSEVNRERydlVDIiwiemlwcGVkIjp0cnVlLCJjcmVhdGVkIjoiMTY3ODE3OTU2NiIsInJlbmV3RXhwIjoiMTk4OTMwNTk2NiIsInNlc3MiOiJINHNJQUFBQUFBQUEvMU1xNFZJeE16SkxzVWhKTTlRMVRERkswalZKU3JiVVRVbzFNZGMxVFUweE0wcXlURTR5TkRVVjRyc3c0Y0x1QzFzdjdMcllDQ1IzU25GZG1IeXgrY0xHQ3pzdTdGVVNUaTlOeXN4elNNNHZLdEJMeTh4THpOVXJLbldTRG5ZTkN2TjBkdFZOemtnczBVM0tMOUUxTWpBeTFqVUFJdk1PUmlZQU9qeU5QWGtBQUFBIiwiaXNzIjoidHhzZXJ2ZXIiLCJrZXlJZCI6IjQxZGNhMTkyLTA1NzgtNGJlMS1hMzZmLTg2M2FlOWY0NTRiZSIsImZpcmViYXNlIjoiIiwic2VjcmV0cyI6Im9rNWppK2htb1lRUlN0WjQ3MEFtWUE9PSIsInByb3ZpZGVyIjoiSU5URVJOQUwiLCJzY29wZSI6IkNBRVFBUSIsInRzdGVwIjoiZmFsc2UiLCJleHAiOjE5ODkyMTk1NjYsImp0aSI6IjdlMDM0MDZlLTNkYTUtNGE4YS1hOTNkLWJiYWZiYmMwNjlhZiJ9.HatwaQC9cqCx58IbJ1LAEnOFWFyAFvvl_T7V1h3G5iqOnZ3wLHiq48weEB2Y4llU-PRtmxq4KQELnMZWLctE0Q"
-    #prod токен КВАЛ ЦБ
-    api_key_kval: "eyJraWQiOiJkNmRmOWJkNi1jOWZkLTQzZTctODdjMy1iY2JjNWFkOWZiODciLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhcmVhIjoidHQiLCJzY29udGV4dCI6IkNnc0lCeElIZFc1cmJtOTNiZ29vQ0FNU0pEYzBNV1l6T1RkakxUVXdNbVl0TkdFMllTMWhaVGxpTFdWbE5EQTNNbUZqTWpBMk13b0VDQVVTQUFvTENBQVNCM1Z1YTI1dmQyNEtLQWdDRWlRNFpqYzJNekl5WmkxbFpERmxMVFEzTkdVdE9UVmtaaTB3Wm1OaFpXTTBNV1ZpTVRRS0JRZ0lFZ0V4Q2dRSUNSSUFDZ1FJQ2hJQUNpZ0lCQklrWkRaa1pqbGlaRFl0WXpsbVpDMDBNMlUzTFRnM1l6TXRZbU5pWXpWaFpEbG1ZamczRWdRSUNoSUFHZ3dJamFyTnBnWVF3TnVTMVFFaURBaU4ydlc2QnhEQTI1TFZBUSIsInppcHBlZCI6dHJ1ZSwiY3JlYXRlZCI6IjE2OTE1NzE0NjkiLCJyZW5ld0V4cCI6IjIwMDI2OTc4NjkiLCJzZXNzIjoiSDRzSUFBQUFBQUFBQUZOSzVWSXhORFkydGt4Tk5ORTFNell5MURVeFRUSFNUVXhOdGRRMVR6VzBUTEpNTkxKTU16VVM0cm93NGNMdUN6c3U3TDJ3UVlydndod1E2MkwvaFoxQXNYMUs0b201bVhtVmlaazUrUTdKK1VVRmVtbVplWW01ZWtXbFRoeDUrYm81K2VtWmVSMk1UQUNqVUlFbGFnQUFBQSIsImlzcyI6InR4c2VydmVyIiwia2V5SWQiOiJkNmRmOWJkNi1jOWZkLTQzZTctODdjMy1iY2JjNWFkOWZiODciLCJmaXJlYmFzZSI6IiIsInNlY3JldHMiOiI2N0lPaWVzN1B4em4vakJHV1A0V2VBPT0iLCJwcm92aWRlciI6IklOVEVSTkFMIiwic2NvcGUiOiJDQUVRQVEiLCJ0c3RlcCI6ImZhbHNlIiwiZXhwIjoyMDAyNjExNDY5LCJqdGkiOiI3NDFmMzk3Yy01MDJmLTRhNmEtYWU5Yi1lZTQwNzJhYzIwNjMifQ.i9VkMZi3sOD9bMoQP4bm1R_y2NdhphBqI9sMZuAVCr9TJW4P6jDw5eZJkENP9pzRwG_gpehVkFD95jtT98CM9Q"
-    
-    # dev
-    # token_txchat: "Xdchcxsd:a9f96344ca6d5408cbe90ca4891581053bba627b"
-    # url_txchat: "https://cbdev.finam.ru/txchat/chatbot/"
-    # uat
-    # token_txchat: "OZMLAcgp:10b30bdd34e4e2cf89eb559e0f7941d679b9f8d6"
-    # url_txchat: "https://uat-txchat.finam.ru/txchat/chatbot/"
-    # uat txchat-prod jaicp
-    # token_txchat: "yqNdotaQ:bc758ce86bc690812f11f515e61e59afa7be4126"
-    # url_txchat: "https://uat-txchat.finam.ru/txchat/chatbot/"
-    # prod
-    token_txchat: "yqNdotaQ:bc758ce86bc690812f11f515e61e59afa7be4126"
-    url_txchat: "https://txchat.finam.ru/txchat/chatbot/"
-    
-    # test crm
-    # url_callCRM: "https://testcrm2.finam.ru/ISV/api/Finam.MSCRM.CommonDataService/Kafka/CreateResponce"
-    # url_profileCRM: "https://testcrm2.finam.ru/ISV/api/Finam.MSCRM.PersonDetailsService/Details?GlobalId="
-    # api_key_callCRM: "FC460E0E90494BBD95603A5FEF3A720C"
-    # prod crm
-    url_callCRM: "https://crm.finam.ru/ISV/api/Finam.MSCRM.CommonDataService/Kafka/CreateResponce"
-    url_profileCRM: "https://crm.finam.ru/ISV/api/Finam.MSCRM.PersonDetailsService/Details?GlobalId="
-    api_key_callCRM: "B46D99343B9C45A29DFC24550CEA21D7"
-    
-
+    - margin_trading.xml
+    - obuchenie.xml
 
 nlp:
-  modifyRequestInPreMatch: true
   intentNoMatchThresholds:
-    phrases: 0.2
-    patterns: 0.2
-  lengthLimit:
-    enabled: true
-    symbols: 200
-    words: -1    
+    phrases: 0.3
+    patterns: 0.5
+
+injector:
+  slotfilling:
+    maxSlotRetries: 3
+    stopOnAnyIntent: false
+    stopOnAnyIntentThreshold: 0.2
