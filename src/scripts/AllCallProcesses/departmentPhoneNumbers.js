@@ -36,12 +36,12 @@ function getPhoneByDateTime(operatorPhoneNumber){
         }
         
         // праздники - выходные дни в дату
-        if((date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '9/5/2024')) {
+        if((date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '12/6/2024')) {
             operatorPhoneNumber = '1000';
         }
         
         // праздники - сокращенный день в дату
-        if((date.format("D/M/YYYY") == '29/4/2024') || (date.format("D/M/YYYY") == '30/4/2024') || (date.format("D/M/YYYY") == '10/5/2024')) {
+        if((date.format("D/M/YYYY") == '29/4/2024') || (date.format("D/M/YYYY") == '30/4/2024') || (date.format("D/M/YYYY") == '10/5/2024') || (date.format("D/M/YYYY") == '12/6/2024')) {
             if(hours < 10 || hours >= 19){
                 operatorPhoneNumber = '1000';
             }    
@@ -74,7 +74,7 @@ function getPhoneByDateTime(operatorPhoneNumber){
         }
         
         // праздники - выходные дни в дату
-        if((date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '9/5/2024')) {
+        if((date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '9/5/2024') || (date.format("D/M/YYYY") == '12/6/2024')) {
             operatorPhoneNumber = '1000';
         }
         
@@ -97,7 +97,7 @@ function getPhoneByDateTime(operatorPhoneNumber){
         }
         
         // праздники - выходные дни в дату
-        if((date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '9/5/2024')) {
+        if((date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '9/5/2024') || (date.format("D/M/YYYY") == '12/6/2024')) {
             operatorPhoneNumber = '1000';
         }
         
@@ -120,7 +120,7 @@ function getPhoneByDateTime(operatorPhoneNumber){
         }
         
         // праздники - выходные дни в дату
-        if((date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '9/5/2024')) {
+        if((date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '9/5/2024') || (date.format("D/M/YYYY") == '12/6/2024')) {
             operatorPhoneNumber = '1000';
         }
         
@@ -143,7 +143,7 @@ function getPhoneByDateTime(operatorPhoneNumber){
         }
         
         // праздники - выходные дни в дату
-        if((date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '9/5/2024')) {
+        if((date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '9/5/2024') || (date.format("D/M/YYYY") == '12/6/2024')) {
             operatorPhoneNumber = '1000';
         }
         
@@ -152,21 +152,6 @@ function getPhoneByDateTime(operatorPhoneNumber){
             if(hours < 10 || hours >= 19){
                 operatorPhoneNumber = '1000';
             }    
-        }
-    }
-    
-    // Контакт центр                    
-    if(operatorPhoneNumber == '1000') {
-        if(day == 'воскресенье'){
-            operatorPhoneNumber = '2222';
-        } else if((day == 'суббота') && (date.format("D/M/YYYY") != '27/4/2024')){
-            if(hours < 10 || hours >= 16){
-                operatorPhoneNumber = '2222';
-            }
-        } else {
-            if(hours < 9 || hours >= 21){
-                operatorPhoneNumber = '2222';
-            }
         }
     }
     
@@ -185,7 +170,7 @@ function getPhoneByDateTime(operatorPhoneNumber){
         }
         
         // праздники - выходные дни в дату
-        if((date.format("D/M/YYYY") == '29/4/2024') || (date.format("D/M/YYYY") == '30/4/2024') || (date.format("D/M/YYYY") == '10/5/2024') || (date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '9/5/2024')) {
+        if((date.format("D/M/YYYY") == '29/4/2024') || (date.format("D/M/YYYY") == '12/6/2024')) {
             operatorPhoneNumber = '1000';
         }
     }
@@ -205,7 +190,7 @@ function getPhoneByDateTime(operatorPhoneNumber){
         }
         
         // праздники - выходные дни в дату
-        if((date.format("D/M/YYYY") == '29/4/2024') || (date.format("D/M/YYYY") == '30/4/2024') || (date.format("D/M/YYYY") == '10/5/2024') || (date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '9/5/2024')) {
+        if((date.format("D/M/YYYY") == '29/4/2024') || (date.format("D/M/YYYY") == '12/6/2024')) {
             operatorPhoneNumber = '1000';
         }
     }
@@ -221,7 +206,7 @@ function getPhoneByDateTime(operatorPhoneNumber){
         }
         
         // праздники - выходные дни в дату
-        if((date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '9/5/2024')) {
+        if((date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '12/6/2024')) {
             operatorPhoneNumber = '1000';
         }
         
@@ -244,8 +229,27 @@ function getPhoneByDateTime(operatorPhoneNumber){
         }
         
         // праздники - выходные дни в дату
-        if((date.format("D/M/YYYY") == '29/4/2024') || (date.format("D/M/YYYY") == '30/4/2024') || (date.format("D/M/YYYY") == '10/5/2024') || (date.format("D/M/YYYY") == '1/5/2024') || (date.format("D/M/YYYY") == '9/5/2024')) {
+        if((date.format("D/M/YYYY") == '29/4/2024') || (date.format("D/M/YYYY") == '12/6/2024')) {
             operatorPhoneNumber = '1000';
+        }
+    }
+    
+    // Контакт центр                    
+    if(operatorPhoneNumber == '1000') {
+        if(day == 'воскресенье'){
+            operatorPhoneNumber = '2222';
+        } else if((day == 'суббота') && (date.format("D/M/YYYY") != '27/4/2024')){
+            if(hours < 10 || hours >= 16){
+                operatorPhoneNumber = '2222';
+            }
+        } else {
+            if(hours < 9 || hours >= 21){
+                operatorPhoneNumber = '2222';
+            }
+        }
+        
+        if((date.format("D/M/YYYY") == '12/6/2024')) {
+            operatorPhoneNumber = '2222';
         }
     }
     

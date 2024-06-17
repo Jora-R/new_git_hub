@@ -2,6 +2,8 @@ function getGlobalID(phoneNumber){
     
     // var phoneNumber = "+7(916) 363-44-16"; //Ира
     // var phoneNumber = "+7(952) 202-32-47"; //Катя
+    // var phoneNumber = "79163737777"; // Ковтун
+    
     
     var response = $http.query("https://global-data-api.finam.ru/v1/globaldata/find", {
         method: "POST",
@@ -38,6 +40,9 @@ function getGlobalID(phoneNumber){
               return response.data.data[i].actualGlobalId  
             }
         }
+        if (response.data.data.length > 1) {
+            return "error1";
+        }
         $jsapi.context().client.getGlobalID = response.data.data[0];
         return response.data.data[0].actualGlobalId;
     } 
@@ -48,3 +53,65 @@ function getGlobalID(phoneNumber){
         return "error2";
     }
 }
+
+
+// ЕСЛИ В КАРТОЧКЕ НЕСКОЛЬКО ФИЗИКОВ С РАЗНЫМИ СТАТУСАМИ И НУЖНО ВЫБРАТЬ ЛУЧШЕГО
+   //Итоговая проверка ошибок
+//     if (response.isOk){
+//         for (var i in response.data.data) {
+//             if (response.data.data[i].type == "L"){
+//                 $analytics.setMessageLabel("ЮЛ", "IVR");
+//                 $jsapi.context().client.getGlobalID = response.data.data[i];
+//               return response.data.data[i].actualGlobalId  
+//             }
+//         }
+//         var userArrayIndex = selectUserProfile(response.data.data);
+//         $jsapi.context().client.getGlobalID = response.data.data[userArrayIndex];
+//         return response.data.data[userArrayIndex].actualGlobalId;
+//     } 
+//     else if (response.status == "404" && responseError.code == "5"){
+//         return "error1";
+//     }
+//     else {
+//         return "error2";
+//     }
+// }
+
+// function selectUserProfile(userArray){
+//     $reactions.answer(1);
+//     if(userArray.length === 1){
+//         return 0;
+//     }
+//     $reactions.answer(2);
+//     for (var i in userArray) {
+//         var profileCRM = getProfileCRM(userArray[i].actualGlobalId);
+//         $reactions.answer(22);
+//         if((profileCRM == "") || (profileCRM == null) || (profileCRM == "error")){
+//             userArray[i]["isVip"] = false;
+//             userArray[i]["clientStatus"] = null;
+//         }
+//         $reactions.answer(222);
+//         userArray[i]["isVip"] = profileCRM.Result.IsVip;
+//         userArray[i]["clientStatus"] = profileCRM.Result.ClientStatus;
+//     }
+//     $reactions.answer(3);
+//     for (var i in userArray) {
+//         if(userArray[i]["isVip"] == true){
+//             return i;
+//         }
+//     }
+//     $reactions.answer(4);
+//     for (var i in userArray) {
+//         if(userArray[i]["clientStatus"] == "Престиж"){
+//             return i;
+//         }
+//     }
+//     $reactions.answer(5);
+//     for (var i in userArray) {
+//         if(userArray[i]["clientStatus"] != null){
+//             return i;
+//         }
+//     }
+//     $reactions.answer(6);
+//     return 0;
+// }

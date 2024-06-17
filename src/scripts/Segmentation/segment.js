@@ -15,6 +15,7 @@ function segment(phoneNumber){
                             '1/5/2024',
                             '9/5/2024', 
                             '10/5/2024',
+                            '12/6/2024',
                             ];
     var indexOf = holidayDayList.indexOf(date.format("D/M/YYYY"));
     // Проверка на наличие флага принудительной отмены сегментации

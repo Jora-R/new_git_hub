@@ -5,6 +5,7 @@ function identification(){
     
     var resultDetokenization = phoneNumberDetokenization();
         if(resultDetokenization == "error"){
+            $analytics.setMessageLabel("Детокенизация не прошла VB", "Сегмент");
             // $reactions.answer("Ошибка");
             return "error";
         } else {
@@ -14,11 +15,13 @@ function identification(){
             $jsapi.context().client.personGlobalID = resultGetGlobalID;
             // $reactions.answer("получил глобал айди 2");
             if((resultGetGlobalID == "error1") || (resultGetGlobalID == "error2")){
+                $analytics.setMessageLabel("Отсутствует GlobalID VB", "Сегмент");
                return "error";
             } else {
                 // $reactions.answer("Прошел глобал айди");
                 var resultGetProfileCRM = getProfileCRM(resultGetGlobalID);
                 if((resultGetProfileCRM == "") || (resultGetProfileCRM == null) || (resultGetProfileCRM == "error")){
+                    $analytics.setMessageLabel("Нет профиля CRM VB", "Сегмент");
                     return "error";
                 }
                 $jsapi.context().client.profileCRM = resultGetProfileCRM;

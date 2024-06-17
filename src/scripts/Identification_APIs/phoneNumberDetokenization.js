@@ -8,6 +8,21 @@ function phoneNumberDetokenization(){
     var value = $dialer.getCaller();
     // var value = "fervour-7oCv_IwR6kHCwX3T-XaTlA=="; // Для теста на конкретном человеке
     // var value = "3е2е3е34е5н445"; // Для теста на конкретном человеке
+    // var value = "7924"; // Для теста на конкретном человеке
+    // var value = "webcall"; // Для теста звонок с сайта
+    
+    $jsapi.context().session.specificPhoneNumber = "default";
+ 
+    if (value != undefined) {
+        if (value.length === 4){
+            $jsapi.context().session.specificPhoneNumber = "short"; //задаем флаг если звонок осуществляется с добавочного номера
+            return "error";
+        }
+        if (value == "webcall"){
+            $jsapi.context().session.specificPhoneNumber = "webcall"; //задаем флаг если звонок осуществляется с добавочного номера
+            return "error";
+        }
+    }
     
     var Authorization = "Basic ";
     
