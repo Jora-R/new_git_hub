@@ -30,7 +30,7 @@ function holiday($context, countersArray, currentState){
     
     var date = currentDate();
     
-    var allHolidaysDates = "2/7/2024 3/7/2024 4/7/2024 1/7/2024 12/6/2024";
+    var allHolidaysDates = "12/7/2024 13/7/2024 14/7/2024 15/7/2024 12/6/2024";
     
     var allHolidaysArray = allHolidaysDates.split(' ');
     
@@ -40,7 +40,7 @@ function holiday($context, countersArray, currentState){
         
         if(currentState == "/Доступные биржи" && countersArray[0] == true){
             
-        $reactions.answer("4 июля – день Независимости в США. Торги и расчёты на американских биржах не проводятся.");
+        $reactions.answer("15 июля — Праздничный день в Турции. Торги и расчеты с турецкой лирой в режиме today и СВОП не проводятся.");
         countersArray[0] = false;
         return 0;    
         
@@ -48,7 +48,7 @@ function holiday($context, countersArray, currentState){
         
         if(currentState == "/Время торгов" && countersArray[1] == true){
             
-        $reactions.answer("4 июля – день Независимости в США. Торги и расчёты на американских биржах не проводятся.");
+        $reactions.answer("15 июля — Праздничный день в Турции. Торги и расчеты с турецкой лирой в режиме today и СВОП не проводятся.");
         countersArray[1] = false;
         return 0;    
         
@@ -56,7 +56,7 @@ function holiday($context, countersArray, currentState){
         
         if(currentState == "/Режим расчетов" && countersArray[2] == true){
             
-        $reactions.answer("4 июля – день Независимости в США. Торги и расчёты на американских биржах не проводятся.");
+        $reactions.answer("15 июля — Праздничный день в Турции. Торги и расчеты с турецкой лирой в режиме today и СВОП не проводятся.");
         countersArray[2] = false;
         return 0;    
         
